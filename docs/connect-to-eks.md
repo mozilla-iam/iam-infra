@@ -18,4 +18,4 @@ document](create-and-destroy-eks.md#authenticating-and-adding-worker-nodes-to-cl
 The AWS documentation provides a nice overview of [cluster
 authentication](https://docs.aws.amazon.com/eks/latest/userguide/managing-auth.html).
 
-[!auth-architecture](https://docs.aws.amazon.com/eks/latest/userguide/images/eks-iam.png)
+![auth-architecture](https://docs.aws.amazon.com/eks/latest/userguide/images/eks-iam.png)
