@@ -25,7 +25,7 @@ If someone compromises one pod, they won't be able to access the secrets for the
 
 Create a new service role for kube2iam if RBAC is enabled on your cluster. We do have RBAC enabled so this is required.
 
-```
+```yaml
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -36,14 +36,14 @@ metadata:
 
 Apply this with `kubectl`:
 
-```
+```sh
 $ kubectl apply -f kube2iam-service-role.yaml
 serviceaccount "kube2iam" unchanged
 ```
 
 Setup the role and binding:
 
-```
+```yaml
 ---
 apiVersion: v1
 items:
@@ -72,7 +72,7 @@ kind: List
 
 Apply with `kubectl`:
 
-```
+```sh
 $ kubectl apply -f kube2iam-role-bindings.yaml
 serviceaccount "kube2iam" unchanged
 ```
@@ -83,7 +83,7 @@ Source: https://github.com/jtblin/kube2iam#rbac-setup
 
 You can `kubectl` apply the following daemonset YAML:
 
-```
+```yaml
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
@@ -128,7 +128,7 @@ In this daemonset, we have diverged from the kube2iam documentation when passing
 
 You should have a kube2iam pod running on each worker node in your cluster. In my case, I have two nodes:
 
-```
+```sh
 $ kubectl get pods -n kube-system | grep kube2iam
 kube2iam-m5vmr             1/1       Running   0          2d
 kube2iam-pjzpn             1/1       Running   0          2d
@@ -138,7 +138,7 @@ You'll want to refer to the kube2iam documentation to see how annotations are us
 
 As a general note, I did find the following useful for testing kube2iam. I created a new pod with the following YAML and tested different annotations and resource requests:
 
-```
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
