@@ -35,7 +35,8 @@ variable "cluster-name" {
 ```
 
 Edit the `providers.tf` file to include the S3 bucket for shared state and a
-key name for the state file.:
+key name for the state file. You must update the key name so you are not
+overwriting a shared state file for another cluster.
 
 ```
 # Shared state configuration
@@ -43,7 +44,7 @@ key name for the state file.:
 terraform {
   backend "s3" {
     bucket  = ""
-    key     = "iam-eks-cluster/development/terraform.tfstate"
+    key     = "iam-eks-cluster/I_USE_CLUSTER_NAME_HERE/terraform.tfstate"
   }
 }
 ```
