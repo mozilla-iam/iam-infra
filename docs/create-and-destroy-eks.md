@@ -81,7 +81,7 @@ $ cd eks-deployment
 
 Edit the `variables.tf` file to include your desired `cluster-name`:
 
-```json
+```hcl
 #
 # Variables Configuration
 #
@@ -96,7 +96,7 @@ Edit the `providers.tf` file to include the S3 bucket for shared state and a
 key name for the state file. You must update the key name so you are not
 overwriting a shared state file for another cluster.
 
-```json
+```hcl
 # Shared state configuration
 
 terraform {
