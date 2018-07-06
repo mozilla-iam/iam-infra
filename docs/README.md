@@ -1,12 +1,11 @@
-# docs
+# IAM Kubernetes Handbook
 
-## Cluster management
+This handbook is structured in three parts:
 
-* [Create and destroy an EKS cluster](create-and-destroy-eks.md)
-* [Connect to EKS](connect-to-eks.md)
-* [Cluster addons or extensions](cluster-addons.md)
+* [EKS cluster management](create-and-destroy-eks.md) - Managing cluster resources in AWS.
+* [Kubernetes administration](connect-to-eks.md) - Includes topics like user management and cluster addons.
+* [CI/CD and manual deployments](cluster-addons.md) - Deploy a sample application through a CI/CD pipeline using AWS tools.
 
 ## Notes
 
-Use these resources to setup a cluster, administer it, extend it with things like kube2iam or Calico, etc.
-
+Use these resources to setup a cluster, administer it, and extend it with addons like kube2iam and Calico.
