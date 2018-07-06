@@ -117,17 +117,6 @@ $ terraform plan
 $ terraform apply
 ```
 
-# OLD STUFF
-
-After that, you can run your Terraform init, plan and apply from the root of the
-repository:
-
-```sh
-$ terraform init
-$ terraform plan
-$ terraform apply
-```
-
 ## <a id="toc-test-auth"></a>Test cluster authentication
 
 When Terraform is done applying resources, you will receive a config map to apply and a `kubeconfig` file that you can use to interact with the cluster.
