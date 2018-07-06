@@ -23,13 +23,27 @@ Generally speaking, a new user should refer to the Kubernetes documentation for 
 
 # <a id="toc-user-management"></a>User Management
 
-Work in progress.
+EKS user management requires two separate changes. A user or role will need to be created in IAM. That ARN can be added to the `aws-auth` ConfigMap in Kuberenetes to authorize it to perform certain actions associated with a user and groups.
 
 ## <a id="toc-add-user"></a>Add a new user
 
 ## <a id="toc-add-user-in-iam"></a>Configure IAM
 
+Create a [new user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) or [role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create.html) in IAM. Take care to ensure that new users setup MFA. Once this work is complete, make a note of the ARN for the user or role.
+
 ## <a id="toc-add-user-to-configmap"></a>Configure ConfigMap
+
+Please read the linked documentation for a comprehensive overview of this process. Here is an example of the udpated ConfigMap might contain:
+
+```yaml
+  mapUsers: |
+    - userarn: arn:aws:iam::555555555555:user/admin
+      username: admin
+      groups:
+        - system:masters
+```
+
+[Source](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html).
 
 # <a id="toc-kube2iam-setup"></a>kube2iam setup
 
