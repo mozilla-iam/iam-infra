@@ -1,44 +1,47 @@
 # EKS cluster management
 
-This document provides instructions for Kubernetes cluster administration (user management). We also focus on managing cluster addons which are essential to meet our security best practices.
+This document provides instructions for Kubernetes cluster administration (user management). It also focuses on managing cluster addons like kube2iam.
 
 See the [README](/README.md) for related documents.
 
 # Table of Contents
 
 - [Introduction](#toc-introduction)
-- [Overview](#toc-overview)
-  - [kube2iam](#toc-kube2iam)
-  - [Calico](#toc-calico)
-  - [User management](#toc-summary-user-management)
 - [User management](#toc-user-management)
-  - [Add a new IAM user](#toc-add-iam-user)
+  - [Add a new user](#toc-add-user)
     - [Configure IAM](#toc-add-user-in-iam)
     - [Configure ConfigMap](#toc-add-user-to-configmap)
 - [kube2iam setup](#toc-kube2iam-setup)
   - [Service account and role binding](#toc-kube2iam-role)
   - [Daemonset](#toc-kube2iam-daemonset)
   - [Testing the configuration](#toc-kube2iam-testing)
-- [Calico setup](#toc-calico-setup)
-  - [Undefined](#toc-calico-undefined)
+  - [Role naming](#toc-role-naming)
 
 # <a id="toc-introduction"></a>Introduction
 
-This document is a work in progress.
+Generally speaking, a new user should refer to the Kubernetes documentation for questions about cluster administration. In this document, I do want to provide a quick reference for actions that I expect to be repeated across all of our clusters. As of today, I know that we will be setting up new users, roles, kube2iam and Calico after every new cluster is created. Until these documented steps are automated, this should be a useful resource.
 
-### kube2iam
+# <a id="toc-user-management"></a>User Management
 
-#### Why?
+Work in progress.
 
-kube2iam will allow us to impose strict control over the AWS API calls that can be made by individual pods. This is useful for many reasons but we can imagine having `webservice-01` and `webservice-02`. Each has a set of secrets to perform its function. We can create an IAM role for each web service which only provides access to certain S3 buckets, namespaced Parameter Store values, etc.
+## <a id="toc-add-user"></a>Add a new user
 
-If someone compromises one pod, they won't be able to access the secrets for the other service's pods because of the strict control that kube2iam affords us.
+## <a id="toc-add-user-in-iam"></a>Configure IAM
 
-#### Setup
+## <a id="toc-add-user-to-configmap"></a>Configure ConfigMap
 
-##### Service account and role binding
+# <a id="toc-kube2iam-setup"></a>kube2iam setup
 
-Create a new service role for kube2iam if RBAC is enabled on your cluster. We do have RBAC enabled so this is required.
+kube2iam will allow us to impose strict control over the AWS API calls that can be made by individual pods. This is useful for many reasons but we can imagine having `webservice-01` and `webservice-02`. Each has a set of secrets to perform its function. We can create an IAM role for each web service which only provides access to certain S3 buckets or namespaced Parameter Store values.
+
+We benefit from this if someone compromises the security of a pod.
+
+## <a id="toc-kube2iam-role"></a>Service account and role binding
+
+Create a new service role for kube2iam.
+
+Note: This is only required on clusters with RBAC enabled. We should always have RBAC enabled.
 
 ```yaml
 ---
@@ -94,7 +97,7 @@ serviceaccount "kube2iam" unchanged
 
 Source: https://github.com/jtblin/kube2iam#rbac-setup
 
-##### Create the kube2iam daemonset
+## <a id="toc-kube2iam-daemonset"></a>Daemonset
 
 You can `kubectl` apply the following daemonset YAML:
 
@@ -137,11 +140,11 @@ spec:
             privileged: true
 ```
 
-In this daemonset, we have diverged from the kube2iam documentation when passing arguments into kube2iam. The `--host-interface` should be set to `eni+` because we are currently using this VPC ENI. This is only documented in a [pull request](https://github.com/jtblin/kube2iam/pull/146) from a user. When we look at Calico in the future, this may change.
+This daemonset diverges from the kube2iam documentation when passing arguments into kube2iam. The `--host-interface` should be set to `eni+` to work with VPC ENIs.
 
-##### Validate kube2iam
+## <a id="toc-kube2iam-testing"></a>Testing the configuration
 
-You should have a kube2iam pod running on each worker node in your cluster. In my case, I have two nodes:
+Now, there should be a kube2iam pod running on each worker node in the cluster:
 
 ```sh
 $ kubectl get pods -n kube-system | grep kube2iam
@@ -173,3 +176,14 @@ spec:
     name: aws-cli
 ```
 
+Please review the next section for standards on role naming in AWS.
+
+## <a id="toc-role-naming"></a>Role naming
+
+Please adhere to these naming conventions when creating new IAM roles that will be referenced in pod annotations.
+
+```
+arn:aws:iam::{{ account_id }}:role/eks-{{ service_name }}-{{ env }}
+```
+
+We have not settled on a templating solution yet. This document will be updated once that is available.
