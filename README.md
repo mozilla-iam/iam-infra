@@ -1,13 +1,15 @@
-# IAM EKS deployment
+# IAM Kubernetes Handbook
 
-This will be a work in progress, starting with Terraform's EKS getting started
-guide (linked below). I plan on slowly turning this into a Terraform module that
-we can use to start new EKS clusters.
+This handbook is structured in three parts:
 
-# EKS Getting Started Guide Configuration
+* [EKS cluster management](/docs/eks-cluster-management.md) - Managing cluster resources in AWS.
+* [Kubernetes administration](/docs/kubernetes-administration.md) - Includes topics like user management and cluster addons.
+* [CI/CD and manual deployments](/docs/cluster-ci.md) - Deploy a sample application through a CI/CD pipeline using AWS tools.
 
-This is the full configuration from https://www.terraform.io/docs/providers/aws/guides/eks-getting-started.html
+Use these resources to setup a cluster, administer it, and extend it with addons like kube2iam and Calico.
 
-See that guide for additional information.
+## Notes
 
-NOTE: This full configuration utilizes the [Terraform http provider](https://www.terraform.io/docs/providers/http/index.html) to call out to icanhazip.com to determine your local workstation external IP for easily configuring EC2 Security Group access to the Kubernetes master servers. Feel free to replace this as necessary.
+This is a work in progress and I am starting with Terraform's EKS getting started guide (linked below). I plan on slowly turning this into a Terraform module that we can use to start new EKS clusters.
+
+https://www.terraform.io/docs/providers/aws/guides/eks-getting-started.html

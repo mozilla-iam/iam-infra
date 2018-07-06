@@ -2,7 +2,7 @@
 
 This document provides instructions for managing EKS cluster resources in AWS with Terraform.
 
-See the [README](./README.md) for related documents.
+See the [README](/README.md) for related documents.
 
 # Table of Contents
 

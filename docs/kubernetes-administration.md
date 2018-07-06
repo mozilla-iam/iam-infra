@@ -1,15 +1,30 @@
-# EKS cluster addons
+# EKS cluster management
 
-## Summary
+This document provides instructions for Kubernetes cluster administration (user management). We also focus on managing cluster addons which are essential to meet our security best practices.
 
-These addons should be included with every cluster that we deploy. Today, I do
-not have a method to do this programmatically while provisioning a new cluster
-so I am documenting the steps required.
+See the [README](/README.md) for related documents.
 
-In the future, I would like all cluster management to be done programmatically
-and these steps can be done as part of a post-deployment process.
+# Table of Contents
 
-## Instructions
+- [Introduction](#toc-introduction)
+- [Overview](#toc-overview)
+  - [kube2iam](#toc-kube2iam)
+  - [Calico](#toc-calico)
+  - [User management](#toc-summary-user-management)
+- [User management](#toc-user-management)
+  - [Add a new IAM user](#toc-add-iam-user)
+    - [Configure IAM](#toc-add-user-in-iam)
+    - [Configure ConfigMap](#toc-add-user-to-configmap)
+- [kube2iam setup](#toc-kube2iam-setup)
+  - [Service account and role binding](#toc-kube2iam-role)
+  - [Daemonset](#toc-kube2iam-daemonset)
+  - [Testing the configuration](#toc-kube2iam-testing)
+- [Calico setup](#toc-calico-setup)
+  - [Undefined](#toc-calico-undefined)
+
+# <a id="toc-introduction"></a>Introduction
+
+This document is a work in progress.
 
 ### kube2iam
 
