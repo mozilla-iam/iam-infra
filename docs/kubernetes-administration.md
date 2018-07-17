@@ -7,19 +7,50 @@ See the [README](/README.md) for related documents.
 # Table of Contents
 
 - [Introduction](#toc-introduction)
+- [Configuration syncing with Flux](#toc-flux)
 - [User management](#toc-user-management)
   - [Add a new user](#toc-add-user)
     - [Configure IAM](#toc-add-user-in-iam)
     - [Configure ConfigMap](#toc-add-user-to-configmap)
 - [kube2iam setup](#toc-kube2iam-setup)
-  - [Service account and role binding](#toc-kube2iam-role)
-  - [Daemonset](#toc-kube2iam-daemonset)
   - [Testing the configuration](#toc-kube2iam-testing)
   - [Role naming](#toc-role-naming)
 
 # <a id="toc-introduction"></a>Introduction
 
 Generally speaking, a new user should refer to the Kubernetes documentation for questions about cluster administration. In this document, I do want to provide a quick reference for actions that I expect to be repeated across all of our clusters. As of today, I know that we will be setting up new users, roles, kube2iam and Calico after every new cluster is created. Until these documented steps are automated, this should be a useful resource.
+
+# <a id="toc-flux"></a>Configuration syncing with Flux
+
+Fortunately, we can simplify cluster management with the GitOps Kubernetes operator from Weaveworks.
+
+https://github.com/weaveworks/flux
+
+We can deploy Flux to our cluster with the following instructions:
+
+https://github.com/weaveworks/flux/blob/master/site/standalone/installing.md
+
+First, clone the repository and edit `deploy/flux-deployment.yaml` to set the `--git-url` parameter. We want to set this to our configuration repository at `mozilla-iam/eks-configuration`. Once Flux is running in the cluster, capture the SSH public key that it generates and add it as a deploy key, with write access, to the `mozilla-iam/eks-configuration` repository. Flux will automatically poll the repository for changes and `kubectl apply` each YAML file in the repository.
+
+**Note:** This will not remove resources once they have been created. You will have to do that manually.
+
+Today, this will setup:
+
+- Calico
+- kube2iam
+- Prometheus and Grafana
+
+**Security concerns:**
+
+Unfortunately, the Flux project has an open issue to evaluate and implement read-only access to a source repository. Until this is available, we will need to add the deploy key to the settings for the GitHub repository.
+
+Flux keeps the private key as a Kubernetes secret:
+
+https://github.com/weaveworks/flux/blob/master/deploy/flux-deployment.yaml#L16-L20
+
+If the secret store were compromised or the Flux container itself, which is not exposed to the internet, an attacker could gain write access to the source repository. We should be able to improve our security by restricting the Kubernetes namespaces that Flux has access to. Beyond that, if an attacker can write to the repository, they would have either full control or partial control over our cluster.
+
+In order to get the private key, an attacker would have to have some foothold into the cluster anyway so this may not be a huge concern for us today. We could also leak the private key but we would have to go out of our way to access the Kubernetes secret and expose it in some way.
 
 # <a id="toc-user-management"></a>User Management
 
@@ -51,110 +82,7 @@ kube2iam will allow us to impose strict control over the AWS API calls that can 
 
 We benefit from this if someone compromises the security of a pod.
 
-## <a id="toc-kube2iam-role"></a>Service account and role binding
-
-Create a new service role for kube2iam.
-
-Note: This is only required on clusters with RBAC enabled. We should always have RBAC enabled.
-
-```yaml
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kube2iam
-  namespace: kube-system
-```
-
-Apply this with `kubectl`:
-
-```sh
-$ kubectl apply -f kube2iam-service-role.yaml
-serviceaccount "kube2iam" unchanged
-```
-
-Setup the role and binding:
-
-```yaml
----
-apiVersion: v1
-items:
-  - apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: ClusterRole
-    metadata:
-      name: kube2iam
-    rules:
-      - apiGroups: [""]
-        resources: ["namespaces","pods"]
-        verbs: ["get","watch","list"]
-  - apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: ClusterRoleBinding
-    metadata:
-      name: kube2iam
-    subjects:
-    - kind: ServiceAccount
-      name: kube2iam
-      namespace: kube-system
-    roleRef:
-      kind: ClusterRole
-      name: kube2iam
-      apiGroup: rbac.authorization.k8s.io
-kind: List
-```
-
-Apply with `kubectl`:
-
-```sh
-$ kubectl apply -f kube2iam-role-bindings.yaml
-serviceaccount "kube2iam" unchanged
-```
-
-Source: https://github.com/jtblin/kube2iam#rbac-setup
-
-## <a id="toc-kube2iam-daemonset"></a>Daemonset
-
-You can `kubectl` apply the following daemonset YAML:
-
-```yaml
-apiVersion: extensions/v1beta1
-kind: DaemonSet
-metadata:
-  name: kube2iam
-  labels:
-    app: kube2iam
-  namespace: kube-system
-spec:
-  template:
-    metadata:
-      labels:
-        name: kube2iam
-    spec:
-      serviceAccountName: kube2iam
-      hostNetwork: true
-      containers:
-        - image: jtblin/kube2iam:latest
-          imagePullPolicy: Always
-          name: kube2iam
-          args:
-            - "--iptables=true"
-            - "--host-ip=$(HOST_IP)"
-            - "--auto-discover-base-arn"
-            - "--host-interface=eni+"
-            - "--verbose"
-          env:
-            - name: HOST_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-          ports:
-            - containerPort: 8181
-              hostPort: 8181
-              name: http
-          securityContext:
-            privileged: true
-```
-
-This daemonset diverges from the kube2iam documentation when passing arguments into kube2iam. The `--host-interface` should be set to `eni+` to work with VPC ENIs.
+**Update**: kube2iam does not need to be setup manually anymore. We use a Kubernetes operator called Flux to poll for changes in a GitHub configuration repository. When a change is detected, or after Flux runs for the first time, the `kube2iam.yaml` file is applied to the cluster.
 
 ## <a id="toc-kube2iam-testing"></a>Testing the configuration
 
