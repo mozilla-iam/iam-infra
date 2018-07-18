@@ -52,6 +52,10 @@ If the secret store were compromised or the Flux container itself, which is not 
 
 In order to get the private key, an attacker would have to have some foothold into the cluster anyway so this may not be a huge concern for us today. We could also leak the private key but we would have to go out of our way to access the Kubernetes secret and expose it in some way.
 
+**Flux demo:**
+
+[![asciicast](https://asciinema.org/a/K8ZXtHuSaqqsDUDte3pjQn85e.png)](https://asciinema.org/a/K8ZXtHuSaqqsDUDte3pjQn85e)
+
 # <a id="toc-user-management"></a>User Management
 
 EKS user management requires two separate changes. A user or role will need to be created in IAM. That ARN can be added to the `aws-auth` ConfigMap in Kuberenetes to authorize it to perform certain actions associated with a user and groups.
