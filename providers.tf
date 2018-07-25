@@ -22,7 +22,7 @@ provider "http" {}
 
 terraform {
   backend "s3" {
-    bucket  = ""
-    key     = "iam-eks-cluster/development/terraform.tfstate"
+    bucket = ""
+    key    = "danielhartnell/development/terraform.tfstate"
   }
 }
