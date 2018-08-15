@@ -5,6 +5,7 @@ This handbook is structured in three parts:
 * [EKS cluster management](/docs/eks-cluster-management.md) - Managing cluster resources in AWS.
 * [Kubernetes administration](/docs/kubernetes-administration.md) - Includes topics like user management and cluster addons.
 * [CI/CD and manual deployments](/docs/cluster-ci.md) - Deploy a sample application through a CI/CD pipeline using AWS tools.
+* [Local development](/docs/local-dev.md) - Suggestions for local development.
 
 Use these resources to setup a cluster, administer it, and extend it with addons like kube2iam and Calico.
 
