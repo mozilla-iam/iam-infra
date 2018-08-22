@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: development
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sso-dashboard
+  labels:
+    app: sso-dashboard
+    keel.sh/trigger: poll
+    keel.sh/policy: force
+  namespace: development
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sso-dashboard
+  template:
+    metadata:
+      annotations:
+        iam.amazonaws.com/role: arn:aws:iam::656532927350:role/SSODashboardKubernetesDeployment
+      labels:
+        app: sso-dashboard
+    spec:
+      containers:
+        - name: sso-dashboard
+          image: 656532927350.dkr.ecr.us-west-2.amazonaws.com/sso-dashboard:latest
+          ports:
+          - containerPort: 8000
+          env:
+            - name: AWS_DEFAULT_REGION
+              value: us-west-2
+            - name: ENVIRONMENT
+              value: Development
+            - name: MOZILLIANS_API_URL
+              value: https://mozillians.org/api/v2/users/
+            - name: SERVER_NAME
+              value: sso.allizom.org
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sso-dashboard
+  namespace: development
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: sso-dashboard
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-production
+  name: sso-dashboard
+  namespace: development
+spec:
+  tls:
+  - hosts:
+    - sso.allizom.org
+    secretName: sso-dashboard-secret
+  rules:
+  - host: sso.allizom.org
+    http:
+      paths:
+      - backend:
+          serviceName: sso-dashboard
+          servicePort: 8000
+        path: /
