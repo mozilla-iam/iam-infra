@@ -45,6 +45,8 @@ kind: Prometheus
 metadata:
   name: prometheus-general
   namespace: monitoring
+  labels:
+    prometheus: prometheus-general
 spec:
   alerting:
     alertmanagers:
@@ -61,4 +63,35 @@ spec:
   ruleSelector:
     matchLabels:
       role: alert-rules
+      prometheus: prometheus-general
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    prometheus: prometheus-general
+  name: prometheus-general
+  namespace: monitoring
+spec:
+  ports:
+  - name: web
+    port: 9090
+    targetPort: web
+  selector:
+    app: prometheus
+    prometheus: prometheus-general
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: prometheus
+  name: prometheus
+  namespace: monitoring
+spec:
+  endpoints:
+  - interval: 30s
+    port: web
+  selector:
+    matchLabels:
       prometheus: prometheus-general

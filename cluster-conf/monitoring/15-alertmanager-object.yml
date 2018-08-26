@@ -28,6 +28,22 @@ metadata:
   name: alertmanager-main
   namespace: monitoring
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    alertmanager: main
+  name: alertmanager-main
+  namespace: monitoring
+spec:
+  ports:
+  - name: web
+    port: 9093
+    targetPort: web
+  selector:
+    alertmanager: main
+    app: alertmanager
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
