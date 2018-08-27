@@ -62,6 +62,7 @@ resource "aws_security_group" "demo-node" {
     map(
      "Name", "terraform-${var.cluster-name}-node",
      "kubernetes.io/cluster/${var.cluster-name}", "owned",
+     "k8s.io/cluster-autoscaler/${var.cluster-name}", "",
     )
   }"
 }

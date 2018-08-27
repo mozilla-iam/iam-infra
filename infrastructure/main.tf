@@ -16,6 +16,6 @@ module "eks-cluster-production-01" {
   cluster-name              = "kubernetes-production-01"
   instance-type             = "c4.large"
   instance-desired-capacity = 3
-  instance-max              = 3
+  instance-max              = 10
   instance-min              = 2
 }
