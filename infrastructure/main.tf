@@ -2,20 +2,20 @@
 # EKS cluster management
 #---
 
-module "eks-cluster-development" {
+module "eks-development-01" {
   source                    = "./modules/eks-cluster"
-  cluster-name              = "kubernetes-development"
+  cluster-name              = "kubernetes-development-01"
   instance-type             = "c4.large"
-  instance-desired-capacity = 3
-  instance-max              = 3
+  instance-desired-capacity = 4
+  instance-max              = 4
   instance-min              = 2
 }
 
-module "eks-cluster-production-01" {
+module "eks-production-01" {
   source                    = "./modules/eks-cluster"
   cluster-name              = "kubernetes-production-01"
   instance-type             = "c4.large"
   instance-desired-capacity = 3
-  instance-max              = 3
+  instance-max              = 10
   instance-min              = 2
 }
