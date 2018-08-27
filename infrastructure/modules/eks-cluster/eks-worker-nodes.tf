@@ -26,6 +26,72 @@ resource "aws_iam_role" "demo-node" {
 POLICY
 }
 
+resource "aws_iam_role" "cluster-autoscaler" {
+  name = "terraform-${var.cluster-name}-ClusterAutoscaler"
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_role.demo-node.arn}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy" "cluster-autoscaler-policy" {
+  name = "terraform-${var.cluster-name}-node-ClusterAutoscaler"
+  role = "${aws_iam_role.cluster-autoscaler.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeTags",
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:TerminateInstanceInAutoScalingGroup"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "sts-assume-role" {
+  name = "terraform-${var.cluster-name}-node-AllowSTSAssumeRole"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::656532927350:role/*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "demo-node-STSAssumeRole" {
+  policy_arn = "${aws_iam_policy.sts-assume-role.arn}"
+  role       = "${aws_iam_role.demo-node.name}"
+}
+
 resource "aws_iam_role_policy_attachment" "demo-node-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = "${aws_iam_role.demo-node.name}"
@@ -62,7 +128,6 @@ resource "aws_security_group" "demo-node" {
     map(
      "Name", "terraform-${var.cluster-name}-node",
      "kubernetes.io/cluster/${var.cluster-name}", "owned",
-     "k8s.io/cluster-autoscaler/${var.cluster-name}", "",
     )
   }"
 }
@@ -158,6 +223,18 @@ resource "aws_autoscaling_group" "demo" {
   tag {
     key                 = "kubernetes.io/cluster/${var.cluster-name}"
     value               = "owned"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
+    value               = ""
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "k8s.io/cluster-autoscaler/enabled"
+    value               = "true"
     propagate_at_launch = true
   }
 }

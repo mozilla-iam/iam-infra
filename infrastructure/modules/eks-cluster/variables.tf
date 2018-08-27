@@ -3,11 +3,11 @@
 #
 
 variable "cluster-name" {
-  type    = "string"
+  type = "string"
 }
 
 variable "instance-type" {
-  type = "string"
+  type    = "string"
   default = "c4.large"
 }
 
