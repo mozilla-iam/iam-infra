@@ -51,6 +51,9 @@ spec:
         - mountPath: /grafana-dashboard-definitions/0/k8s-pod-detailed
           name: grafana-dashboard-k8s-pod-detailed
           readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/nginx-ingress-controller
+          name: grafana-dashboard-nginx-ingress-controller
+          readOnly: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
@@ -76,6 +79,9 @@ spec:
       - configMap:
           name: grafana-dashboard-k8s-cluster-overview
         name: grafana-dashboard-k8s-cluster-overview
+      - configMap:
+          name: grafana-dashboard-nginx-ingress-controller
+        name: grafana-dashboard-nginx-ingress-controller
 ---
 apiVersion: v1
 kind: Service
