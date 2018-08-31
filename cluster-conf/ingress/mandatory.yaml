@@ -72,6 +72,7 @@ metadata:
     app: ingress-nginx
 data:
   use-proxy-protocol: "true"
+  enable-vts-status: "true"
 ---
 
 kind: ConfigMap
