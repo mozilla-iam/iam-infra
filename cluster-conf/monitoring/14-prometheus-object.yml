@@ -64,6 +64,13 @@ spec:
     matchLabels:
       role: alert-rules
       prometheus: prometheus-general
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: prometheus-storage
+        resources:
+          requests:
+            storage: 40Gi
 ---
 apiVersion: v1
 kind: Service
@@ -95,3 +102,12 @@ spec:
   selector:
     matchLabels:
       prometheus: prometheus-general
+---
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: prometheus-storage
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+allowVolumeExpansion: true
