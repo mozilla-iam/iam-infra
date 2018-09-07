@@ -57,3 +57,7 @@ output "config-map-aws-auth" {
 output "kubeconfig" {
   value = "${local.kubeconfig}"
 }
+
+output "vpc-id" {
+  value = "${aws_vpc.demo.id}"
+}
