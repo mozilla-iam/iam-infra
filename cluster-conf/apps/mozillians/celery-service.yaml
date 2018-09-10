@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert
+    kompose.version: ""
+  creationTimestamp: null
+  labels:
+    io.kompose.service: celery
+  name: celery
+  namespace: mozillians-dev
+spec:
+  clusterIP: None
+  ports:
+  - name: headless
+    port: 55555
+    targetPort: 0
+  selector:
+    io.kompose.service: celery
+status:
+  loadBalancer: {}

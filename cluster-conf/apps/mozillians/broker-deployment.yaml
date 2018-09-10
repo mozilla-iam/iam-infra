@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert
+    kompose.version: ""
+  creationTimestamp: null
+  labels:
+    io.kompose.service: broker
+  name: broker
+  namespace: mozillians-dev
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: broker
+    spec:
+      containers:
+      - image: redis:3
+        name: broker
+        ports:
+        - containerPort: 6379
+        resources: {}
+      restartPolicy: Always
+status: {}

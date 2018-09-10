@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert
+    kompose.version: ""
+  creationTimestamp: null
+  labels:
+    io.kompose.service: es
+  name: es
+  namespace: mozillians-dev
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: es
+    spec:
+      containers:
+      - image: elasticsearch:2.4.5
+        name: es
+        ports:
+        - containerPort: 9200
+        resources: {}
+      restartPolicy: Always
+status: {}

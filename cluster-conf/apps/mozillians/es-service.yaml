@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert
+    kompose.version: ""
+  creationTimestamp: null
+  labels:
+    io.kompose.service: es
+  name: es
+  namespace: mozillians-dev
+spec:
+  clusterIP: None
+  ports:
+  - name: headless
+    port: 9200
+    targetPort: 9200
+  selector:
+    io.kompose.service: es
+status:
+  loadBalancer: {}
