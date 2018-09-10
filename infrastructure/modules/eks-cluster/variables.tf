@@ -22,3 +22,7 @@ variable "instance-min" {
 variable "instance-max" {
   default = 3
 }
+
+variable "create-resource-vpc" {
+  default = false
+}

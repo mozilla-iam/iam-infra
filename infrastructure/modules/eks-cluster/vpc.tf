@@ -43,18 +43,115 @@ resource "aws_internet_gateway" "demo" {
   }
 }
 
-resource "aws_route_table" "demo" {
-  vpc_id = "${aws_vpc.demo.id}"
+resource "aws_route" "demo-route" {
+  route_table_id            = "${aws_vpc.demo.main_route_table_id}"
+  destination_cidr_block    = "0.0.0.0/0"
+  gateway_id = "${aws_internet_gateway.demo.id}"
+}
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.demo.id}"
+#---
+# Create optional resource VPC and dependencies
+#---
+
+resource "aws_vpc" "resource-vpc" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  cidr_block           = "172.16.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  instance_tenancy     = "default"
+
+  tags {
+    "Name" = "apps-${var.cluster-name}-vpc"
+  }  
+}
+
+#---
+# Enable VPC peering between EKS VPC and resource VPC
+#---
+
+resource "aws_vpc_peering_connection" "resource-vpc" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  peer_vpc_id = "${aws_vpc.resource-vpc.id}"
+  vpc_id      = "${aws_vpc.demo.id}"
+  auto_accept = true
+}
+
+#---
+# Resource VPC subnets
+# Currently scoped to us-west-2 region
+#---
+
+resource "aws_subnet" "resource-2a" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  vpc_id                  = "${aws_vpc.resource-vpc.id}"
+  cidr_block              = "172.16.0.0/18"
+  availability_zone       = "us-west-2a"
+  map_public_ip_on_launch = true
+
+  tags {
+    "Name" = "apps-${var.cluster-name}-2a"
   }
 }
 
-resource "aws_route_table_association" "demo" {
-  count = 2
+resource "aws_subnet" "resource-2b" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  vpc_id                  = "${aws_vpc.resource-vpc.id}"
+  cidr_block              = "172.16.64.0/18"
+  availability_zone       = "us-west-2b"
+  map_public_ip_on_launch = true
 
-  subnet_id      = "${aws_subnet.demo.*.id[count.index]}"
-  route_table_id = "${aws_route_table.demo.id}"
+  tags {
+    "Name" = "apps-${var.cluster-name}-2b"
+  }
+}
+
+resource "aws_subnet" "resource-2c" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  vpc_id                  = "${aws_vpc.resource-vpc.id}"
+  cidr_block              = "172.16.128.0/18"
+  availability_zone       = "us-west-2c"
+  map_public_ip_on_launch = true
+
+  tags {
+    "Name" = "apps-${var.cluster-name}-2c"
+  }
+}
+
+#---
+# Create internet gateway for resource VPC
+#---
+
+resource "aws_internet_gateway" "resource-igw" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  vpc_id = "${aws_vpc.resource-vpc.id}"
+
+  tags = {
+    Name = "apps-${var.cluster-name}-igw"
+  }
+}
+
+#---
+# Update VPC routes
+# Enables communication between EKS and resource VPCs
+#---
+
+resource "aws_route" "eks-vpc-route" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  route_table_id            = "${aws_vpc.resource-vpc.main_route_table_id}"
+  destination_cidr_block    = "${aws_vpc.demo.cidr_block}"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.resource-vpc.id}"
+}
+
+resource "aws_route" "eks-ig-route" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  route_table_id            = "${aws_vpc.resource-vpc.main_route_table_id}"
+  destination_cidr_block    = "0.0.0.0/0"
+  gateway_id                = "${aws_internet_gateway.resource-igw.id}"
+}
+
+resource "aws_route" "resource-vpc-route" {
+  count = "${var.create-resource-vpc ? 1 : 0}"
+  route_table_id            = "${aws_vpc.demo.main_route_table_id}"
+  destination_cidr_block    = "${aws_vpc.resource-vpc.cidr_block}"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.resource-vpc.id}"
 }

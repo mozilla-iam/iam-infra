@@ -9,6 +9,7 @@ module "eks-development-01" {
   instance-desired-capacity = 4
   instance-max              = 4
   instance-min              = 2
+  create-resource-vpc       = true
 }
 
 module "eks-production-01" {
@@ -18,4 +19,5 @@ module "eks-production-01" {
   instance-desired-capacity = 4
   instance-max              = 10
   instance-min              = 4
+  create-resource-vpc       = false
 }
