@@ -62,6 +62,6 @@ output "vpc-id" {
   value = "${aws_vpc.demo.id}"
 }
 
-output "resource-vpc-id" {
-  value = "${aws_vpc.resource-vpc.id}"
+output "vpc-main-rt-id" {
+  value = "${aws_vpc.demo.main_route_table_id}"
 }
