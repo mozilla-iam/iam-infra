@@ -1,0 +1,23 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    name: mozillians-celery
+  name: mozillians-celery
+  namespace: mozillians-dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: mozillians-celery
+    spec:
+      containers:
+      - command: ["/code/bin/run-celery.sh"]
+        env:
+        - name: C_FORCE_ROOT
+          value: "true"
+        image: danielhartnell/mozillians:1.0.4
+        name: mozillians-celery
