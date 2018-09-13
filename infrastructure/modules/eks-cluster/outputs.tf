@@ -61,3 +61,7 @@ output "kubeconfig" {
 output "vpc-id" {
   value = "${aws_vpc.demo.id}"
 }
+
+output "vpc-main-rt-id" {
+  value = "${aws_vpc.demo.main_route_table_id}"
+}

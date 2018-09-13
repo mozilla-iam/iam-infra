@@ -22,3 +22,19 @@ variable "instance-min" {
 variable "instance-max" {
   default = 3
 }
+
+variable "create-resource-vpc" {
+  default = false
+}
+
+variable "environment" {
+  default = "development"
+}
+
+variable "region" {
+  default = "us-west-2"
+}
+
+variable "peering-connection-id" {
+  default = "unused"
+}
