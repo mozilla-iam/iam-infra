@@ -1,0 +1,37 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    name: mozillians-es
+  name: mozillians-es
+  namespace: mozillians-dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: mozillians-es
+    spec:
+      containers:
+      - image: elasticsearch:2.4.5
+        name: mozillians-es
+        ports:
+        - containerPort: 9200
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    name: mozillians-es
+  name: mozillians-es
+  namespace: mozillians-dev
+spec:
+  ports:
+  - protocol: TCP
+    port: 9200
+    targetPort: 9200
+  selector:
+    name: mozillians-es
