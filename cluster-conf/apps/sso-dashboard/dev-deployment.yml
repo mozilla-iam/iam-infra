@@ -60,6 +60,33 @@ spec:
   selector:
     app: sso-dashboard
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitor-sso-dashboard
+  namespace: development
+  labels:
+    name: monitor-sso-dashboard
+spec:
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: sso-dashboard
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sso-dashboard
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      name: monitor-sso-dashboard
+  endpoints:
+  - port: 9000
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
