@@ -30,6 +30,13 @@ spec:
           image: 656532927350.dkr.ecr.us-west-2.amazonaws.com/sso-dashboard:latest
           ports:
           - containerPort: 8000
+          resources:
+            requests:
+              memory: "768Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
           env:
             - name: AWS_DEFAULT_REGION
               value: us-west-2
