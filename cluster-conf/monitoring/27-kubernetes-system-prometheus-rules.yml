@@ -4,7 +4,7 @@ metadata:
   labels:
     prometheus: prometheus-general
     role: alert-rules
-  name: prometheus-k8s-rules
+  name: prometheus-general-rules
   namespace: monitoring
 spec:
   groups:
@@ -274,33 +274,7 @@ spec:
       for: 15m
       labels:
         severity: critical
-    #- alert: KubeAPIDown
-    #  annotations:
-    #    message: KubeAPI has disappeared from Prometheus target discovery.
-    #    runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapidown
-    #  expr: |
-    #    absent(up{job="apiserver"} == 1)
-    #  for: 15m
-    #  labels:
-    #    severity: critical
-    #- alert: KubeControllerManagerDown
-    #  annotations:
-    #    message: KubeControllerManager has disappeared from Prometheus target discovery.
-    #    runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecontrollermanagerdown
-    #  expr: |
-    #    absent(up{job="kube-controller-manager"} == 1)
-    #  for: 15m
-    # labels:
-    #    severity: critical
-    #- alert: KubeSchedulerDown
-    #  annotations:
-    #    message: KubeScheduler has disappeared from Prometheus target discovery.
-    #    runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeschedulerdown
-    #  expr: |
-    #    absent(up{job="kube-scheduler"} == 1)
-    #  for: 15m
-    #  labels:
-    #    severity: critical
+        team: moc
     - alert: KubeStateMetricsDown
       annotations:
         message: KubeStateMetrics has disappeared from Prometheus target discovery.
@@ -310,6 +284,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        team: moc
     - alert: KubeletDown
       annotations:
         message: Kubelet has disappeared from Prometheus target discovery.
@@ -319,6 +294,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        team: infra
     - alert: NodeExporterDown
       annotations:
         message: NodeExporter has disappeared from Prometheus target discovery.
@@ -328,6 +304,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        team: moc
     - alert: PrometheusDown
       annotations:
         message: Prometheus has disappeared from Prometheus target discovery.
@@ -337,6 +314,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        team: moc
     - alert: PrometheusOperatorDown
       annotations:
         message: PrometheusOperator has disappeared from Prometheus target discovery.
@@ -346,6 +324,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+        team: moc
   - name: kubernetes-apps
     rules:
     - alert: KubePodCrashLooping
@@ -378,7 +357,7 @@ spec:
         kube_deployment_metadata_generation{job="kube-state-metrics"}
       for: 15m
       labels:
-        severity: critical
+        severity: warning
     - alert: KubeDeploymentReplicasMismatch
       annotations:
         message: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replica
@@ -494,6 +473,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        team: infra
     - alert: KubeMemOvercommit
       annotations:
         message: Overcommited Memory resource requests on Pods, cannot tolerate node
@@ -522,6 +502,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        team: infra
     - alert: KubeMemOvercommit
       annotations:
         message: Overcommited Memory resource request quota on Namespaces.
@@ -534,6 +515,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        team: infra
     - alert: KubeQuotaExceeded
       annotations:
         message: '{{ printf "%0.0f" $value }}% usage of {{ $labels.resource }} in
@@ -547,6 +529,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        team: infra
   - name: kubernetes-storage
     rules:
     - alert: KubePersistentVolumeUsageCritical
@@ -563,6 +546,7 @@ spec:
       for: 1m
       labels:
         severity: critical
+        team: infra
     - alert: KubePersistentVolumeFullInFourDays
       annotations:
         message: Based on recent sampling, the persistent volume claimed by {{ $labels.persistentvolumeclaim
@@ -574,6 +558,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        team: infra
   - name: kubernetes-system
     rules:
     - alert: KubeNodeNotReady
@@ -585,6 +570,7 @@ spec:
       for: 1h
       labels:
         severity: warning
+        team: infra
     - alert: KubeVersionMismatch
       annotations:
         message: There are {{ $value }} different versions of Kubernetes components
@@ -698,6 +684,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+        team: moc
     - alert: AlertmanagerDownOrMissing
       annotations:
         description: An unexpected number of Alertmanagers are scraped or Alertmanagers
@@ -718,6 +705,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+        team: moc
   - name: general.rules
     rules:
     - alert: TargetDown
@@ -748,6 +736,7 @@ spec:
       for: 30m
       labels:
         severity: warning
+        team: infra
     - alert: NodeDiskRunningFull
       annotations:
         description: device {{$labels.device}} on node {{$labels.instance}} is running
@@ -758,6 +747,7 @@ spec:
       for: 10m
       labels:
         severity: critical
+        team: infra
   - name: prometheus.rules
     rules:
     - alert: PrometheusConfigReloadFailed
@@ -765,97 +755,107 @@ spec:
         description: Reloading Prometheus' configuration has failed for {{$labels.namespace}}/{{$labels.pod}}
         summary: Reloading Promehteus' configuration failed
       expr: |
-        prometheus_config_last_reload_successful{job="prometheus-k8s"} == 0
+        prometheus_config_last_reload_successful{job="prometheus-general"} == 0
       for: 10m
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusNotificationQueueRunningFull
       annotations:
         description: Prometheus' alert notification queue is running full for {{$labels.namespace}}/{{
           $labels.pod}}
         summary: Prometheus' alert notification queue is running full
       expr: |
-        predict_linear(prometheus_notifications_queue_length{job="prometheus-k8s"}[5m], 60 * 30) > prometheus_notifications_queue_capacity{job="prometheus-k8s"}
+        predict_linear(prometheus_notifications_queue_length{job="prometheus-general"}[5m], 60 * 30) > prometheus_notifications_queue_capacity{job="prometheus-general"}
       for: 10m
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusErrorSendingAlerts
       annotations:
         description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{
           $labels.pod}} to Alertmanager {{$labels.Alertmanager}}
         summary: Errors while sending alert from Prometheus
       expr: |
-        rate(prometheus_notifications_errors_total{job="prometheus-k8s"}[5m]) / rate(prometheus_notifications_sent_total{job="prometheus-k8s"}[5m]) > 0.01
+        rate(prometheus_notifications_errors_total{job="prometheus-general"}[5m]) / rate(prometheus_notifications_sent_total{job="prometheus-general"}[5m]) > 0.01
       for: 10m
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusErrorSendingAlerts
       annotations:
         description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{
           $labels.pod}} to Alertmanager {{$labels.Alertmanager}}
         summary: Errors while sending alerts from Prometheus
       expr: |
-        rate(prometheus_notifications_errors_total{job="prometheus-k8s"}[5m]) / rate(prometheus_notifications_sent_total{job="prometheus-k8s"}[5m]) > 0.03
+        rate(prometheus_notifications_errors_total{job="prometheus-general"}[5m]) / rate(prometheus_notifications_sent_total{job="prometheus-general"}[5m]) > 0.03
       for: 10m
       labels:
         severity: critical
+        team: moc
     - alert: PrometheusNotConnectedToAlertmanagers
       annotations:
         description: Prometheus {{ $labels.namespace }}/{{ $labels.pod}} is not connected
           to any Alertmanagers
         summary: Prometheus is not connected to any Alertmanagers
       expr: |
-        prometheus_notifications_alertmanagers_discovered{job="prometheus-k8s"} < 1
+        prometheus_notifications_alertmanagers_discovered{job="prometheus-general"} < 1
       for: 10m
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusTSDBReloadsFailing
       annotations:
         description: '{{$labels.job}} at {{$labels.instance}} had {{$value | humanize}}
           reload failures over the last four hours.'
         summary: Prometheus has issues reloading data blocks from disk
       expr: |
-        increase(prometheus_tsdb_reloads_failures_total{job="prometheus-k8s"}[2h]) > 0
+        increase(prometheus_tsdb_reloads_failures_total{job="prometheus-general"}[2h]) > 0
       for: 12h
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusTSDBCompactionsFailing
       annotations:
         description: '{{$labels.job}} at {{$labels.instance}} had {{$value | humanize}}
           compaction failures over the last four hours.'
         summary: Prometheus has issues compacting sample blocks
       expr: |
-        increase(prometheus_tsdb_compactions_failed_total{job="prometheus-k8s"}[2h]) > 0
+        increase(prometheus_tsdb_compactions_failed_total{job="prometheus-general"}[2h]) > 0
       for: 12h
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusTSDBWALCorruptions
       annotations:
         description: '{{$labels.job}} at {{$labels.instance}} has a corrupted write-ahead
           log (WAL).'
         summary: Prometheus write-ahead log is corrupted
       expr: |
-        tsdb_wal_corruptions_total{job="prometheus-k8s"} > 0
+        tsdb_wal_corruptions_total{job="prometheus-general"} > 0
       for: 4h
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusNotIngestingSamples
       annotations:
         description: Prometheus {{ $labels.namespace }}/{{ $labels.pod}} isn't ingesting
           samples.
         summary: Prometheus isn't ingesting samples
       expr: |
-        rate(prometheus_tsdb_head_samples_appended_total{job="prometheus-k8s"}[5m]) <= 0
+        rate(prometheus_tsdb_head_samples_appended_total{job="prometheus-general"}[5m]) <= 0
       for: 10m
       labels:
         severity: warning
+        team: moc
     - alert: PrometheusTargetScapesDuplicate
       annotations:
         description: '{{$labels.namespace}}/{{$labels.pod}} has many samples rejected
           due to duplicate timestamps but different values'
         summary: Prometheus has many samples rejected
       expr: |
-        increase(prometheus_target_scrapes_sample_duplicate_timestamp_total{job="prometheus-k8s"}[5m]) > 0
+        increase(prometheus_target_scrapes_sample_duplicate_timestamp_total{job="prometheus-general"}[5m]) > 0
       for: 10m
       labels:
         severity: warning
+        team: moc
