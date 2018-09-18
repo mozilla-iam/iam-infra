@@ -16,7 +16,7 @@ data "aws_subnet_ids" "all" {
 #---
 
 resource "aws_security_group" "mozillians-memcached" {
-  name        = "mozillians-memcached"
+  name        = "mozillians-memcached-${var.environment}"
   description = "Traffic rules for Mozillians Memcached"
   vpc_id      = "${var.vpc_id}"
 }
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "mozillians-memcached-egress" {
 #---
 
 resource "aws_security_group" "mozillians-redis" {
-  name        = "mozillians-redis"
+  name        = "mozillians-redis-${var.environment}"
   description = "Traffic rules for Mozillians Redis"
   vpc_id      = "${var.vpc_id}"
 }
@@ -72,12 +72,13 @@ resource "aws_security_group_rule" "mozillians-redis-egress" {
 #---
 
 resource "aws_security_group" "mozillians-mysql" {
-  name        = "rds"
+  name        = "mozillians-mysql-${var.environment}"
   description = "Traffic rules for Mozillians MySQL"
   vpc_id      = "${var.vpc_id}"
 }
 
 resource "aws_security_group_rule" "mozillians-mysql-ingress" {
+  type                     = "ingress"
   from_port                = 3306
   to_port                  = 3306
   protocol                 = "-1"
@@ -86,6 +87,7 @@ resource "aws_security_group_rule" "mozillians-mysql-ingress" {
 }
 
 resource "aws_security_group_rule" "mozillians-mysql-egress" {
+  type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
