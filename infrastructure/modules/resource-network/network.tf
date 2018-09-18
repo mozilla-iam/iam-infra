@@ -11,7 +11,7 @@ resource "aws_vpc" "resource-vpc" {
 
   tags {
     "Name" = "apps-${var.environment}-${var.region}-vpc"
-  }  
+  }
 }
 
 #---
@@ -86,7 +86,7 @@ resource "aws_route" "eks-vpc-route" {
 }
 
 resource "aws_route" "eks-ig-route" {
-  route_table_id            = "${aws_vpc.resource-vpc.main_route_table_id}"
-  destination_cidr_block    = "0.0.0.0/0"
-  gateway_id                = "${aws_internet_gateway.resource-igw.id}"
+  route_table_id         = "${aws_vpc.resource-vpc.main_route_table_id}"
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = "${aws_internet_gateway.resource-igw.id}"
 }
