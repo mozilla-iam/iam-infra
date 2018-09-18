@@ -3,11 +3,11 @@
 #
 
 variable "environment" {
-    default = "development"
+  default = "development"
 }
 
 variable "region" {
-    default = "us-west-2"
+  default = "us-west-2"
 }
 
 variable "vpc-main-rt-id" {}

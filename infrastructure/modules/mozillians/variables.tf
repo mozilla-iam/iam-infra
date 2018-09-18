@@ -5,3 +5,4 @@ variable "elasticache_memcached_instance_size" {}
 variable "cis_publisher_role_arn" {}
 variable "rds_instance_class" {}
 variable "mysql-mozillians-db_password" {}
+variable "k8s_source_security_group" {}

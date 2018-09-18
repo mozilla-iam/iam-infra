@@ -65,3 +65,7 @@ output "vpc-id" {
 output "vpc-main-rt-id" {
   value = "${aws_vpc.demo.main_route_table_id}"
 }
+
+output "node-security-group" {
+  value = "${aws_security_group.demo-node.id}"
+}
