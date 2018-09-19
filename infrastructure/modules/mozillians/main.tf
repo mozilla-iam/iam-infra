@@ -187,54 +187,46 @@ resource "aws_db_instance" "mysql-mozillians-db" {
 # Elasticsearch
 #---
 
+resource "aws_elasticsearch_domain" "mozillians-es" {
+    domain_name                       = "mozillians-shared-es-${var.environment}"
+    elasticsearch_version             = "2.3"
 
-# resource "aws_elasticsearch_domain" "mozillians-es" {
-#     domain_name                       = "mozillians-shared-es-${var.environment}"
-#     elasticsearch_version             = "2.3"
+    ebs_options {
+        ebs_enabled                   = true
+        volume_type                   = "gp2"
+        volume_size                   = 10
+    }
 
+    cluster_config {
+        instance_count                = 3
+        instance_type                 = "t2.micro.elasticsearch"
+        dedicated_master_enabled      = false
+        zone_awareness_enabled        = false
+    }
 
-#     ebs_options {
-#         ebs_enabled                   = true
-#         volume_type                   = "gp2"
-#         volume_size                   = 10
-#     }
+    snapshot_options {
+        automated_snapshot_start_hour = 23
+    }
 
+    vpc_options {
+        subnet_ids = ["${data.aws_subnet_ids.all.ids[0]}"]
+    }
 
-#     cluster_config {
-#         instance_count                = 3
-#         instance_type                 = "t2.micro.elasticsearch"
-#         dedicated_master_enabled      = false
-#         zone_awareness_enabled        = false
-#     }
+    tags {
+      Domain                          = "mozillians-shared-es"
+      app                             = "elasticsearch"
+      env                             = "${var.environment}"
+      project                         = "mozillians"
+    }
 
-
-#     snapshot_options {
-#         automated_snapshot_start_hour = 23
-#     }
-
-
-#     tags {
-#       Domain                          = "mozillians-shared-es"
-#       app                             = "elasticsearch"
-#       env                             = "${var.environment}"
-#       project                         = "mozillians"
-#     }
-
-
-#     access_policies = <<CONFIG
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Action": "es:*",
-#             "Principal": "*",
-#             "Effect": "Allow",
-#             "Condition": {
-#                 "IpAddress": {"aws:SourceIp": ["52.91.164.226"]}
-#             }
-#         }
-#     ]
-# }
-# CONFIG
-# }
-
+    access_policies = <<CONFIG
+{
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Action": "es:*",
+        "Principal": "*",
+        "Effect": "Allow"
+    }]
+}
+CONFIG
+}
