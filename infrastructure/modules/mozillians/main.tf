@@ -148,6 +148,18 @@ resource "aws_elasticache_cluster" "mozillians-memcached-ec" {
 # RDS MySQL database
 #---
 
+data "aws_route53_zone" "iam-infra" {
+  name = "infra.iam.mozilla.com"
+}
+
+resource "aws_route53_record" "mysql-mozillians-dns" {
+  zone_id = "${data.aws_route53_zone.iam-infra.zone_id}"
+  name    = "mozillians-db-${var.environment}"
+  type    = "CNAME"
+  ttl     = 300
+  records = ["${aws_db_instance.mysql-mozillians-db.address}"]
+}
+
 resource "aws_db_subnet_group" "apps-rds-subnetgroup" {
   name        = "apps-rds-subnetgroup-${var.environment}"
   description = "RDS subnet group for resource VPC"
@@ -188,38 +200,38 @@ resource "aws_db_instance" "mysql-mozillians-db" {
 #---
 
 resource "aws_elasticsearch_domain" "mozillians-es" {
-    domain_name                       = "mozillians-shared-es-${var.environment}"
-    elasticsearch_version             = "2.3"
+  domain_name           = "mozillians-shared-es-${var.environment}"
+  elasticsearch_version = "2.3"
 
-    ebs_options {
-        ebs_enabled                   = true
-        volume_type                   = "gp2"
-        volume_size                   = 10
-    }
+  ebs_options {
+    ebs_enabled = true
+    volume_type = "gp2"
+    volume_size = 10
+  }
 
-    cluster_config {
-        instance_count                = 3
-        instance_type                 = "t2.micro.elasticsearch"
-        dedicated_master_enabled      = false
-        zone_awareness_enabled        = false
-    }
+  cluster_config {
+    instance_count           = 3
+    instance_type            = "t2.micro.elasticsearch"
+    dedicated_master_enabled = false
+    zone_awareness_enabled   = false
+  }
 
-    snapshot_options {
-        automated_snapshot_start_hour = 23
-    }
+  snapshot_options {
+    automated_snapshot_start_hour = 23
+  }
 
-    vpc_options {
-        subnet_ids = ["${data.aws_subnet_ids.all.ids[0]}"]
-    }
+  vpc_options {
+    subnet_ids = ["${data.aws_subnet_ids.all.ids[0]}"]
+  }
 
-    tags {
-      Domain                          = "mozillians-shared-es"
-      app                             = "elasticsearch"
-      env                             = "${var.environment}"
-      project                         = "mozillians"
-    }
+  tags {
+    Domain  = "mozillians-shared-es"
+    app     = "elasticsearch"
+    env     = "${var.environment}"
+    project = "mozillians"
+  }
 
-    access_policies = <<CONFIG
+  access_policies = <<CONFIG
 {
     "Version": "2012-10-17",
     "Statement": [{
