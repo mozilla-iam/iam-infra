@@ -71,6 +71,7 @@ spec:
         resources:
           requests:
             storage: 40Gi
+  retention: 90d
 ---
 apiVersion: v1
 kind: Service
