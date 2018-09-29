@@ -173,7 +173,7 @@ resource "aws_db_subnet_group" "apps-rds-subnetgroup" {
 resource "aws_db_instance" "mysql-mozillians-db" {
   allocated_storage          = 5
   engine                     = "mysql"
-  engine_version             = "5.6.27"
+  engine_version             = "5.6.40"
   auto_minor_version_upgrade = false
   instance_class             = "${var.rds_instance_class}"
   publicly_accessible        = false
