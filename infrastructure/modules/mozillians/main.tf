@@ -171,21 +171,22 @@ resource "aws_db_subnet_group" "apps-rds-subnetgroup" {
 }
 
 resource "aws_db_instance" "mysql-mozillians-db" {
-  allocated_storage         = 5
-  engine                    = "mysql"
-  engine_version            = "5.6.27"
-  instance_class            = "${var.rds_instance_class}"
-  publicly_accessible       = false
-  backup_retention_period   = 14
-  apply_immediately         = true
-  multi_az                  = true
-  storage_type              = "gp2"
-  final_snapshot_identifier = "mysql-mozillians-db-final-${var.environment}"
-  name                      = "mozilliansdb"
-  username                  = "root"
-  password                  = "${var.mysql-mozillians-db_password}"
-  db_subnet_group_name      = "${aws_db_subnet_group.apps-rds-subnetgroup.name}"
-  parameter_group_name      = "default.mysql5.6"
+  allocated_storage          = 5
+  engine                     = "mysql"
+  engine_version             = "5.6.27"
+  auto_minor_version_upgrade = false
+  instance_class             = "${var.rds_instance_class}"
+  publicly_accessible        = false
+  backup_retention_period    = 14
+  apply_immediately          = true
+  multi_az                   = true
+  storage_type               = "gp2"
+  final_snapshot_identifier  = "mysql-mozillians-db-final-${var.environment}"
+  name                       = "mozilliansdb"
+  username                   = "root"
+  password                   = "${var.mysql-mozillians-db_password}"
+  db_subnet_group_name       = "${aws_db_subnet_group.apps-rds-subnetgroup.name}"
+  parameter_group_name       = "default.mysql5.6"
 
   tags {
     Name    = "mysql-mozillians-db"

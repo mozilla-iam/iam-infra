@@ -1,9 +1,13 @@
 variable "mysql-mozillians-db_password" {}
 
+#---
+# Create AWS resources for Mozillians
+#---
+
 # Addresses this issue:
 # github.com/terraform-providers/terraform-provider-aws/issues/5218
 resource "aws_iam_service_linked_role" "es" {
-    aws_service_name = "es.amazonaws.com"
+  aws_service_name = "es.amazonaws.com"
 }
 
 module "mozillians-staging" {
@@ -35,4 +39,30 @@ module "mozillians-production" {
   cis_publisher_role_arn              = "arn:aws:iam::371522382791:role/CISPublisherRole"
   mysql-mozillians-db_password        = "${var.mysql-mozillians-db_password}"
   k8s_source_security_group           = "${module.eks-production-01.node-security-group}"
+}
+
+#---
+# Create CI pipeline:
+#   - CodeBuild and ECR
+#   - Uses OAuth to create webhooks in GitHub repositories
+#
+# https://docs.aws.amazon.com/codepipeline/latest/userguide/GitHub-authentication.html
+#---
+
+module "mozillians-ci-stage" {
+  source = "./modules/ci"
+
+  project_name  = "mozillians"
+  environment   = "stage"
+  github_repo   = "https://github.com/danielhartnell/mozillians"
+  github_branch = "master"
+}
+
+module "mozillians-ci-prod" {
+  source = "./modules/ci"
+
+  project_name  = "mozillians"
+  environment   = "prod"
+  github_repo   = "https://github.com/danielhartnell/mozillians"
+  github_branch = "production"
 }
