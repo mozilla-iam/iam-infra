@@ -3,6 +3,7 @@
 #---
 
 resource "aws_codebuild_webhook" "webhook" {
+  count         = "${var.enable_webhook ? 1 : 0}"
   project_name  = "${aws_codebuild_project.build.name}"
   branch_filter = "${var.github_branch}"
 }
@@ -25,7 +26,7 @@ resource "aws_codebuild_project" "build" {
 
     environment_variable {
       "name"  = "DOCKER_REPO"
-      "value" = "${aws_ecr_repository.registry.repository_url}"
+      "value" = "${coalesce(join("",aws_ecr_repository.registry.*.repository_url),"UNUSED")}"
     }
   }
 
@@ -105,10 +106,12 @@ POLICY
 #---
 
 resource "aws_ecr_repository" "registry" {
-  name = "${var.project_name}/${var.environment}"
+  count = "${var.enable_ecr ? 1 : 0}"
+  name  = "${var.project_name}/${var.environment}"
 }
 
 resource "aws_ecr_repository_policy" "registrypolicy" {
+  count      = "${var.enable_ecr ? 1 : 0}"
   repository = "${aws_ecr_repository.registry.name}"
 
   policy = <<EOF
