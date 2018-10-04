@@ -719,14 +719,6 @@ spec:
       for: 10m
       labels:
         severity: warning
-    - alert: DeadMansSwitch
-      annotations:
-        description: This is a DeadMansSwitch meant to ensure that the entire Alerting
-          pipeline is functional.
-        summary: Alerting DeadMansSwitch
-      expr: vector(1)
-      labels:
-        severity: none
   - name: kube-prometheus-node-alerting.rules
     rules:
     - alert: NodeDiskRunningFull
