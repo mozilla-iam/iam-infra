@@ -202,7 +202,7 @@ resource "aws_db_instance" "mysql-mozillians-db" {
 
 resource "aws_elasticsearch_domain" "mozillians-es" {
   domain_name           = "mozillians-shared-es-${var.environment}"
-  elasticsearch_version = "2.3"
+  elasticsearch_version = "5.6"
 
   ebs_options {
     ebs_enabled = true
