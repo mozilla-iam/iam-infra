@@ -32,10 +32,10 @@ spec:
           - containerPort: 8000
           resources:
             requests:
-              memory: "768Mi"
+              memory: "200Mi"
               cpu: "250m"
             limits:
-              memory: "1024Mi"
+              memory: "200Mi"
               cpu: "500m"
           env:
             - name: AWS_DEFAULT_REGION
