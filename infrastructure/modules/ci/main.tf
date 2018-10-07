@@ -1,8 +1,14 @@
+data "aws_caller_identity" "current" {}
+data "aws_kms_key" "ssm" {
+  key_id = "alias/aws/ssm"
+}
+
 #---
 # CodeBuild and GitHub webhooks
 #---
 
 resource "aws_codebuild_webhook" "webhook" {
+  count         = "${var.enable_webhook ? 1 : 0}"
   project_name  = "${aws_codebuild_project.build.name}"
   branch_filter = "${var.github_branch}"
 }
@@ -19,13 +25,13 @@ resource "aws_codebuild_project" "build" {
 
   environment {
     compute_type    = "BUILD_GENERAL1_SMALL"
-    image           = "aws/codebuild/docker:17.09.0"
+    image           = "${var.build_image}"
     type            = "LINUX_CONTAINER"
     privileged_mode = "true"
 
     environment_variable {
       "name"  = "DOCKER_REPO"
-      "value" = "${aws_ecr_repository.registry.repository_url}"
+      "value" = "${coalesce(join("",aws_ecr_repository.registry.*.repository_url),"UNUSED")}"
     }
   }
 
@@ -94,6 +100,20 @@ resource "aws_iam_role_policy" "codebuild" {
         "ecr:*"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter*"
+      ],
+      "Resource": "arn:aws:ssm:us-west-2:${data.aws_caller_identity.current.account_id}:parameter/iam/${var.project_name}/${var.environment}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt"
+      ],
+      "Resource": "arn:aws:kms:us-west-2:${data.aws_caller_identity.current.account_id}:key/${data.aws_kms_key.ssm.id}"
     }
   ]
 }
@@ -105,10 +125,12 @@ POLICY
 #---
 
 resource "aws_ecr_repository" "registry" {
-  name = "${var.project_name}/${var.environment}"
+  count = "${var.enable_ecr ? 1 : 0}"
+  name  = "${var.project_name}/${var.environment}"
 }
 
 resource "aws_ecr_repository_policy" "registrypolicy" {
+  count      = "${var.enable_ecr ? 1 : 0}"
   repository = "${aws_ecr_repository.registry.name}"
 
   policy = <<EOF
