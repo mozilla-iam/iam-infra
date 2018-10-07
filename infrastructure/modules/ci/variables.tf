@@ -10,3 +10,7 @@ variable "enable_webhook" {
 variable "enable_ecr" {
   default = "true"
 }
+
+variable "build_image" {
+  default = "aws/codebuild/docker:17.09.0"
+}
