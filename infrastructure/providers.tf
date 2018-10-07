@@ -21,6 +21,7 @@ provider "http" {}
 # Shared state configuration
 
 terraform {
+  required_version = "~> 0.11"
   backend "s3" {
     bucket = "eks-terraform-shared-state"
     key    = "iam-eks-cluster/development/terraform.tfstate"
