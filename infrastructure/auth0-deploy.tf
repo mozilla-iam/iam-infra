@@ -13,17 +13,8 @@ module "auth0-deploy-ci-stage" {
   environment    = "stage"
   github_repo    = "https://github.com/mozilla-iam/auth0-deploy"
   github_branch  = "master"
-  enable_webhook = "false"
+  enable_webhook = "true"
   enable_ecr     = "false"
+  build_image    = "aws/codebuild/python:3.6.5"
 }
 
-module "auth0-deploy-ci-prod" {
-  source = "./modules/ci"
-
-  project_name   = "auth0-deploy"
-  environment    = "prod"
-  github_repo    = "https://github.com/mozilla-iam/auth0-deploy"
-  github_branch  = "production"
-  enable_webhook = "false"
-  enable_ecr     = "false"
-}
