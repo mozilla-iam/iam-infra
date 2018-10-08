@@ -325,11 +325,12 @@ spec:
       labels:
         severity: critical
         team: moc
+
   - name: kubernetes-apps
     rules:
     - alert: KubePodCrashLooping
       annotations:
-        message: '{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container
+        message: '{{ $labels.exported_namespace }}/{{ $labels.exported_pod }} ({{ $labels.container
           }}) is restarting {{ printf "%.2f" $value }} / second'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping
       expr: |
@@ -339,16 +340,16 @@ spec:
         severity: critical
     - alert: KubePodNotReady
       annotations:
-        message: '{{ $labels.namespace }}/{{ $labels.pod }} is not ready.'
+        message: '{{ $labels.exported_namespace }}/{{ $labels.exported_pod }} is not ready.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready
       expr: |
-        sum by (namespace, pod) (kube_pod_status_phase{job="kube-state-metrics", phase!~"Running|Succeeded"}) > 0
-      for: 1h
+        sum by (exported_namespace, exported_pod) (kube_pod_status_phase{job="kube-state-metrics", phase!~"Running|Succeeded"}) > 0
+      for: 30m
       labels:
         severity: critical
     - alert: KubeDeploymentGenerationMismatch
       annotations:
-        message: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} generation
+        message: Deployment {{ $labels.exported_namespace }}/{{ $labels.deployment }} generation
           mismatch
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedeploymentgenerationmismatch
       expr: |
@@ -360,7 +361,7 @@ spec:
         severity: warning
     - alert: KubeDeploymentReplicasMismatch
       annotations:
-        message: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replica
+        message: Deployment {{ $labels.exported_namespace }}/{{ $labels.deployment }} replica
           mismatch
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedeploymentreplicasmismatch
       expr: |
@@ -372,7 +373,7 @@ spec:
         severity: critical
     - alert: KubeStatefulSetReplicasMismatch
       annotations:
-        message: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replica
+        message: StatefulSet {{ $labels.exported_namespace }}/{{ $labels.statefulset }} replica
           mismatch
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubestatefulsetreplicasmismatch
       expr: |
@@ -384,7 +385,7 @@ spec:
         severity: critical
     - alert: KubeStatefulSetGenerationMismatch
       annotations:
-        message: StatefulSet {{ $labels.namespace }}/{{ labels.statefulset }} generation
+        message: StatefulSet {{ $labels.exported_namespace }}/{{ labels.statefulset }} generation
           mismatch
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubestatefulsetgenerationmismatch
       expr: |
@@ -397,7 +398,7 @@ spec:
     - alert: KubeDaemonSetRolloutStuck
       annotations:
         message: Only {{$value}}% of desired pods scheduled and ready for daemon set
-          {{$labels.namespace}}/{{$labels.daemonset}}
+          {{$labels.exported_namespace}}/{{$labels.daemonset}}
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
       expr: |
         kube_daemonset_status_number_ready{job="kube-state-metrics"}
@@ -408,7 +409,7 @@ spec:
         severity: critical
     - alert: KubeDaemonSetNotScheduled
       annotations:
-        message: A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}}
+        message: A number of pods of daemonset {{$labels.exported_namespace}}/{{$labels.daemonset}}
           are not scheduled.
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetnotscheduled
       expr: |
@@ -420,7 +421,7 @@ spec:
         severity: warning
     - alert: KubeDaemonSetMisScheduled
       annotations:
-        message: A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}}
+        message: A number of pods of daemonset {{$labels.exported_namespace}}/{{$labels.daemonset}}
           are running where they are not supposed to run.
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetmisscheduled
       expr: |
