@@ -98,6 +98,39 @@ spec:
           secret:
             secretName: mozillians-dev
 ---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: mozillians-celery-beat
+    keel.sh/trigger: poll
+    keel.sh/policy: force
+  name: mozillians-celery-beat
+  namespace: mozillians-dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: mozillians-celery-beat
+    spec:
+      containers:
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians-dev-manual:latest
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: secret-volume
+            mountPath: /etc/secrets-volume
+        name: mozillians-celery
+        command: ["/bin/sh"]
+        args: ["-c", "cp /etc/secrets-volume/env /code/mozillians/.env && /bin/sh /code/bin/run-celery-beat.sh"]
+        env:
+        - name: C_FORCE_ROOT
+          value: "true"
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: mozillians-dev
+---
 apiVersion: v1
 kind: Service
 metadata:
