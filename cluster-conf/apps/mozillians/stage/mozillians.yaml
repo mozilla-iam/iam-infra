@@ -90,9 +90,6 @@ spec:
         name: mozillians-celery
         command: ["/bin/sh"]
         args: ["-c", "cp /etc/secrets-volume/env /code/mozillians/.env && /bin/sh /code/bin/run-celery.sh"]
-        env:
-        - name: C_FORCE_ROOT
-          value: "true"
       volumes:
         - name: secret-volume
           secret:
@@ -123,9 +120,6 @@ spec:
         name: mozillians-celery
         command: ["/bin/sh"]
         args: ["-c", "cp /etc/secrets-volume/env /code/mozillians/.env && /bin/sh /code/bin/run-celery-beat.sh"]
-        env:
-        - name: C_FORCE_ROOT
-          value: "true"
       volumes:
         - name: secret-volume
           secret:
