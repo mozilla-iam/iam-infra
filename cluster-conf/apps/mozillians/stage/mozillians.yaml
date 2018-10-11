@@ -1,4 +1,26 @@
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: mozillians-dev
+  name: mozillians-media
+spec:
+  storageClassName: mozillians-stage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: mozillians-stage
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+allowVolumeExpansion: true
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -9,7 +31,7 @@ metadata:
   name: mozillians-web
   namespace: mozillians-dev
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -17,21 +39,33 @@ spec:
       annotations:
         iam.amazonaws.com/role: "arn:aws:iam::320464205386:role/MozilliansDevManual"
     spec:
+      initContainers:
+        - name: setup-volume-mount
+          image: busybox
+          command: ["sh", "-c", "chown -R 431:431 /media"]
+          volumeMounts:
+          - name: mozillians-media
+            mountPath: /media
       containers:
-      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians-dev-manual:latest
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/stage:latest
         imagePullPolicy: Always
         volumeMounts:
-          - name: secret-volume
-            mountPath: /etc/secrets-volume
+        - name: secret-volume
+          mountPath: /etc/secrets-volume
+        - name: mozillians-media
+          mountPath: /code/media
         name: mozillians-web
         ports:
         - containerPort: 8000
         command: ["/bin/sh"]
-        args: ["/code/bin/run-prod.sh"]
+        args: ["-c", "cp /etc/secrets-volume/env /code/mozillians/.env && /code/bin/run-prod.sh"]
       volumes:
         - name: secret-volume
           secret:
             secretName: mozillians-dev
+        - name: mozillians-media
+          persistentVolumeClaim:
+            claimName: mozillians-media
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -50,7 +84,7 @@ spec:
         name: mozillians-flower
     spec:
       containers:
-      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians-dev-manual:latest
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/stage:latest
         imagePullPolicy: Always
         volumeMounts:
           - name: secret-volume
@@ -82,7 +116,7 @@ spec:
         name: mozillians-celery
     spec:
       containers:
-      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians-dev-manual:latest
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/stage:latest
         imagePullPolicy: Always
         volumeMounts:
           - name: secret-volume
@@ -112,7 +146,7 @@ spec:
         name: mozillians-celery-beat
     spec:
       containers:
-      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians-dev-manual:latest
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/stage:latest
         imagePullPolicy: Always
         volumeMounts:
           - name: secret-volume
