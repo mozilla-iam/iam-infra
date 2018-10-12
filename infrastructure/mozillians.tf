@@ -51,7 +51,7 @@ module "mozillians-ci-stage" {
   project_name  = "mozillians"
   environment   = "stage"
   github_repo   = "https://github.com/danielhartnell/mozillians"
-  github_branch = "master"
+  github_branch = "^master$"
 }
 
 module "mozillians-ci-prod" {
@@ -60,5 +60,5 @@ module "mozillians-ci-prod" {
   project_name  = "mozillians"
   environment   = "prod"
   github_repo   = "https://github.com/danielhartnell/mozillians"
-  github_branch = "production"
+  github_branch = "^production$"
 }

@@ -12,7 +12,7 @@ module "sso-dashboard-ci-stage" {
   project_name   = "sso-dashboard"
   environment    = "stage"
   github_repo    = "https://github.com/mozilla-iam/sso-dashboard"
-  github_branch  = "master"
+  github_branch  = "^master$"
   enable_webhook = "true"
 }
 
@@ -22,6 +22,6 @@ module "sso-dashboard-ci-prod" {
   project_name   = "sso-dashboard"
   environment    = "prod"
   github_repo    = "https://github.com/mozilla-iam/sso-dashboard"
-  github_branch  = "production"
+  github_branch  = "^production$"
   enable_webhook = "true"
 }
