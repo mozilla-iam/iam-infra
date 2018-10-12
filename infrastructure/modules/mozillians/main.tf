@@ -1,14 +1,36 @@
 #---
-# - Security groups
-# - Elasticache
-# - Redis
-# - Memcached
+# - Resources:
+#   - Security groups
+#   - Elasticache
+#   - Redis
+#   - Memcached
+#   - Elasticsearch
+#   - S3
+#   - IAM
 #---
+
+output "ssm-db-pass" {
+  value = "${data.aws_ssm_parameter.mozillians-db-password.value}"
+}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_kms_key" "ssm" {
+  key_id = "alias/aws/ssm"
+}
+
 data "aws_subnet_ids" "all" {
   vpc_id = "${var.vpc_id}"
+}
+
+data "aws_security_group" "resource-vpc" {
+  vpc_id = "${var.vpc_id}"
+  name   = "default"
+}
+
+data "aws_ssm_parameter" "mozillians-db-password" {
+  name  = "/iam/mozillians/${var.environment}/DB_PASSWORD"
+  with_decryption = "true"
 }
 
 #---
@@ -184,7 +206,7 @@ resource "aws_db_instance" "mysql-mozillians-db" {
   final_snapshot_identifier  = "mysql-mozillians-db-final-${var.environment}"
   name                       = "mozilliansdb"
   username                   = "root"
-  password                   = "${var.mysql-mozillians-db_password}"
+  password                   = "${data.aws_ssm_parameter.mozillians-db-password.value}"
   db_subnet_group_name       = "${aws_db_subnet_group.apps-rds-subnetgroup.name}"
   parameter_group_name       = "default.mysql5.6"
 
@@ -202,7 +224,7 @@ resource "aws_db_instance" "mysql-mozillians-db" {
 
 resource "aws_elasticsearch_domain" "mozillians-es" {
   domain_name           = "mozillians-shared-es-${var.environment}"
-  elasticsearch_version = "5.6"
+  elasticsearch_version = "2.3"
 
   ebs_options {
     ebs_enabled = true
@@ -223,6 +245,7 @@ resource "aws_elasticsearch_domain" "mozillians-es" {
 
   vpc_options {
     subnet_ids = ["${data.aws_subnet_ids.all.ids[0]}"]
+    security_group_ids = ["${data.aws_security_group.resource-vpc.id}"]
   }
 
   tags {
@@ -234,12 +257,176 @@ resource "aws_elasticsearch_domain" "mozillians-es" {
 
   access_policies = <<CONFIG
 {
-    "Version": "2012-10-17",
-    "Statement": [{
-        "Action": "es:*",
-        "Principal": "*",
-        "Effect": "Allow"
-    }]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "*"
+        ]
+      },
+      "Action": [
+        "es:*"
+      ],
+      "Resource": "arn:aws:es:us-west-2:320464205386:domain/mozillians-shared-es-stage/*"
+    }
+  ]
 }
 CONFIG
 }
+
+#---
+# S3
+#---
+
+resource "aws_s3_bucket" "mozillians" {
+  bucket = "kubernetes-mozillians-${var.environment}"
+  acl    = "private"
+
+  tags {
+    Name        = "kubernetes-mozillians"
+    Environment = "${var.environment}"
+  }
+}
+
+resource "aws_s3_bucket" "mozillians-exports" {
+  bucket = "kubernetes-mozillians-${var.environment}-exports"
+  acl    = "private"
+
+  tags {
+    Name        = "kubernetes-mozillians-exports"
+    Environment = "${var.environment}"
+  }
+}
+
+resource "aws_s3_bucket" "mozillians-orgchart" {
+  bucket = "kubernetes-mozillians-${var.environment}-orgchart"
+  acl    = "private"
+
+  tags {
+    Name = "kubernetes-mozillians-orgchart"
+    Environment = "${var.environment}"
+  }
+}
+
+#---
+# IAM roles
+#---
+
+resource "aws_iam_role" "mozillians" {
+  name = "mozillians-${var.environment}"
+
+  assume_role_policy = <<POLICY
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Action":"sts:AssumeRole",
+         "Principal":{
+            "AWS":"arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/terraform-kubernetes-production-01-node"
+         },
+         "Effect":"Allow",
+         "Sid":""
+      }
+   ]
+}
+POLICY
+}
+
+#---
+# IAM policies
+#---
+
+resource "aws_iam_role_policy" "ses" {
+  name = "mozillians-${var.environment}-ses"
+  role = "${aws_iam_role.mozillians.id}"
+
+  policy = <<POLICY
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Effect":"Allow",
+         "Action":[
+            "ses:Get*",
+            "ses:List*"
+         ],
+         "Resource":"*"
+      }
+   ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy" "s3" {
+  name = "mozillians-${var.environment}-s3"
+  role = "${aws_iam_role.mozillians.id}"
+
+  policy = <<POLICY
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Effect":"Allow",
+         "Action":"s3:*",
+         "Resource":[
+            "${aws_s3_bucket.mozillians.arn}",
+            "${aws_s3_bucket.mozillians.arn}/*",
+            "${aws_s3_bucket.mozillians-exports.arn}",
+            "${aws_s3_bucket.mozillians-exports.arn}/*",
+            "${aws_s3_bucket.mozillians-orgchart.arn}",
+            "${aws_s3_bucket.mozillians-orgchart.arn}/*"
+         ]
+      }
+   ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy" "ssm" {
+  name = "mozillians-${var.environment}-ssm"
+  role = "${aws_iam_role.mozillians.id}"
+
+  policy = <<POLICY
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Effect":"Allow",
+         "Action":[
+            "ssm:GetParameter*"
+         ],
+         "Resource":"arn:aws:ssm:us-west-2:${data.aws_caller_identity.current.account_id}:parameter/iam/mozillians/${var.environment}/*"
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "kms:Decrypt"
+         ],
+         "Resource":"arn:aws:kms:us-west-2:${data.aws_caller_identity.current.account_id}:key/${data.aws_kms_key.ssm.id}"
+      }
+   ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy" "cispublisher" {
+  name = "mozillians-${var.environment}-assume-cis-publisher"
+  role = "${aws_iam_role.mozillians.id}"
+
+  policy = <<POLICY
+{
+   "Version": "2012-10-17",
+   "Statement": [
+       {
+           "Sid": "VisualEditor0",
+           "Effect": "Allow",
+           "Action": "sts:AssumeRole",
+           "Resource": "arn:aws:iam::656532927350:role/CISPublisherRole"
+       }
+   ]
+}
+POLICY
+}
+
