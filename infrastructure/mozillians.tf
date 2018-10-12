@@ -1,5 +1,3 @@
-variable "mysql-mozillians-db_password" {}
-
 #---
 # Create AWS resources for Mozillians
 #---
@@ -19,7 +17,6 @@ module "mozillians-staging" {
   elasticache_memcached_instance_size = "cache.t2.micro"
   rds_instance_class                  = "db.t2.small"
   cis_publisher_role_arn              = "arn:aws:iam::656532927350:role/CISPublisherRole"
-  mysql-mozillians-db_password        = "${var.mysql-mozillians-db_password}"
   k8s_source_security_group           = "${module.eks-production-01.node-security-group}"
 }
 
@@ -37,7 +34,6 @@ module "mozillians-production" {
   elasticache_memcached_instance_size = "cache.t2.micro"
   rds_instance_class                  = "db.t2.medium"
   cis_publisher_role_arn              = "arn:aws:iam::371522382791:role/CISPublisherRole"
-  mysql-mozillians-db_password        = "${var.mysql-mozillians-db_password}"
   k8s_source_security_group           = "${module.eks-production-01.node-security-group}"
 }
 
