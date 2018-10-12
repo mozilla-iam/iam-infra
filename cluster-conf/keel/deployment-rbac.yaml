@@ -110,6 +110,8 @@ spec:
       labels:
         app: keel
         release: keel
+      annotations:
+        iam.amazonaws.com/role: arn:aws:iam::320464205386:role/terraform-kubernetes-production-01-node-keel
     spec:
       serviceAccountName: keel
       containers:
@@ -129,6 +131,8 @@ spec:
             # Enable insecure registries
             - name: INSECURE_REGISTRY
               value: "true"
+            - name: AWS_REGION
+              value: "us-west-2"
           ports:
             - containerPort: 9300
           livenessProbe:
