@@ -12,7 +12,7 @@ module "auth0-deploy-ci-stage" {
   project_name   = "auth0-deploy"
   environment    = "stage"
   github_repo    = "https://github.com/mozilla-iam/auth0-deploy"
-  github_branch  = "master"
+  github_branch  = "^master$"
   enable_webhook = "true"
   enable_ecr     = "false"
   build_image    = "aws/codebuild/python:3.6.5"
