@@ -45,6 +45,25 @@ resource "aws_iam_role" "cluster-autoscaler" {
 POLICY
 }
 
+resource "aws_iam_role" "keel" {
+  name = "terraform-${var.cluster-name}-node-keel"
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_role.demo-node.arn}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+}
+
 resource "aws_iam_role_policy" "cluster-autoscaler-policy" {
   name = "terraform-${var.cluster-name}-node-ClusterAutoscaler"
   role = "${aws_iam_role.cluster-autoscaler.id}"
@@ -65,6 +84,31 @@ resource "aws_iam_role_policy" "cluster-autoscaler-policy" {
             "Resource": "*"
         }
     ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "keel-policy" {
+  name = "terraform-${var.cluster-name}-node-keel"
+  role = "${aws_iam_role.keel.id}"
+
+  policy = <<EOF
+{
+	"Version": "2012-10-17",
+	"Statement": [{
+		"Effect": "Allow",
+		"Action": [
+			"ecr:GetAuthorizationToken",
+			"ecr:BatchCheckLayerAvailability",
+			"ecr:GetDownloadUrlForLayer",
+			"ecr:GetRepositoryPolicy",
+			"ecr:DescribeRepositories",
+			"ecr:ListImages",
+			"ecr:DescribeImages",
+			"ecr:BatchGetImage"
+		],
+		"Resource": "*"
+	}]
 }
 EOF
 }
