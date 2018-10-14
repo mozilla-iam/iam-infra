@@ -31,7 +31,7 @@ metadata:
   name: mozillians-web
   namespace: mozillians-dev
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
