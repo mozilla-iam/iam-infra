@@ -37,7 +37,7 @@ spec:
       labels:
         name: mozillians-web
       annotations:
-        iam.amazonaws.com/role: "arn:aws:iam::320464205386:role/MozilliansDevManual"
+        iam.amazonaws.com/role: "arn:aws:iam::320464205386:role/mozillians-stage"
     spec:
       initContainers:
         - name: setup-volume-mount
