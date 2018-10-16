@@ -236,7 +236,7 @@ systemctl restart kubelet
 USERDATA
 }
 
-resource "aws_launch_configuration" "demo" {
+resource "aws_launch_configuration" "demo2" {
   associate_public_ip_address = true
   iam_instance_profile        = "${aws_iam_instance_profile.demo-node.name}"
   image_id                    = "${data.aws_ami.eks-worker.id}"
@@ -248,37 +248,80 @@ resource "aws_launch_configuration" "demo" {
   lifecycle {
     create_before_destroy = true
   }
+
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = 50
+  }
 }
 
-resource "aws_autoscaling_group" "demo" {
-  desired_capacity     = "${var.instance-desired-capacity}"
-  launch_configuration = "${aws_launch_configuration.demo.id}"
-  max_size             = "${var.instance-max}"
-  min_size             = "${var.instance-min}"
-  name                 = "terraform-${var.cluster-name}"
-  vpc_zone_identifier  = ["${aws_subnet.demo.*.id}"]
+resource "aws_cloudformation_stack" "mymodule_asg" {
+  name          = "cf-terraform-${var.cluster-name}"
+  depends_on    = ["aws_launch_configuration.demo2"]
 
-  tag {
-    key                 = "Name"
-    value               = "terraform-${var.cluster-name}"
-    propagate_at_launch = true
+  lifecycle {
+    create_before_destroy = true
   }
 
-  tag {
-    key                 = "kubernetes.io/cluster/${var.cluster-name}"
-    value               = "owned"
-    propagate_at_launch = true
+  template_body = <<EOF
+{
+  "Resources": {
+    "${replace("CFTerraform-${var.cluster-name}","-","")}": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "VPCZoneIdentifier": ${jsonencode("${aws_subnet.demo.*.id}")},
+        "LaunchConfigurationName": "${aws_launch_configuration.demo2.name}",
+        "MaxSize": ${var.instance-max},
+        "MinSize": ${var.instance-min},
+        "DesiredCapacity": ${var.instance-desired-capacity},
+        "TerminationPolicies": ["OldestLaunchConfiguration", "OldestInstance"],
+        "Tags" : [
+          {
+            "Key": "Name",
+            "Value": "terraform-${var.cluster-name}",
+            "PropagateAtLaunch": "true"
+          },
+          {
+            "Key": "kubernetes.io/cluster/${var.cluster-name}",
+            "Value": "owned",
+            "PropagateAtLaunch": "true"
+          },
+          {
+            "Key": "k8s.io/cluster-autoscaler/${var.cluster-name}",
+            "Value": "",
+            "PropagateAtLaunch": "true"
+          },
+          {
+            "Key": "k8s.io/cluster-autoscaler/enabled",
+            "Value": "true",
+            "PropagateAtLaunch": "true"
+          }
+        ]
+      },
+      "CreationPolicy" : {
+        "AutoScalingCreationPolicy" : {
+          "MinSuccessfulInstancesPercent" : 0
+        },
+        "ResourceSignal": {
+          "Count": 0
+        }
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MinInstancesInService": ${var.instance-min},
+          "MaxBatchSize": 1,
+          "PauseTime": "PT3M",
+          "WaitOnResourceSignals" : false
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "${replace("CFTerraform-${var.cluster-name}","-","")}": {
+      "Description": "The name of the auto scaling group for ${var.cluster-name}",
+       "Value": {"Ref": "${replace("CFTerraform-${var.cluster-name}","-","")}"}
+    }
   }
-
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
-    value               = ""
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/enabled"
-    value               = "true"
-    propagate_at_launch = true
-  }
+}
+EOF
 }
