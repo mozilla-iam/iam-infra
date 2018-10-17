@@ -262,7 +262,7 @@ data:
                 "format": "time_series",
                 "hide": false,
                 "intervalFactor": 2,
-                "legendFormat": "{{ pod }}",
+                "legendFormat": "{{ exported_pod }}",
                 "refId": "A",
                 "step": 2
               }
