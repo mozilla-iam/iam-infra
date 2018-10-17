@@ -33,7 +33,7 @@ spec:
                   name: oidc-proxy-secret
                   key: client_secret
             - name: discovery_url
-              value: "https://auth.mozilla.auth0.com/.well-known/openid-configuration"
+              value: "https://auth-dev.mozilla.auth0.com/.well-known/openid-configuration"
             - name: backend
               value: mozillians-web
             - name: redirect_uri
