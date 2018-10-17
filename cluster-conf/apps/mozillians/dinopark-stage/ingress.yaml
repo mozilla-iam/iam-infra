@@ -13,8 +13,8 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: mozillians-web
-          servicePort: 8000
+          serviceName: oidc_proxy
+          servicePort: 80
         path: /
   tls:
   - hosts:
