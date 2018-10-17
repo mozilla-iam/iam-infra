@@ -54,4 +54,4 @@ spec:
     port: 80
     targetPort: 80
   selector:
-    name: oidc_proxy
+    name: oidc-proxy

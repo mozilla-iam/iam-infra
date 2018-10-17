@@ -13,7 +13,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: oidc_proxy
+          serviceName: oidc-proxy
           servicePort: 80
         path: /
   tls:
