@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-production
+  name: mozillians-ingress
+  namespace: mozillians-dinopark-stage
+spec:
+  rules:
+  - host: web-mozillians.dinopark.infra.iam.mozilla.com
+    http:
+      paths:
+      - backend:
+          serviceName: mozillians-web
+          servicePort: 8000
+        path: /
+  tls:
+  - hosts:
+    - web-mozillians.dinopark.infra.iam.mozilla.com
+    secretName: mozillians-dinothon-cert
