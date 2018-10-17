@@ -35,7 +35,7 @@ spec:
             - name: discovery_url
               value: "https://auth-dev.mozilla.auth0.com/.well-known/openid-configuration"
             - name: backend
-              value: mozillians-web.mozillians-dinopark-stage.svc.cluster.local
+              value: mozillians-web.mozillians-dinopark-stage.svc.cluster.local:8000
             - name: redirect_uri
               value: "https://web-mozillians.dinopark.infra.iam.mozilla.com/oidc/callback/"
 
