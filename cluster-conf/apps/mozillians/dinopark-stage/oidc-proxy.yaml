@@ -1,0 +1,58 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: oidc-proxy
+    keel.sh/trigger: poll
+    keel.sh/policy: force
+  name: oidc-proxy
+  namespace: mozillians-dinopark-stage
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: oidc-proxy
+    spec:
+      containers:
+        - image: mozillaparsys/mozilla.oidc.proxy:latest
+          imagePullPolicy: Always
+          name: oidc-porxy
+          ports:
+            - containerPort: 80
+          env:
+            - name: client_id
+              valueFrom:
+                secretKeyRef:
+                  name: oidc-proxy-secret
+                  key: client_id
+            - name: client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: oidc-proxy-secret
+                  key: client_secret
+            - name: discovery_url
+              value: "https://auth-dev.mozilla.auth0.com/.well-known/openid-configuration"
+            - name: backend
+              value: mozillians-web
+            - name: redirect_uri
+              value: "https://web-mozillians.dinopark.infra.iam.mozilla.com/oidc/callback/"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    name: oidc-proxy
+  name: oidc-proxy
+  namespace: mozillians-dinopark-stage
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+  selector:
+    name: oidc_proxy
