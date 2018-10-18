@@ -128,7 +128,7 @@ resource "aws_security_group_rule" "mozillians-mysql-ingress" {
   security_group_id        = "${aws_security_group.mozillians-mysql.id}"
 }
 
-resource "aws_security_group_rule" "mozillians-mysql-ingress-additions" {
+resource "aws_security_group_rule" "mozillians-mysql-ingress-addition" {
   type                     = "ingress"
   from_port                = 3306
   to_port                  = 3306
