@@ -8,7 +8,7 @@ module "eks-development-01" {
   environment               = "development"
   region                    = "us-west-2"
   instance-type             = "c4.large"
-  instance-desired-capacity = 3
+  instance-desired-capacity = 4
   instance-max              = 5
   instance-min              = 2
 }

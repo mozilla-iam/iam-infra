@@ -8,8 +8,13 @@ data "aws_subnet_ids" "all" {
   vpc_id = "${module.resource-vpc-production.vpc-id}"
 }
 
+data "aws_security_group" "resource-vpc" {
+  vpc_id = "${module.resource-vpc-production.vpc-id}"
+  name   = "default"
+}
+
 resource "aws_elasticsearch_domain" "dinopark-es" {
-  domain_name           = "mozillians-shared-es-dinopark"
+  domain_name           = "mozillians-es-dinopark"
   elasticsearch_version = "6.3"
 
   ebs_options {
@@ -26,7 +31,7 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
   }
 
   snapshot_options {
-    automated_snapshot_start_hour = 23
+    automated_snapshot_start_hour = 17
   }
 
   vpc_options {
