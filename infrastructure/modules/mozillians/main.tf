@@ -52,6 +52,16 @@ resource "aws_security_group_rule" "mozillians-memcached-ingress" {
   security_group_id        = "${aws_security_group.mozillians-memcached.id}"
 }
 
+resource "aws_security_group_rule" "mozillians-memcached-ingress-addition" {
+  type                     = "ingress"
+  from_port                = 11211
+  to_port                  = 11211
+  protocol                 = "-1"
+  cidr_blocks              = ["10.0.0.0/16"]
+  #source_security_group_id = "${var.k8s_source_security_group}"
+  security_group_id        = "${aws_security_group.mozillians-memcached.id}"
+}
+
 resource "aws_security_group_rule" "mozillians-memcached-egress" {
   type              = "egress"
   from_port         = 0
@@ -80,6 +90,16 @@ resource "aws_security_group_rule" "mozillians-redis-ingress" {
   security_group_id        = "${aws_security_group.mozillians-redis.id}"
 }
 
+resource "aws_security_group_rule" "mozillians-redis-ingress-addition" {
+  type                     = "ingress"
+  from_port                = 6379
+  to_port                  = 6379
+  protocol                 = "-1"
+  cidr_blocks              = ["10.0.0.0/16"]
+  #source_security_group_id = "${var.k8s_source_security_group}"
+  security_group_id        = "${aws_security_group.mozillians-redis.id}"
+}
+
 resource "aws_security_group_rule" "mozillians-redis-egress" {
   type              = "egress"
   from_port         = 0
@@ -105,6 +125,16 @@ resource "aws_security_group_rule" "mozillians-mysql-ingress" {
   to_port                  = 3306
   protocol                 = "-1"
   source_security_group_id = "${var.k8s_source_security_group}"
+  security_group_id        = "${aws_security_group.mozillians-mysql.id}"
+}
+
+resource "aws_security_group_rule" "mozillians-mysql-ingress-additions" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "-1"
+  cidr_blocks              = ["10.0.0.0/16"]
+  #source_security_group_id = "${var.k8s_source_security_group}"
   security_group_id        = "${aws_security_group.mozillians-mysql.id}"
 }
 
@@ -269,7 +299,7 @@ resource "aws_elasticsearch_domain" "mozillians-es" {
       "Action": [
         "es:*"
       ],
-      "Resource": "arn:aws:es:us-west-2:${data.aws_caller_identity.current.account_id}:domain/mozillians-shared-es-stage/*"
+      "Resource": "arn:aws:es:us-west-2:${data.aws_caller_identity.current.account_id}:domain/mozillians-shared-es-${var.environment}/*"
     }
   ]
 }
