@@ -60,17 +60,19 @@ module "mozillians-production" {
 module "mozillians-ci-stage" {
   source = "./modules/ci"
 
-  project_name  = "mozillians"
-  environment   = "stage"
-  github_repo   = "https://github.com/danielhartnell/mozillians"
-  github_branch = "^master$"
+  project_name   = "mozillians"
+  environment    = "stage"
+  github_repo    = "https://github.com/danielhartnell/mozillians"
+  github_branch  = "^master$"
+  enable_webhook = "false"
 }
 
 module "mozillians-ci-prod" {
   source = "./modules/ci"
 
-  project_name  = "mozillians"
-  environment   = "prod"
-  github_repo   = "https://github.com/danielhartnell/mozillians"
-  github_branch = "^production$"
+  project_name   = "mozillians"
+  environment    = "prod"
+  github_repo    = "https://github.com/danielhartnell/mozillians"
+  github_branch  = "^production$"
+  enable_webhook = "false"
 }
