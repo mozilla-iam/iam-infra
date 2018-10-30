@@ -18,7 +18,7 @@ spec:
         iam.amazonaws.com/role: "arn:aws:iam::320464205386:role/mozillians-dino"
     spec:
      containers:
-     - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/mozilla:latest
+     - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/dino-park-mozillians:9a45bf0ac7e602e8aea9188800a785fc58c9dbd5
        imagePullPolicy: Always
        volumeMounts:
        - name: secret-volume
@@ -50,7 +50,7 @@ spec:
         name: mozillians-flower
     spec:
       containers:
-      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/mozilla:latest
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/dino-park-mozillians:9a45bf0ac7e602e8aea9188800a785fc58c9dbd5
         imagePullPolicy: Always
         volumeMounts:
           - name: secret-volume
@@ -82,7 +82,7 @@ spec:
         name: mozillians-celery
     spec:
       containers:
-      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/mozilla:latest
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/dino-park-mozillians:9a45bf0ac7e602e8aea9188800a785fc58c9dbd5
         imagePullPolicy: Always
         volumeMounts:
           - name: secret-volume
@@ -112,7 +112,7 @@ spec:
         name: mozillians-celery-beat
     spec:
       containers:
-      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/mozillians/mozilla:latest
+      - image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/dino-park-mozillians:9a45bf0ac7e602e8aea9188800a785fc58c9dbd5
         imagePullPolicy: Always
         volumeMounts:
           - name: secret-volume
