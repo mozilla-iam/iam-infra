@@ -2604,7 +2604,7 @@ data:
           ]
         },
         "timezone": "browser",
-        "title": "Kubernetes Cluster (Prometheus)",
+        "title": "Kubernetes Cluster Overview",
         "uid": "4XuMd2Iiz",
         "version": 1
       }
