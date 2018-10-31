@@ -65,8 +65,13 @@ module "dino-park-mozillians-ci" {
   service_name = "dino-park-mozillians"
 }
 
-module "graylog-resources" {
-  source          = "./modules/sites/graylog"
-  service_name    = "graylog"
-  resource_vpc_id = "${module.resource-vpc-production.vpc-id}"
+module "dino-park-dev-tools-ci" {
+  source       = "./modules/sites/dino-park-dev-tools"
+  service_name = "dino-park-dev-tools"
 }
+
+#module "graylog-resources" {
+#  source          = "./modules/sites/graylog"
+#  service_name    = "graylog"
+#  resource_vpc_id = "${module.resource-vpc-production.vpc-id}"
+#}
