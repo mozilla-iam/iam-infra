@@ -75,3 +75,13 @@ module "dino-park-dev-tools-ci" {
 #  service_name    = "graylog"
 #  resource_vpc_id = "${module.resource-vpc-production.vpc-id}"
 #}
+
+module "sso-dashboard-staging-ci" {
+  source       = "./modules/sites/sso-dashboard-staging"
+  service_name = "sso-dashboard-staging"
+}
+
+module "sso-dashboard-prod-ci" {
+  source       = "./modules/sites/sso-dashboard-prod"
+  service_name = "sso-dashboard-prod"
+}
