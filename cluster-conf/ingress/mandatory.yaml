@@ -73,6 +73,7 @@ metadata:
 data:
   use-proxy-protocol: "true"
   enable-vts-status: "true"
+  proxy-buffer-size: "16k"
 ---
 
 kind: ConfigMap
