@@ -6,10 +6,6 @@ data "aws_kms_key" "ssm" {
   key_id = "alias/aws/ssm"
 }
 
-data "template_file" "buildspec" {
-  template = "${file("${path.module}/buildspec.yml")}"
-}
-
 #---
 # CodeBuild and webhook
 #---
@@ -60,7 +56,6 @@ resource "aws_codebuild_project" "build" {
   source {
     type      = "GITHUB"
     location  = "https://github.com/mozilla-iam/dino-tree.git"
-    buildspec = "${data.template_file.buildspec.rendered}"
   }
 
   tags {

@@ -1,0 +1,169 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: codebuild-deployer
+rules:
+- apiGroups: ["","extensions","apps"]
+  resources: ["pods","ingresses","services","namespaces","deployments","configmaps"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: mozillians-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: mozillians-staging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: mozillians-prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: dinopark-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: dinopark-staging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: dinopark-prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: sso-dashboard-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: sso-dashboard-staging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: sso-dashboard-prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: codebuild-deployer
+  namespace: dino-park
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: codebuild-deployer
+subjects:
+- kind: ServiceAccount
+  name: codebuild-deployer
+  namespace: default

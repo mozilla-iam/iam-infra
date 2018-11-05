@@ -6,14 +6,13 @@ data "aws_kms_key" "ssm" {
   key_id = "alias/aws/ssm"
 }
 
+data "template_file" "buildspec" {
+  template = "${file("${path.module}/buildspec.yml")}"
+}
+
 #---
 # CodeBuild and webhook
 #---
-
-resource "aws_codebuild_webhook" "webhook" {
-  project_name  = "${aws_codebuild_project.build.name}"
-  branch_filter = "^master$"
-}
 
 resource "aws_codebuild_project" "build" {
   name          = "${var.service_name}"
@@ -55,7 +54,8 @@ resource "aws_codebuild_project" "build" {
 
   source {
     type      = "GITHUB"
-    location  = "https://github.com/mozilla-iam/dino-park-front-end.git"
+    location  = "https://github.com/danielhartnell/sso-dashboard.git"
+    buildspec = "${data.template_file.buildspec.rendered}"
   }
 
   tags {

@@ -6,10 +6,6 @@ data "aws_kms_key" "ssm" {
   key_id = "alias/aws/ssm"
 }
 
-data "template_file" "buildspec" {
-  template = "${file("${path.module}/buildspec.yml")}"
-}
-
 #---
 # CodeBuild and webhook
 #---
@@ -17,7 +13,7 @@ data "template_file" "buildspec" {
 resource "aws_codebuild_project" "build" {
   name          = "${var.service_name}"
   description   = "CI pipeline for ${var.service_name}"
-  build_timeout = "10"
+  build_timeout = "30"
   service_role  = "${aws_iam_role.codebuild.arn}"
 
   artifacts {
@@ -55,7 +51,6 @@ resource "aws_codebuild_project" "build" {
   source {
     type      = "GITHUB"
     location  = "https://github.com/mozilla/mozillians.git"
-    buildspec = "${data.template_file.buildspec.rendered}"
   }
 
   tags {
