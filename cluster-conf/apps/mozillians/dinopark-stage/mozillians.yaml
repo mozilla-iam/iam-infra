@@ -1,3 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "mozillians-dinopark-stage"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
