@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: graylog-slave
+  namespace: logging
+spec:
+  selector:
+    matchLabels:
+      k8s-app: graylog-slave
+  serviceName: "graylog-slave"
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        k8s-app: graylog-slave
+        graylog-role: slave
+        graylog: "true"
+    spec:
+      terminationGracePeriodSeconds: 70
+      affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: k8s-app
+                  operator: In
+                  values:
+                  - graylog-master
+                - key: k8s-app
+                  operator: In
+                  values:
+                  - graylog-slave
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: graylog-slave
+          image: graylog2/server:2.4.6-1
+          env:
+          - name: GRAYLOG_PASSWORD_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: graylog-config-secret
+                key: admin_pw
+          - name: GRAYLOG_ROOT_PASSWORD_SHA2
+            valueFrom:
+              secretKeyRef:
+                name: graylog-config-secret
+                key: admin_pw_sha2
+          - name: GRAYLOG_MONGODB_URI
+            value: "mongodb://mongo-graylog-0.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-1.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-2.mongo-graylog.logging.svc.cluster.local:27017/graylog?replicaSet=rs0"
+          - name: GRAYLOG_IS_MASTER
+            value: "false"
+          - name: GRAYLOG_ELASTICSEARCH_HOSTS
+            value: "https://vpc-graylog-logging-aqaqfilc3hkduvijar3uwexthu.us-west-2.es.amazonaws.com"
+          - name: GRAYLOG_REST_LISTEN_URI
+            value: "http://0.0.0.0:9000/api/"
+          - name: GRAYLOG_WEB_LISTEN_URI
+            value: "http://0.0.0.0:9000/"
+          - name: GRAYLOG_REST_TRANSPORT_URI
+            value: "http://graylog-master.logging.svc.cluster.local:9000/api/"
+          - name: GRAYLOG_SERVER_JAVA_OPTS
+            value: "-Xms1024m -Xmx1024m -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow"
+          ports:
+          - containerPort: 9000
+            name: http
+          - containerPort: 12201
+            name: udp-input
+          - containerPort: 1514
+            name: tcp-input
+          volumeMounts:
+          - name: graylog-persistent-storage
+            mountPath: /usr/share/graylog/data/journal
+            subPath: graylog
+          - name: graylog-plugins-storage
+            mountPath: /usr/share/graylog/plugin
+            subPath: graylog
+          resources:
+            requests:
+              cpu: .25
+              memory: 1024Mi
+            limits:
+              cpu: 1.5
+              memory: 1536Mi
+          readinessProbe:
+            httpGet:
+              path: /api/system/lbstatus
+              port: 9000
+            initialDelaySeconds: 90
+            periodSeconds: 3
+            timeoutSeconds: 60
+            successThreshold: 1
+            failureThreshold: 2
+  volumeClaimTemplates:
+  - metadata:
+      name: graylog-persistent-storage
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "logging-storage"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 60Gi
+  - metadata:
+      name: graylog-plugins-storage
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "logging-storage"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graylog-slave
+  labels:
+    name: graylog-slave
+    k8s-app: graylog-slave
+  namespace: logging
+spec:
+  selector:
+    k8s-app: graylog-slave
+  ports:
+  - name: http
+    protocol: TCP
+    port: 9000
+  - name: syslog-tcp
+    protocol: TCP
+    port: 514
+  clusterIP: None
+
