@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: prometheus-general
+    role: alert-rules
+  name: es-graylog-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: es-system.rules
+    rules:
+    - alert: Graylog-ES-low_on_disk_space
+      annotations:
+        message: 'ES Graylog is finishing its free disk space'
+      expr: |
+        elasticsearch_filesystem_data_free_bytes{cluster="320464205386:graylog-logging"} * 100 / elasticsearch_filesystem_data_size_bytes{cluster="320464205386:graylog-logging"} < 10
+      for: 5m
+      labels:
+        severity: critical
