@@ -7,7 +7,7 @@ metadata:
     app: sso-dashboard
     keel.sh/trigger: poll
     keel.sh/policy: force
-  namespace: development
+  namespace: dev
 spec:
   replicas: 3
   selector:
@@ -46,7 +46,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sso-dashboard
-  namespace: development
+  namespace: dev
 spec:
   ports:
     - port: 8000
@@ -63,7 +63,7 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     certmanager.k8s.io/cluster-issuer: letsencrypt-production
   name: sso-dashboard
-  namespace: development
+  namespace: dev
 spec:
   tls:
   - hosts:
