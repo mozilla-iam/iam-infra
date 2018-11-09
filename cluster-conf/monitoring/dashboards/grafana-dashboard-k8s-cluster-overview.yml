@@ -5,11 +5,11 @@ metadata:
   namespace: monitoring
 data:
   grafana-dashboard-k8s-cluster-overview.json: |-
+      
       {
         "annotations": {
           "list": [
             {
-              "$$hashKey": "object:2982",
               "builtIn": 1,
               "datasource": "-- Grafana --",
               "enable": true,
@@ -24,8 +24,7 @@ data:
         "editable": true,
         "gnetId": 6417,
         "graphTooltip": 1,
-        "id": 6,
-        "iteration": 1532425685642,
+        "iteration": 1541760785101,
         "links": [
           {
             "asDropdown": true,
@@ -65,7 +64,7 @@ data:
             "datasource": "prometheus",
             "format": "percentunit",
             "gauge": {
-              "maxValue": 100,
+              "maxValue": 1,
               "minValue": 0,
               "show": true,
               "thresholdLabels": false,
@@ -120,7 +119,7 @@ data:
                 "refId": "A"
               }
             ],
-            "thresholds": "80,90",
+            "thresholds": "0.8,0.9",
             "title": "Cluster Pod Usage",
             "type": "singlestat",
             "valueFontSize": "80%",
@@ -145,7 +144,7 @@ data:
             "datasource": "prometheus",
             "format": "percentunit",
             "gauge": {
-              "maxValue": 100,
+              "maxValue": 1,
               "minValue": 0,
               "show": true,
               "thresholdLabels": false,
@@ -200,7 +199,7 @@ data:
                 "refId": "A"
               }
             ],
-            "thresholds": "80,90",
+            "thresholds": "0.8,0.9",
             "title": "Cluster CPU Usage",
             "type": "singlestat",
             "valueFontSize": "80%",
@@ -225,7 +224,7 @@ data:
             "datasource": "prometheus",
             "format": "percentunit",
             "gauge": {
-              "maxValue": 100,
+              "maxValue": 1,
               "minValue": 0,
               "show": true,
               "thresholdLabels": false,
@@ -280,7 +279,7 @@ data:
                 "refId": "A"
               }
             ],
-            "thresholds": "80,90",
+            "thresholds": "0.8,0.9",
             "title": "Cluster Memory Usage",
             "type": "singlestat",
             "valueFontSize": "80%",
@@ -305,7 +304,7 @@ data:
             "datasource": "prometheus",
             "format": "percentunit",
             "gauge": {
-              "maxValue": 100,
+              "maxValue": 1,
               "minValue": 0,
               "show": true,
               "thresholdLabels": false,
@@ -360,7 +359,7 @@ data:
                 "refId": "A"
               }
             ],
-            "thresholds": "80,90",
+            "thresholds": "0.8,0.9",
             "title": "Cluster Disk Usage",
             "type": "singlestat",
             "valueFontSize": "80%",
@@ -1110,84 +1109,88 @@ data:
             "type": "row"
           },
           {
-            "cacheTimeout": null,
-            "colorBackground": false,
-            "colorValue": false,
-            "colors": [
-              "#299c46",
-              "rgba(237, 129, 40, 0.89)",
-              "#d44a3a"
-            ],
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
             "datasource": "prometheus",
-            "format": "none",
-            "gauge": {
-              "maxValue": 100,
-              "minValue": 0,
-              "show": false,
-              "thresholdLabels": false,
-              "thresholdMarkers": true
-            },
+            "fill": 4,
             "gridPos": {
-              "h": 3,
-              "w": 8,
+              "h": 4,
+              "w": 15,
               "x": 0,
               "y": 17
             },
-            "id": 24,
-            "interval": null,
-            "links": [],
-            "mappingType": 1,
-            "mappingTypes": [
-              {
-                "name": "value to text",
-                "value": 1
-              },
-              {
-                "name": "range to text",
-                "value": 2
-              }
-            ],
-            "maxDataPoints": 100,
-            "nullPointMode": "connected",
-            "nullText": null,
-            "postfix": "",
-            "postfixFontSize": "50%",
-            "prefix": "",
-            "prefixFontSize": "50%",
-            "rangeMaps": [
-              {
-                "from": "null",
-                "text": "N/A",
-                "to": "null"
-              }
-            ],
-            "sparkline": {
-              "fillColor": "rgba(31, 118, 189, 0.18)",
-              "full": false,
-              "lineColor": "rgb(31, 120, 193)",
-              "show": false
+            "id": 51,
+            "legend": {
+              "avg": false,
+              "current": false,
+              "max": false,
+              "min": false,
+              "show": false,
+              "total": false,
+              "values": false
             },
-            "tableColumn": "",
+            "lines": true,
+            "linewidth": 4,
+            "links": [],
+            "nullPointMode": "null",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
             "targets": [
               {
                 "expr": "sum(kube_node_info{node=~\"$node\"})",
                 "format": "time_series",
                 "intervalFactor": 1,
+                "legendFormat": "number of nodes",
                 "refId": "A"
               }
             ],
-            "thresholds": "",
-            "title": "Number Of Nodes",
-            "type": "singlestat",
-            "valueFontSize": "80%",
-            "valueMaps": [
+            "thresholds": [],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Number of nodes in the cluster",
+            "tooltip": {
+              "shared": true,
+              "sort": 0,
+              "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
               {
-                "op": "=",
-                "text": "N/A",
-                "value": "null"
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
               }
             ],
-            "valueName": "avg"
+            "yaxis": {
+              "align": false,
+              "alignLevel": null
+            }
           },
           {
             "cacheTimeout": null,
@@ -1208,9 +1211,9 @@ data:
               "thresholdMarkers": true
             },
             "gridPos": {
-              "h": 3,
-              "w": 8,
-              "x": 8,
+              "h": 4,
+              "w": 4,
+              "x": 15,
               "y": 17
             },
             "id": 25,
@@ -1288,9 +1291,9 @@ data:
               "thresholdMarkers": true
             },
             "gridPos": {
-              "h": 3,
-              "w": 8,
-              "x": 16,
+              "h": 4,
+              "w": 5,
+              "x": 19,
               "y": 17
             },
             "id": 26,
@@ -1355,7 +1358,7 @@ data:
               "h": 1,
               "w": 24,
               "x": 0,
-              "y": 20
+              "y": 21
             },
             "id": 28,
             "panels": [],
@@ -1384,7 +1387,7 @@ data:
               "h": 3,
               "w": 12,
               "x": 0,
-              "y": 21
+              "y": 22
             },
             "id": 30,
             "interval": null,
@@ -1465,7 +1468,7 @@ data:
               "h": 3,
               "w": 12,
               "x": 12,
-              "y": 21
+              "y": 22
             },
             "id": 31,
             "interval": null,
@@ -1546,7 +1549,7 @@ data:
               "h": 3,
               "w": 8,
               "x": 0,
-              "y": 24
+              "y": 25
             },
             "id": 32,
             "interval": null,
@@ -1627,7 +1630,7 @@ data:
               "h": 3,
               "w": 8,
               "x": 8,
-              "y": 24
+              "y": 25
             },
             "id": 33,
             "interval": null,
@@ -1708,7 +1711,7 @@ data:
               "h": 3,
               "w": 8,
               "x": 16,
-              "y": 24
+              "y": 25
             },
             "id": 34,
             "interval": null,
@@ -1773,7 +1776,7 @@ data:
               "h": 1,
               "w": 24,
               "x": 0,
-              "y": 27
+              "y": 28
             },
             "id": 36,
             "panels": [],
@@ -1802,7 +1805,7 @@ data:
               "h": 3,
               "w": 6,
               "x": 0,
-              "y": 28
+              "y": 29
             },
             "id": 38,
             "interval": null,
@@ -1882,7 +1885,7 @@ data:
               "h": 3,
               "w": 6,
               "x": 6,
-              "y": 28
+              "y": 29
             },
             "id": 39,
             "interval": null,
@@ -1962,7 +1965,7 @@ data:
               "h": 3,
               "w": 6,
               "x": 12,
-              "y": 28
+              "y": 29
             },
             "id": 40,
             "interval": null,
@@ -2042,7 +2045,7 @@ data:
               "h": 3,
               "w": 6,
               "x": 18,
-              "y": 28
+              "y": 29
             },
             "id": 41,
             "interval": null,
@@ -2122,7 +2125,7 @@ data:
               "h": 3,
               "w": 12,
               "x": 0,
-              "y": 31
+              "y": 32
             },
             "id": 43,
             "interval": null,
@@ -2202,7 +2205,7 @@ data:
               "h": 3,
               "w": 12,
               "x": 12,
-              "y": 31
+              "y": 32
             },
             "id": 42,
             "interval": null,
@@ -2266,7 +2269,7 @@ data:
               "h": 1,
               "w": 24,
               "x": 0,
-              "y": 34
+              "y": 35
             },
             "id": 45,
             "panels": [],
@@ -2295,7 +2298,7 @@ data:
               "h": 3,
               "w": 8,
               "x": 0,
-              "y": 35
+              "y": 36
             },
             "id": 47,
             "interval": null,
@@ -2375,7 +2378,7 @@ data:
               "h": 3,
               "w": 8,
               "x": 8,
-              "y": 35
+              "y": 36
             },
             "id": 48,
             "interval": null,
@@ -2455,7 +2458,7 @@ data:
               "h": 3,
               "w": 8,
               "x": 16,
-              "y": 35
+              "y": 36
             },
             "id": 49,
             "interval": null,
@@ -2534,6 +2537,7 @@ data:
               "query": "prometheus",
               "refresh": 1,
               "regex": "/$ds/",
+              "skipUrlSync": false,
               "type": "datasource"
             },
             {
@@ -2552,6 +2556,7 @@ data:
                 }
               ],
               "query": ".*",
+              "skipUrlSync": false,
               "type": "constant"
             },
             {
@@ -2570,12 +2575,13 @@ data:
                 }
               ],
               "query": ".*",
+              "skipUrlSync": false,
               "type": "constant"
             }
           ]
         },
         "time": {
-          "from": "now-30m",
+          "from": "now-1h",
           "to": "now"
         },
         "timepicker": {
@@ -2606,5 +2612,5 @@ data:
         "timezone": "browser",
         "title": "Kubernetes Cluster Overview",
         "uid": "4XuMd2Iiz",
-        "version": 1
+        "version": 2
       }
