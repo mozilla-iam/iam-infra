@@ -1,0 +1,6 @@
+resource "aws_ssm_parameter" "service_name" {
+  name   = "/iam/sso-dashboard/prod/service_name"
+  value  = "sso-dashboard"
+  type   = "SecureString"
+  key_id = "${data.aws_kms_key.ssm.id}"
+}
