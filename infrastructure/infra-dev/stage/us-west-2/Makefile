@@ -1,5 +1,3 @@
-AWS_PROFILE=daniel
-
 default:
 	@echo "Provide a valid make target: tf-apply-all, tf-destroy-all"
 
