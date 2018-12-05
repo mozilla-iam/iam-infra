@@ -1,0 +1,2 @@
+stage/us-west-2/kubernetes/kubeconfig_*
+stage/us-west-2/kubernetes/config-map-aws-auth_*
