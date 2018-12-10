@@ -42,19 +42,40 @@ spec:
                 name: graylog-config-secret
                 key: admin_pw_sha2
           - name: GRAYLOG_MONGODB_URI
-            value: "mongodb://mongo-graylog-0.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-1.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-2.mongo-graylog.logging.svc.cluster.local:27017/graylog?replicaSet=rs0"
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key:  mongodb_uri
           - name: GRAYLOG_IS_MASTER
-            value: "true"
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key:  is_master
           - name: GRAYLOG_ELASTICSEARCH_HOSTS
-            value: "https://vpc-graylog-logging-aqaqfilc3hkduvijar3uwexthu.us-west-2.es.amazonaws.com"
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key:  elasticsearch_hosts
           - name: GRAYLOG_REST_LISTEN_URI
-            value: "http://0.0.0.0:9000/api/"
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key: rest_listen_uri 
           - name: GRAYLOG_WEB_LISTEN_URI
-            value: "http://0.0.0.0:9000/"
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key:   web_listen_uri
           - name: GRAYLOG_REST_TRANSPORT_URI
-            value: "http://graylog-master.logging.svc.cluster.local:9000/api/"
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key: rest_transportation_uri
           - name: GRAYLOG_SERVER_JAVA_OPTS
-            value: "-Xms1024m -Xmx1024m -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow"
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key: server_java_opts
           ports:
           - containerPort: 9000
             name: http
