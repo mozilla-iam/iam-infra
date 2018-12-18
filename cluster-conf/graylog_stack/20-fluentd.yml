@@ -56,7 +56,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: fluentd
-        image: fluent/fluentd-kubernetes-daemonset:v1.2-debian-graylog
+        image: fluent/fluentd-kubernetes-daemonset:v1.3-debian-graylog
         env:
           - name:  FLUENT_GRAYLOG_HOST
             value: "graylog-master.logging.svc.cluster.local"
