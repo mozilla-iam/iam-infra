@@ -36,6 +36,8 @@ spec:
     metadata:
       labels:
         app: grafana
+      annotations:
+        iam.amazonaws.com/role: replace-me-with-arn-from-grafana-role
     spec:
       containers:
       - image: grafana/grafana:5.3.1
