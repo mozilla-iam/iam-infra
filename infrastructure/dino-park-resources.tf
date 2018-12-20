@@ -53,14 +53,10 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": [
-          "*"
-        ]
+        "AWS": "arn:aws:iam::320464205386:role/dino-park-staging"
       },
-      "Action": [
-        "es:*"
-      ],
-      "Resource": "arn:aws:es:us-west-2:${data.aws_caller_identity.current.account_id}:domain/mozillians-es-dinopark/*"
+      "Action": "es:*",
+      "Resource": "arn:aws:es:us-west-2:320464205386:domain/mozillians-es-dinopark/*"
     }
   ]
 }
