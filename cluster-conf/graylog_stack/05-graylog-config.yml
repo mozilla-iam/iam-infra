@@ -6,7 +6,7 @@ metadata:
 data:
   mongodb_uri: mongodb://mongo-graylog-0.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-1.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-2.mongo-graylog.logging.svc.cluster.local:27017/graylog?replicaSet=rs0
   is_master: 'true'
-  elasticsearch_hosts: https://vpc-graylog-logging-aqaqfilc3hkduvijar3uwexthu.us-west-2.es.amazonaws.com
+  elasticsearch_hosts: https://vpc-graylog-prod-uazovty6jvwvezxrgtlktw3swm.us-west-2.es.amazonaws.com
   rest_listen_uri: http://0.0.0.0:9000/api/
   web_listen_uri: http://0.0.0.0:9000/
   rest_transportation_uri: http://graylog-master.logging.svc.cluster.local:9000/api/
