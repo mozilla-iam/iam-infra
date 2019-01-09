@@ -10,7 +10,7 @@ terraform {
   required_version = "~> 0.11"
 
   backend "s3" {
-    bucket = ""
+    bucket = "eks-terraform-shared-state"
     key    = "prod/us-west-2/vpc/terraform.tfstate"
     region = "us-west-2"
   }
