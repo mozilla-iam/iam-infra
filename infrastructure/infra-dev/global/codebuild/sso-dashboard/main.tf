@@ -10,7 +10,7 @@ resource "aws_codebuild_webhook" "webhook" {
 resource "aws_codebuild_project" "build" {
   name          = "${var.project_name}"
   description   = "CI pipeline for ${var.project_name}"
-  build_timeout = "20"
+  build_timeout = "60"
   service_role  = "${aws_iam_role.codebuild.arn}"
 
   artifacts {
