@@ -49,4 +49,5 @@ module "eks" {
   worker_groups      = "${local.worker_groups}"
   worker_group_count = "1"
   tags               = "${local.tags}"
+  write_kubeconfig   = "false"
 }
