@@ -10,7 +10,7 @@ data "aws_security_group" "default" {
 }
 
 resource "aws_elasticsearch_domain" "es" {
-  domain_name           = "dinopark-mozillians-es"
+  domain_name           = "dinopark-mozillians-es-stage"
   elasticsearch_version = "6.3"
 
   ebs_options {
@@ -36,10 +36,10 @@ resource "aws_elasticsearch_domain" "es" {
   }
 
   tags {
-    Domain  = "dinopark-mozillians-es"
+    Domain  = "dinopark-mozillians-es-stage"
     app     = "elasticsearch"
-    env     = "dinopark"
-    project = "mozillians"
+    env     = "dinopark-staging"
+    project = "dinopark"
   }
 
   access_policies = <<CONFIG
@@ -52,7 +52,7 @@ resource "aws_elasticsearch_domain" "es" {
         "AWS": "arn:aws:iam::320464205386:role/dino-park-staging"
       },
       "Action": "es:*",
-      "Resource": "arn:aws:es:us-west-2:320464205386:domain/dinopark-mozillians-es/*"
+      "Resource": "arn:aws:es:us-west-2:320464205386:domain/dinopark-mozillians-es-stage/*"
     }
   ]
 }

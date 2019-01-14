@@ -11,7 +11,7 @@ terraform {
 
   backend "s3" {
     bucket = "eks-terraform-shared-state"
-    key    = "prod/us-west-2/services/dino-park/terraform.tfstate"
+    key    = "stage/us-west-2/services/dino-park/terraform.tfstate"
     region = "us-west-2"
   }
 }
