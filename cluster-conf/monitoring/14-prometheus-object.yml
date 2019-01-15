@@ -64,6 +64,10 @@ spec:
     matchLabels:
       role: alert-rules
       prometheus: prometheus-general
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
   storage:
     volumeClaimTemplate:
       spec:
