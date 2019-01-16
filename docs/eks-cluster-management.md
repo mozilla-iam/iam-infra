@@ -18,6 +18,9 @@ See the [README](/README.md) for related documents.
   - [Test cluster authentication](#toc-test-auth)
   - [Add workers](#toc-add-workers)
   - [Cleanup](#toc-cleanup)
+- [Upgrades](#toc-upgrades)
+  - [EKS cluster](#toc-cluster-upgrade)
+  - [Workers](#toc-worker-upgrade)
 
 # <a id="toc-introduction"></a>Introduction
 
@@ -172,3 +175,66 @@ $ terraform destroy
 ```
 
 You will be prompted to confirm that you want to remove all cluster resources.
+
+# <a id="toc-upgrades"></a>Upgrades
+
+This is a work in progress. I have gone through the cluster and worker upgrade
+process one time and this provides some documentation for that along with a
+number of issues that should be addressed in the future.
+
+## <a id="toc-cluster-upgrade"></a>EKS cluster
+
+The managed workers are simple to upgrade thanks for AWS. Documentation can be
+found
+[here](https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html). At
+the bottom of the page there should be a link for "Worker Node Updates". That
+documentation should apply to the AWS recommended setup which uses
+CloudFormation. Our process is different with Terraform. Continue to the next
+section for details.
+
+## <a id="toc-worker-upgrade"></a>Workers
+
+There are two important pieces of information that you should have:
+
+- We use the
+[EKS
+module](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/1.0.0)
+from the Terraform team.
+- We take [Wylie's
+  approach](https://thinklumo.com/blue-green-node-deployment-kubernetes-eks-terraform/)
+to worker node deployments with EKS and Terraform (Thank you, Wylie)
+
+These are the steps you should follow to upgrade the worker nodes:
+
+1. To begin, open
+[main.tf](https://github.com/mozilla-iam/eks-deployment/blob/development/infrastructure/infra-dev/prod/us-west-2/kubernetes/main.tf#L9)
+and identify the unused worker group. You will see two in the list of worker
+groups. The unused one will have the ASG desired, min and max instances set to
+0
+2. For the new worker group, make any necessary changes (AMI ID, root volume
+size, etc.) and set the ASG desired, min and max instances to match the active
+worker group
+3. Run `terraform apply`
+4. Use `kubectl get nodes` and wait for all new workers to join. The total
+number will depend on the ASG capacity as well as whether or not the cluster
+autoscaler has added new nodes. Once all new nodes are in a ready state, you can
+begin draining the old nodes
+5. Sort the nodes by the date created: `kubectl get no
+--sort-by=.metadata.creationTimestamp`
+6. Drain one node and use `kubectl describe node <node name>` to make sure the
+pods have moved to another node successfully. Capture the name from the first
+column in the output from the previous command use drain the node with `kubectl
+drain node <name> --ignore-daemonsets=true --delete-local-data`
+7. Once this is done, you can drain all of the old nodes. After that, all the
+pods should be running on the new nodes
+
+This is where I ran into an issue. The documentation in the EKS Terraform module
+says that you should add the following to your worker group configuration if you
+are going to use the cluster autoscaler: `protect_from_scale_in = true`. This is
+consistent with what I have read in other places. This prevents the autoscaling
+group from terminating nodes.
+
+Terraform will return an error after it times out waiting to terminate the
+instances. I did this, ran the `terraform apply` again and then manually
+terminated those older instances in the AWS console.
+
