@@ -2,17 +2,6 @@
 # EKS cluster management
 #---
 
-module "eks-development-01" {
-  source                    = "./modules/eks-cluster"
-  cluster-name              = "kubernetes-development-01"
-  environment               = "development"
-  region                    = "us-west-2"
-  instance-type             = "c4.large"
-  instance-desired-capacity = 4
-  instance-max              = 5
-  instance-min              = 2
-}
-
 module "eks-production-01" {
   source                    = "./modules/eks-cluster"
   cluster-name              = "kubernetes-production-01"
@@ -70,18 +59,12 @@ module "dino-park-dev-tools-ci" {
   service_name = "dino-park-dev-tools"
 }
 
-#module "graylog-resources" {
-#  source          = "./modules/sites/graylog"
-#  service_name    = "graylog"
-#  resource_vpc_id = "${module.resource-vpc-production.vpc-id}"
-#}
-
-module "sso-dashboard-staging-ci" {
-  source       = "./modules/sites/sso-dashboard-staging"
-  service_name = "sso-dashboard-staging"
+module "mozillians-staging-ci" {
+  source       = "./modules/sites/mozillians-staging"
+  service_name = "mozillians-staging"
 }
 
-module "sso-dashboard-prod-ci" {
-  source       = "./modules/sites/sso-dashboard-prod"
-  service_name = "sso-dashboard-prod"
+module "mozillians-production-ci" {
+  source       = "./modules/sites/mozillians-prod"
+  service_name = "mozillians-production"
 }

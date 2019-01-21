@@ -8,7 +8,6 @@ See the [README](/README.md) for related documents.
 
 - [Introduction](#toc-introduction)
 - [Overview](#toc-overview)
-  - [CloudFormation](#toc-cloudformation)
   - [Build and deployment steps](#toc-build-and-deploy)
 - [Creating a deployment pipeline](#toc-first-pipeline)
   - [Create the pipeline](#toc-codepipeline-resources)
@@ -17,13 +16,9 @@ See the [README](/README.md) for related documents.
 
 # <a id="toc-introduction"></a>Introduction
 
-Today, this document will provide manual steps required to setup a new CodePipeline and CodeBuild project through the AWS console. Future iterations will move toward programmatic creation of these resources.
+Today, this document will provide manual steps required to setup a new CodePipeline and CodeBuild project through the AWS console.
 
 # <a id="toc-overview"></a>Overview
-
-## <a id="toc-cloudformation"></a>CloudFormation
-
-I have not completed the CloudFormation required for this work. In the future, the project will be found [here](https://github.com/mozilla-iam/aws-codepipeline-cloudformation).
 
 ## <a id="toc-build-and-deploy"></a>Build and deployment steps
 
@@ -131,4 +126,4 @@ spec:
         - containerPort: 88
 ```
 
-Once you apply with `kubectl apply -f test-eks-pod.yaml`, you'll have this pod running in your Kubernetes cluster. If you push a change to your source repository, wait for the build to complete and update this to reflect a new container image tag, you can `kubectl apply` again to update to the new iamge.
+Once you apply with `kubectl apply -f test-eks-pod.yaml`, you'll have this pod running in your Kubernetes cluster. If you push a change to your source repository, wait for the build to complete and update this to reflect a new container image tag, you can `kubectl apply` again to update to the new image.

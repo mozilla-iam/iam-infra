@@ -18,6 +18,9 @@ See the [README](/README.md) for related documents.
   - [Test cluster authentication](#toc-test-auth)
   - [Add workers](#toc-add-workers)
   - [Cleanup](#toc-cleanup)
+- [Upgrades](#toc-upgrades)
+  - [EKS cluster](#toc-cluster-upgrade)
+  - [Workers](#toc-worker-upgrade)
 
 # <a id="toc-introduction"></a>Introduction
 
@@ -31,17 +34,38 @@ This process diverges from Amazon's [cluster creation documentation](https://doc
 
 ## <a id="toc-terraform"></a>Terraform
 
-The Terraform used to manage these cluster resources is found at the root of [this repository](https://github.com/mozilla-iam/eks-deployment). This will create:
+The Terraform used to manage these cluster resources is found in [this repository](https://github.com/mozilla-iam/eks-deployment/infrastructure/infra-dev). This will create:
 
-- IAM roles and policies
-- VPC, subnets, security groups
-- Workers based on the EKS optimized AMI
-- An EKS cluster
-- Launch configuration and an autoscaling group
+The Terraform is roughly organized like this:
 
-This is a copy of the work that [Terraform shared](https://www.terraform.io/docs/providers/aws/guides/eks-getting-started.html). Minor changes have been made to namespace resources based on the provided cluster name. This allows you to use the same Terraform to create multiple clusters.
+```
+.
+├── global
+│   └── codebuild
+│       ├── auth0-deploy
+│       └── sso-dashboard
+├── prod
+│   └── us-west-2
+│       ├── Makefile
+│       ├── kubernetes
+│       ├── services
+│       └── vpc
+└── stage
+    └── us-west-2
+        ├── Makefile
+        ├── kubernetes
+        ├── services
+        └── vpc
+```
 
-The future architecture of this Terraform is being discussed in [issue/3](https://github.com/mozilla-iam/eks-deployment/issues/3).
+The `services` folder will contain additional folders for AWS services that our deployed sites will rely on. This includes things like RDS and Elasticsearch.
+
+Kubernetes and the VPC used the following modules:
+
+- https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/2.1.0
+- https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/1.53.0
+
+These provide a simple interface to manage those resources.
 
 ## <a id="toc-remote-state"></a>Remote state
 
@@ -53,7 +77,7 @@ The Terraform documentation describes this best:
 
 Source: [state/remote](https://www.terraform.io/docs/state/remote.html)
 
-We are using remote state backed by S3. This is configured in `providers.tf`. Today, you must edit the [following lines](https://github.com/mozilla-iam/eks-deployment/blob/master/providers.tf#L21-L28) manually to set the proper region, S3 bucket and object key. This will be described in more depth in the [Terraform options](#toc-terraform-options) section below.
+We are using remote state backed by S3. This is configured in the `providers.tf` file found in each Terraform folder.
 
 ## <a id="toc-workers"></a>EKS workers
 
@@ -67,49 +91,20 @@ In order to complete this deployment, you must have `kubectl` version >= 1.10 an
 
 ## <a id="toc-terraform-options"></a>Terraform options
 
-As mentioned above, this Terraform source has minor changes from what the Terraform team has [shared with the community](https://github.com/terraform-providers/terraform-provider-aws/tree/master/examples/eks-getting-started).
-I have modified some of the resource names to include the cluster name specified
-in `variables.tf`. This would allow you to apply the Terraform multiple times to
-deploy multiple clusters, as long as you change the cluster name.
-
 To begin, clone the source repository:
 
 ```sh
 $ git clone https://github.com/mozilla-iam/eks-deployment.git
-$ cd eks-deployment
+$ cd eks-deployment/infrastructure/infra-dev
 ```
 
-Edit the `variables.tf` file to include your desired `cluster-name`:
+If the production cluster has not been deployed, you should change into the `prod/us-west-2/vpc` folder. The Terraform is flexible and you can add new regions or environments by copying the existing folders. If you do this, you must search through the Terraform to make sure you have not duplicated the environment name or things like the Terraform state file location. Just be cautious and try to avoid naming conflicts.
 
-```hcl
-#
-# Variables Configuration
-#
-
-variable "cluster-name" {
-  default = "eks-development"
-  type    = "string"
-}
-```
-
-Edit the `providers.tf` file to include the S3 bucket for shared state and a
-key name for the state file. You must update the key name so you are not
-overwriting a shared state file for another cluster.
-
-```hcl
-# Shared state configuration
-
-terraform {
-  backend "s3" {
-    bucket  = ""
-    key     = "iam-eks-cluster/USE_CLUSTER_NAME_HERE/terraform.tfstate"
-  }
-}
-```
+Be sure to read the documentation for the VPC module. You can make any changes in `main.tf` if you would like.
 
 ## <a id="toc-terraform-apply"></a>Create resources
 
-With the prerequisites addressed, you can run your Terraform `init`, `plan` and `apply` from the root of the repository:
+With the prerequisites addressed, you can run your Terraform `init`, `plan` and `apply` from the root of the VPC repository:
 
 ```sh
 $ terraform init
@@ -117,47 +112,29 @@ $ terraform plan
 $ terraform apply
 ```
 
+I have had issues with Terraform when MFA is enforced on the AWS authentication. I use `aws-vault` to help deal with this. I have added my account to the tool and then I run the following command: `aws-vault exec mozilla-iam --assume-role-ttl 60m`. This provides me with a shell where Terraform has the right access to the account.
+
+With the network created, you can use Terraform to create the Kubernetes cluster next. You will want to change into your Kubernetes folder, make any changes to `main.tf` that you would like and make sure that `data.tf` points to the right VPC state file. Just like the VPC, you can run the Terraform init, plan and apply to create the cluster.
+
 ## <a id="toc-test-auth"></a>Test cluster authentication
 
-When Terraform is done applying resources, you will receive a config map to apply and a `kubeconfig` file that you can use to interact with the cluster.
+When Terraform is done applying resources, you can use the `aws` CLI tool to configure `kubectl`. Use `aws eks update-kubeconfig --name $CLUSTER_NAME`. Cluster name is defined in the Kubernetes `main.tf` file as `kubernetes-${var.environment}-${var.region}`.
 
-If you no longer have the history from the `terraform apply` output, you can get
-these file contents by running `terraform output`:
-
-```sh
-$ terraform output
-config-map-aws-auth =
-
-apiVersion: v1
-kind: ConfigMap
-...
-```
-
-Write out each output to a file so you can use them. For `kubectl`, you can set
-the `KUBECONFIG` environment variable to point to the `kubeconfig` file you
-created. Alternatively, you can pass in the path when you run `kubectl`:
-
-```sh
-$ kubectl --kubeconfig=./kubeconfig cluster-info
-Kubernetes master is running at https://UNIQUE-NAME.yl4.us-west-2.eks.amazonaws.com
-
-To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
-```
+With that complete, you should be able to use this context and interact with the cluster with `kubectl`.
 
 ## <a id="#toc-add-workers"></a>Add workers
 
-To connect workers, apply the config map so the worker nodes can join the cluster. If you named the other file `config-map-aws-auth.yaml`, you can apply
-it like this:
+Terraform will output a config map which can be used to make sure that the workers are able to join the cluster. The Terraform module should automatically apply this config map but, if it fails, you can do it manually from the Kubernetes directory. If running `kubectl get nodes` returns an empty list, this may be necessary.
 
 ```sh
-$ kubectl --kubeconfig=./kubeconfig apply -f config-map-aws-auth.yaml
+$ kubectl apply -f config-map-aws-auth.yaml
 ```
 
 After a successful write of that config map, you'll start to see nodes joining
 your cluster. Note: this can take a moment and you may want to run the command several times or append the `--watch` flag.
 
 ```sh
-$ kubectl --kubeconfig=./kubeconfig get nodes
+$ kubectl get nodes
 NAME                                       STATUS    ROLES     AGE       VERSION
 ip-10-0-0-90.us-west-2.compute.internal    Ready     <none>    1h        v1.10.3
 ip-10-0-1-100.us-west-2.compute.internal   Ready     <none>    1h        v1.10.3
@@ -165,10 +142,73 @@ ip-10-0-1-100.us-west-2.compute.internal   Ready     <none>    1h        v1.10.3
 
 ## <a id="toc-cleanup"></a>Cleanup
 
-From the folder where you can the apply, you can run your destroy:
+If you want to destroy the cluster, you can do so from the folder where you ran the apply:
 
 ```sh
 $ terraform destroy
 ```
 
-You will be prompted to confirm that you want to remove all cluster resources.
+You will be prompted to confirm that you want to remove all cluster resources. Repeat the same action for the VPC if that is no longer needed as well.
+
+# <a id="toc-upgrades"></a>Upgrades
+
+This is a work in progress. I have gone through the cluster and worker upgrade
+process one time and this provides some documentation for that along with a
+number of issues that should be addressed in the future.
+
+## <a id="toc-cluster-upgrade"></a>EKS cluster
+
+The managed workers are simple to upgrade thanks for AWS. Documentation can be
+found
+[here](https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html). At
+the bottom of the page there should be a link for "Worker Node Updates". That
+documentation should apply to the AWS recommended setup which uses
+CloudFormation. Our process is different with Terraform. Continue to the next
+section for details.
+
+## <a id="toc-worker-upgrade"></a>Workers
+
+There are two important pieces of information that you should have:
+
+- We use the
+[EKS
+module](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/1.0.0)
+from the Terraform team.
+- We take [Wylie's
+  approach](https://thinklumo.com/blue-green-node-deployment-kubernetes-eks-terraform/)
+to worker node deployments with EKS and Terraform (Thank you, Wylie)
+
+These are the steps you should follow to upgrade the worker nodes:
+
+1. To begin, open
+[main.tf](https://github.com/mozilla-iam/eks-deployment/blob/development/infrastructure/infra-dev/prod/us-west-2/kubernetes/main.tf#L9)
+and identify the unused worker group. You will see two in the list of worker
+groups. The unused one will have the ASG desired, min and max instances set to
+0
+2. For the new worker group, make any necessary changes (AMI ID, root volume
+size, etc.) and set the ASG desired, min and max instances to match the active
+worker group
+3. Run `terraform apply`
+4. Use `kubectl get nodes` and wait for all new workers to join. The total
+number will depend on the ASG capacity as well as whether or not the cluster
+autoscaler has added new nodes. Once all new nodes are in a ready state, you can
+begin draining the old nodes
+5. Sort the nodes by the date created: `kubectl get no
+--sort-by=.metadata.creationTimestamp`
+6. Drain one node and use `kubectl describe node <node name>` to make sure the
+pods have moved to another node successfully. Capture the name from the first
+column in the output from the previous command use drain the node with `kubectl
+drain node <name> --ignore-daemonsets=true --delete-local-data`
+7. Once this is done, you can drain all of the old nodes. After that, all the
+pods should be running on the new nodes
+
+This is where I ran into an issue. The documentation in the EKS Terraform module
+says that you should add the following to your worker group configuration if you
+are going to use the cluster autoscaler: `protect_from_scale_in = true`. This is
+consistent with what I have read in other places. This prevents the autoscaling
+group from terminating nodes.
+
+Terraform will return an error after it times out waiting to terminate the
+instances. I did this, ran the `terraform apply` again and then manually
+terminated those older instances in the AWS console.
+

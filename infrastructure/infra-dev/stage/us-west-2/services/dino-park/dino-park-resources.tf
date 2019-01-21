@@ -4,17 +4,13 @@
 
 data "aws_caller_identity" "current" {}
 
-data "aws_subnet_ids" "all" {
-  vpc_id = "${module.resource-vpc-production.vpc-id}"
-}
-
-data "aws_security_group" "resource-vpc" {
-  vpc_id = "${module.resource-vpc-production.vpc-id}"
+data "aws_security_group" "default" {
+  vpc_id = "${data.terraform_remote_state.vpc.vpc_id}"
   name   = "default"
 }
 
-resource "aws_elasticsearch_domain" "dinopark-es" {
-  domain_name           = "mozillians-es-dinopark"
+resource "aws_elasticsearch_domain" "es" {
+  domain_name           = "dinopark-mozillians-es-stage"
   elasticsearch_version = "6.3"
 
   ebs_options {
@@ -35,15 +31,15 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
   }
 
   vpc_options {
-    subnet_ids = ["${data.aws_subnet_ids.all.ids[0]}"]
-    security_group_ids = ["${data.aws_security_group.resource-vpc.id}"]
+    subnet_ids = ["${data.terraform_remote_state.vpc.private_subnets[0]}"]
+    security_group_ids = ["${data.aws_security_group.default.id}"]
   }
 
   tags {
-    Domain  = "mozillians-dinopark-es"
+    Domain  = "dinopark-mozillians-es-stage"
     app     = "elasticsearch"
-    env     = "dinopark"
-    project = "mozillians"
+    env     = "dinopark-staging"
+    project = "dinopark"
   }
 
   access_policies = <<CONFIG
@@ -56,7 +52,7 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
         "AWS": "arn:aws:iam::320464205386:role/dino-park-staging"
       },
       "Action": "es:*",
-      "Resource": "arn:aws:es:us-west-2:320464205386:domain/mozillians-es-dinopark/*"
+      "Resource": "arn:aws:es:us-west-2:320464205386:domain/dinopark-mozillians-es-stage/*"
     }
   ]
 }
