@@ -6,7 +6,7 @@ This handbook is structured in three parts:
 * [Kubernetes administration](/docs/kubernetes-administration.md) - Includes topics like user management and cluster addons.
 * [CI/CD and manual deployments](/docs/cluster-ci.md) - Deploy a sample application through a CI/CD pipeline using AWS tools.
 * [Local development](/docs/local-dev.md) - Suggestions for local development.
-* [Runbooks and Troubleshooting](/docs/runbooks.md) - Instructions for troubleshooting problems.
+* [Runbooks and Troubleshooting](/docs/runbooks/) - Instructions for troubleshooting problems.
 
 Use these resources to setup a cluster, administer it, troubleshoot the problems you find and extend it with addons like kube2iam and Calico.
 
