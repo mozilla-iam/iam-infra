@@ -14,6 +14,8 @@ See the [README](/README.md) for related documents.
 - [kube2iam setup](#toc-kube2iam-setup)
   - [Testing the configuration](#toc-kube2iam-testing)
   - [Role naming](#toc-role-naming)
+- [Upgrades](#toc-upgrades)
+  - [Prometheus Operator](#toc-upgrade-prometheus-operator)
 
 # <a id="toc-introduction"></a>Introduction
 
@@ -94,3 +96,17 @@ arn:aws:iam::{{ account_id }}:role/eks-{{ service_name }}-{{ env }}
 ```
 
 We have not settled on a templating solution yet. This document will be updated once that is available.
+
+# <a id="toc-upgrades"></a>Upgrades
+This section provides insights on how to upgrade different services running in the cluster.
+Before upgrading any component, you should read before its Changelog and make sure the upgrade will not break any functionality needed.
+
+## <a id="toc-upgrade-prometheus-operator"></a>Prometheus-Operator
+Prometheus Operator is taking care of choosing the right container image for Prometheus, so if you want to upgrade to a more recent version, first you have to check if it is supported by the operator, and upgrade this one.
+Before start doing it, is important that you read the [Changelog](https://github.com/coreos/prometheus-operator/blob/master/CHANGELOG.md) and verify that there are not incompatible changes, or if they are, that you took care of those.
+
+New versions can modify 2 very different things: the code of the prometheus-operator binary and/or the code of the CRDs.
+
+If you want to upgrade to a new version, which is not modifying the CRDs you are lucky, it's strightforward! Modify the version of the operator [here](https://github.com/mozilla-iam/eks-deployment/blob/master/cluster-conf/monitoring/10-prometheus-operator.yml#L103), apply the changes, and delete the prometheus-operator pod. Kubernetes will take care of starting it again using the new image.
+
+If the upgrade modifies also the CRDs, you will have to replace them first: "kubectl replace -f 01-*". Once this is done, the prometheus-operator pod should start again hopefully without any errors. In case you face errors, better fixing them while the old version of Prometheus is running. Once you are done with it, you can delete the prometheus-master pod, and the operator will recreate it using the new image.

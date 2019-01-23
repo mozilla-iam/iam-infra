@@ -82,6 +82,7 @@ metadata:
 spec:
   endpoints:
   - interval: 120s
+    port: metrics
   jobLabel: aws-graylog-es-metrics
   selector:
     matchLabels:
