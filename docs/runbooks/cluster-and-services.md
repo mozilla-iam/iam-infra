@@ -11,6 +11,7 @@ See the [README](/README.md) for related documents.
   - [Pod stuck in ContainerCreating state](#pod-stuck-containercreating)
     - [No Resources Available](#no-resources-available)
     - [ConfigMap/Secret/Volume not found](#resource-not-found)
+- [Disaster recovery and backups](#dr-and-backups)
 - [Cluster services](#cluster-services)
   - [MongoDB](#mongodb)
 
@@ -36,6 +37,17 @@ Sometimes Pods are not able to start because there are not enough resources of s
 It can be that the ASG already hit the maximum number of instances it can scale. In that case, modify the Terraform code to increase the AutoScalingGroup.
 
 Other possibility is that the Pod tries to mount a volume which was created in an Availability Zone where currently there are not nodes running. We have seen this problem, and overcome it forcing the cluster to create new nodes scaling up some deployment. After the node is created in the right region, scale the Deployment down again.
+
+# <a id="dr-and-backups"></a>Disaster recovery and backups
+
+In order to backup Kubernetes configuration, secrets and persistent volumes we are using Ark, a piece of software developed by Heptio to make easy the process of taking and restoring this kind of backups.
+
+Ark is composed by a server running in the cluster, and a client running in your local machine. In order to schedule and manage backups, and also to restore them you first should install Ark. It can be dowloaded from [here](https://github.com/heptio/ark/releases). It uses your KubeConfig file to find the right cluster, so if you are able to access the Kubernetes cluster, you are all set.
+
+Now, you can take a look at the available backups running `ark backup get`. There you should see several backups with a timestamp. Find the one you want to restore and run: `ark restore create --from-backup $backup-name`, once this is done you can follow the restoring process by running `ark restore get`. 
+
+If you need more information, check the official [Ark documentation](https://heptio.github.io/ark/v0.10.0/index.html).
+
 
 # <a id="cluster-services"></a>Cluster services
 
