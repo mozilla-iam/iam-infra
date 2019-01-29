@@ -1,0 +1,9 @@
+apiVersion: ark.heptio.com/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: aws-default
+  namespace: heptio-ark
+spec:
+  provider: aws
+  config:
+    region: us-west-2
