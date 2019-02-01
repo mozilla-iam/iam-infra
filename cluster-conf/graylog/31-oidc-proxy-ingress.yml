@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-production
+  name: graylog-oidc-proxy
+  namespace: logging
+spec:
+  tls:
+  - hosts:
+    - graylog.infra.iam.mozilla.com
+    secretName: graylog-oidc-proxy-ingress-secret
+  rules:
+  - host: graylog.infra.iam.mozilla.com
+    http:
+      paths:
+      - backend:
+          serviceName: graylog-oidc-proxy
+          servicePort: 80
+        path: /
+

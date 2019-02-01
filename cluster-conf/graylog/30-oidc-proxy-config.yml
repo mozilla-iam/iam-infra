@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: graylog-oidc-proxy-config
+  namespace: logging
+data:
+  backend: graylog-master.logging.svc.cluster.local:9000
+  discovery_url: https://auth.mozilla.auth0.com/.well-known/openid-configuration
+  app_name: graylog
+  aws_region: us-west-2
+

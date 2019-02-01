@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: graylog-oidc-proxy
+  name: graylog-oidc-proxy
+  namespace: logging
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      k8s-app: graylog-oidc-proxy
+  template:
+    metadata:
+      labels:
+        k8s-app: graylog-oidc-proxy
+    spec:
+      containers:
+      - image:  thesmoothoperator/mozilla.oidc.accessproxy:k8s_dns_resolver
+        name: graylog-oidc-proxy
+        env:
+        - name: discovery_url
+          valueFrom:
+            configMapKeyRef:
+              name: graylog-oidc-proxy-config
+              key: discovery_url
+        - name: backend
+          valueFrom:
+            configMapKeyRef:
+              name: graylog-oidc-proxy-config
+              key:  backend
+        - name: app_name
+          valueFrom:
+            configMapKeyRef:
+              name: graylog-oidc-proxy-config
+              key: app_name
+        - name: aws_region
+          valueFrom:
+            configMapKeyRef:
+              name: graylog-oidc-proxy-config
+              key: aws_region
+        - name: client_id
+          valueFrom:
+            secretKeyRef:
+              name: graylog-oidc-proxy-secret
+              key: client_id
+        - name: client_secret
+          valueFrom:
+            secretKeyRef:
+              name: graylog-oidc-proxy-secret
+              key: client_secret
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      securityContext:
+        runAsNonRoot: false
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graylog-oidc-proxy
+  labels:
+    name: graylog-oidc-proxy
+    k8s-app: graylog-oidc-proxy
+  namespace: logging
+spec:
+  selector:
+    k8s-app: graylog-oidc-proxy
+  ports:
+  - name: https
+    protocol: TCP
+    port: 443
+  - name: http
+    protocol: TCP
+    port: 80
+  clusterIP: None
