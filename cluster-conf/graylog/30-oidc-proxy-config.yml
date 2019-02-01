@@ -9,4 +9,3 @@ data:
   app_name: graylog
   aws_region: us-west-2
   host_name: graylog.infra.iam.mozilla.com
-
