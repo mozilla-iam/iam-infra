@@ -32,7 +32,7 @@ resource "aws_elasticsearch_domain" "graylog" {
   }
 
   cluster_config {
-    instance_count           = 3
+    instance_count           = 1
     instance_type            = "m3.medium.elasticsearch"
     dedicated_master_enabled = false
     zone_awareness_enabled   = false
