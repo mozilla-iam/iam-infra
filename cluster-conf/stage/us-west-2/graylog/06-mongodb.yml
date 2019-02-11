@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-graylog
+  labels:
+  namespace: logging
+spec:
+  selector:
+    k8s-app: mongo-graylog
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mongo-graylog
+  namespace: logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: logging
+  name: mongo-graylog
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mongo-graylog
+  namespace: logging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mongo-graylog
+subjects:
+- kind: ServiceAccount
+  name: mongo-graylog
+  namespace: logging
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-graylog
+  namespace: logging
+spec:
+  selector:
+    matchLabels:
+      k8s-app: mongo-graylog
+  serviceName: "mongo-graylog"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        k8s-app: mongo-graylog
+    spec:
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: mongo-graylog
+      containers:
+        - name: mongo
+          image: mongo
+          command:
+            - mongod
+            - "--replSet"
+            - rs0
+            - "--smallfiles"
+            - "--noprealloc"
+            - "--bind_ip_all"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+        - name: mongo-sidecar
+          image: cvallance/mongo-k8s-sidecar
+          env:
+          - name: MONGO_SIDECAR_POD_LABELS
+            value: "k8s-app=mongo-graylog"
+          - name: KUBE_NAMESPACE
+            value: "logging"
+          - name: KUBERNETES_MONGO_SERVICE_NAME
+            value: "mongo-graylog"
+            #value: "mongo-graylog.logging.svc.cluster.local"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-persistent-storage
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "logging-storage"
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
