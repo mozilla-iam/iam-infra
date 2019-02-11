@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: graylog-mongodb-metrics-exporter
+  name: graylog-mongodb-metrics-exporter
+  namespace: logging
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      k8s-app: graylog-mongodb-metrics-exporter
+  template:
+    metadata:
+      labels:
+        k8s-app: graylog-mongodb-metrics-exporter
+    spec:
+      containers:
+      - image: thesmoothoperator/mongodb-prometheus-exporter:0.6.2
+        name: graylog-mongodb-metrics-exporter
+        command:
+          - /bin/mongodb_exporter
+          - -mongodb.uri=mongodb://mongo-graylog-0.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-1.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-2.mongo-graylog.logging.svc.cluster.local:27017
+        ports:
+        - containerPort: 9216
+          name: metrics
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graylog-mongodb-metrics-exporter
+  namespace: logging
+  labels:
+    k8s-app: graylog-mongodb-metrics-exporter
+spec:
+  ports:
+  - name: metrics
+    port: 9216
+    targetPort: metrics
+  selector:
+    k8s-app: graylog-mongodb-metrics-exporter
+  clusterIP: None
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: graylog-mongodb-metrics-exporter
+  name: graylog-mongodb-metrics-exporter
+  namespace: logging
+spec:
+  endpoints:
+  - interval: 120s
+    port: metrics 
+  jobLabel: graylog-mongodb-metrics
+  selector:
+    matchLabels:
+      k8s-app: graylog-mongodb-metrics-exporter
