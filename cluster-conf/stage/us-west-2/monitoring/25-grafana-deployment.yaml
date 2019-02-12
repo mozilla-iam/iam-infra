@@ -40,46 +40,6 @@ spec:
       containers:
       - image: grafana/grafana:5.3.1
         name: grafana
-        env:
-        - name: GF_SERVER_ROOT_URL
-          value: "https://grafana.infra.iam.mozilla.com/"
-        - name: GF_AUTH_ANONYMOUS_ENABLED
-          value: "false"
-        - name: GF_AUTH_BASIC_ENABLED
-          value: "false"
-        - name: GF_AUTH_DISABLE_LOGIN_FORM
-          value: "true"
-        - name: GF_AUTH_GENERIC_OAUTH_NAME
-          value: Auth0
-        - name: GF_AUTH_GENERIC_OAUTH_ENABLED
-          value: "true"
-        - name: GF_AUTH_GENERIC_OAUTH_SCOPES
-          value: "openid profile email"
-        - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: grafana-oidc
-              key: client_id
-        - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: grafana-oidc
-              key: client_secret
-        - name: GF_AUTH_GENERIC_OAUTH_AUTH_URL
-          valueFrom:
-            secretKeyRef:
-              name: grafana-oidc
-              key: auth_url
-        - name: GF_AUTH_GENERIC_OAUTH_TOKEN_URL
-          valueFrom:
-            secretKeyRef:
-              name: grafana-oidc
-              key: token_url
-        - name: GF_AUTH_GENERIC_OAUTH_API_URL
-          valueFrom:
-            secretKeyRef:
-              name: grafana-oidc
-              key: api_url
         ports:
         - containerPort: 3000
           name: http
@@ -142,9 +102,6 @@ spec:
       - configMap:
           name: grafana-dashboard-k8s-cluster-overview
         name: grafana-dashboard-k8s-cluster-overview
-      - configMap:
-          name: grafana-dashboard-nginx-ingress-controller
-        name: grafana-dashboard-nginx-ingress-controller
 
 ---
 apiVersion: v1
