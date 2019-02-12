@@ -117,7 +117,7 @@ spec:
   template:
     metadata:
       annotations:
-        iam.amazonaws.com/role: arn:aws:iam::320464205386:role/terraform-kubernetes-stage-us-west-2-ClusterAutoscaler
+        iam.amazonaws.com/role: arn:aws:iam::320464205386:role/cluster-autoscaler-stage-us-west-2
       labels:
         app: cluster-autoscaler
     spec:
@@ -139,7 +139,7 @@ spec:
             - --cloud-provider=aws
             - --skip-nodes-with-local-storage=false
             - --expander=least-waste
-            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/kubernetes-stage-us-west-2
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,kubernetes.io/cluster/kubernetes-stage-us-west-2
             - --skip-nodes-with-system-pods=false
           env:
             - name: AWS_REGION
