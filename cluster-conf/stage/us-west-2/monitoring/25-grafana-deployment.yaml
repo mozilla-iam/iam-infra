@@ -72,9 +72,6 @@ spec:
         - mountPath: /grafana-dashboard-definitions/0/k8s-pod-detailed
           name: grafana-dashboard-k8s-pod-detailed
           readOnly: false
-        - mountPath: /grafana-dashboard-definitions/0/nginx-ingress-controller
-          name: grafana-dashboard-nginx-ingress-controller
-          readOnly: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
