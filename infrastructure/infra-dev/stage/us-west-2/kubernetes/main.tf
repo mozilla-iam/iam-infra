@@ -20,18 +20,19 @@ locals {
       subnets               = "${join(",", data.terraform_remote_state.vpc.private_subnets)}"
     },
     {
-     name = "k8s-worker-green"
-     ami_id = "ami-0f54a2f7d2e9c88b3"
-     asg_desired_capacity = "0"
-     asg_max_size = "0"
-     asg_min_size = "0"
-     autoscaling_enabled = true
-     protect_from_scale_in = true
-     instance_type = "m4.large"
-     root_volume_size = "100"
-     subnets = "${join(",", data.terraform_remote_state.vpc.private_subnets)}"
-   }
- ],
+      name                  = "k8s-worker-green"
+      ami_id                = "ami-0f54a2f7d2e9c88b3"
+      asg_desired_capacity  = "0"
+      asg_max_size          = "0"
+      asg_min_size          = "0"
+      autoscaling_enabled   = true
+      protect_from_scale_in = true
+      instance_type         = "m4.large"
+      root_volume_size      = "100"
+      subnets               = "${join(",", data.terraform_remote_state.vpc.private_subnets)}"
+    },
+  ]
+
   tags = {
     "Environment" = "${var.environment}"
   }
