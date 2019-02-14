@@ -1,9 +1,0 @@
-apiVersion: storage.k8s.io/v1beta1
-kind: StorageClass
-metadata:
-  name: logging-storage
-provisioner: kubernetes.io/aws-ebs
-parameters:
-  type: gp2
-allowVolumeExpansion: true
-
