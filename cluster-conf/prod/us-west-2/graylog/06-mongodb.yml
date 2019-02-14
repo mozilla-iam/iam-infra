@@ -59,11 +59,11 @@ spec:
       labels:
         k8s-app: mongo-graylog
     spec:
-      terminationGracePeriodSeconds: 10
+      terminationGracePeriodSeconds: 100
       serviceAccountName: mongo-graylog
       containers:
         - name: mongo
-          image: mongo
+          image: mongo:4.0.6
           command:
             - mongod
             - "--replSet"
@@ -76,8 +76,17 @@ spec:
           volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
         - name: mongo-sidecar
-          image: cvallance/mongo-k8s-sidecar
+          # This one has to use :latest as upstream doesn't label
+          # builds by version
+          image: cvallance/mongo-k8s-sidecar:latest
           env:
           - name: MONGO_SIDECAR_POD_LABELS
             value: "k8s-app=mongo-graylog"
@@ -85,7 +94,16 @@ spec:
             value: "logging"
           - name: KUBERNETES_MONGO_SERVICE_NAME
             value: "mongo-graylog"
-            #value: "mongo-graylog.logging.svc.cluster.local"
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
   volumeClaimTemplates:
   - metadata:
       name: mongo-persistent-storage
