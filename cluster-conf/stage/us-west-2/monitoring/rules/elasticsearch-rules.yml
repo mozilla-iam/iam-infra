@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: prometheus-general
+    role: alert-rules
+  name: elasticsearch-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: elasticsearch.rules
+    rules:
+    - alert: Elasticsearch_low_free_disk_space
+      annotations:
+        message: 'Elasticsearch {{ $labels.cluster }} has less than 15% of free disk space'
+      expr: |
+        elasticsearch_filesystem_data_free_bytes{} * 100 / elasticsearch_filesystem_data_size_bytes{} < 15
+      for: 5m
+      labels:
+        severity: warning
+    - alert: Elasticsearch_critical_free_disk_space
+      annotations:
+        message: 'Elasticsearch {{ $labels.cluster }} has less than 8% of free disk space'
+      expr: |
+        elasticsearch_filesystem_data_free_bytes{} * 100 / elasticsearch_filesystem_data_size_bytes{} < 8
+      for: 5m
+      labels:
+        severity: critical
+    - alert: Elasticsearch_heap_usage_over_90pct
+      annotations:
+        message: 'Elasticsearch {{ $labels.cluster }} is using more than 90% of heap memory'
+      expr: |
+        elasticsearch_jvm_memory_used_bytes{area="heap"} / elasticsearch_jvm_memory_max_bytes{area="heap"} > 0.9
+      for: 5m
+      labels:
+        severity: warning

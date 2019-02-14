@@ -41,7 +41,8 @@ resource "aws_iam_role_policy" "cluster_autoscaler" {
                 "autoscaling:DescribeAutoScalingInstances",
                 "autoscaling:DescribeTags",
                 "autoscaling:SetDesiredCapacity",
-                "autoscaling:TerminateInstanceInAutoScalingGroup"
+                "autoscaling:TerminateInstanceInAutoScalingGroup",
+                "autoscaling:DescribeLaunchConfigurations"
             ],
             "Resource": "*"
         }

@@ -2,9 +2,9 @@
 # Elasticsearch
 #---
 
-resource "aws_iam_service_linked_role" "es" {
-  aws_service_name = "es.amazonaws.com"
-}
+#resource "aws_iam_service_linked_role" "es" {
+#  aws_service_name = "es.amazonaws.com"
+#}
 
 resource "aws_security_group" "allow_https_from_kubernetes" {
   name        = "allow_https_from_kubernetes"
@@ -20,7 +20,7 @@ resource "aws_security_group" "allow_https_from_kubernetes" {
 }
 
 resource "aws_elasticsearch_domain" "graylog" {
-  depends_on = ["aws_iam_service_linked_role.es"]
+#  depends_on = ["aws_iam_service_linked_role.es"]
 
   domain_name           = "graylog-${var.environment}"
   elasticsearch_version = "5.6"
@@ -32,7 +32,7 @@ resource "aws_elasticsearch_domain" "graylog" {
   }
 
   cluster_config {
-    instance_count           = 3
+    instance_count           = 1
     instance_type            = "m3.medium.elasticsearch"
     dedicated_master_enabled = false
     zone_awareness_enabled   = false
