@@ -2,18 +2,56 @@ resource "aws_sns_topic" "logs2mozdef" {
   name = "logs2MozDef"
 }
 
+# This topic policy allows InfoSec account to manage the topic
+# and consume its messages via SQS.
 resource "aws_sns_topic_policy" "allowInfosecAccount" {
   arn = "${aws_sns_topic.logs2mozdef.arn}"
 
   policy = <<EOF
 {
     "Version":"2012-10-17",
+    "Id": "__default_policy_ID",
     "Statement":[
         {
+            "Principal": {
+                "AWS": "*"
+            },
             "Effect": "Allow",
-            "Action": "sns:Subscribe",
-            "Principal": { "AWS":"371522382791" },
-            "Resource": "${aws_sns_topic.logs2mozdef.arn}"
+            "Action": [
+                "SNS:Publish",
+                "SNS:RemovePermission",
+                "SNS:SetTopicAttributes",
+                "SNS:DeleteTopic",
+                "SNS:ListSubscriptionsByTopic",
+                "SNS:GetTopicAttributes",
+                "SNS:Receive",
+                "SNS:AddPermission",
+                "SNS:Subscribe"
+            ],
+            "Resource": "${aws_sns_topic.logs2mozdef.arn}",
+            "Condition": {
+                "StringEquals": {
+                    "AWS:SourceOwner": "320464205386"
+                }
+            },
+            "Sid": "Allow_Infosec_to_manage_topic"
+        },
+        {
+            "Principal": {
+                "AWS": "arn:aws:iam::371522382791:root"
+            },
+            "Effect": "Allow",
+            "Action": [
+                "SNS:Subscribe",
+                "SNS:Receive"
+            ],
+            "Resource": "${aws_sns_topic.logs2mozdef.arn}",
+            "Condition": {
+                "StringEquals": {
+                    "SNS:Protocol": "sqs"
+                }
+            },
+            "Sid": "Allow_InfoSec_consume_via_SQS"
         }
     ]
 }
@@ -21,7 +59,7 @@ EOF
 }
 
 # This IAM role allows FluentD (assuming the role) to publish
-# to the SNS topic
+# to the SNS topic.
 resource "aws_iam_role_policy" "fluentd_mozdef_role_policy" {
   name = "fluentd-mozdef-policy-${var.environment}-${var.region}"
   role = "${aws_iam_role.fluentd_mozdef_role.id}"
