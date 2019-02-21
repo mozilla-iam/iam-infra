@@ -45,6 +45,8 @@ resource "aws_db_instance" "mysql-dinopark-db" {
   username                   = "root"
   password                   = "${data.aws_ssm_parameter.dinopark-db-password.value}"
   parameter_group_name       = "default.mysql5.6"
+  identifier                 = "dinopark-mysql-${var.environment}-${var.region}"
+
 
   tags {
     Name    = "mysql-dinopark-db"

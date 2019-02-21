@@ -10,6 +10,16 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
+data "terraform_remote_state" "kubernetes" {
+  backend = "s3"
+
+  config {
+    bucket = "eks-terraform-shared-state"
+    key    = "prod/us-west-2/kubernetes/terraform.tfstate"
+    region = "us-west-2"
+  }
+}
+
 data "aws_kms_key" "ssm" {
   key_id = "alias/aws/ssm"
 }
