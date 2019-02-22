@@ -123,6 +123,8 @@ In case you haven't done it yet, you also have to specify the address of Elastic
 
 That's it, now you can start creating streams, outputs, roles and users.
 
+In order to send Graylog alerts to Slack, in the UI `System / Outputs -> Outputs`  Choose `Slack Output` from the dropdown and click the `Launch new output` button.  In Slack, create a new App and corresponding Incoming Webhook, this will give you a URL which you will enter in the Webhook URL field in Graylog. Also enter the Channel to send to.
+
 
 Usage
 ============
