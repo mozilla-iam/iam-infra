@@ -13,7 +13,7 @@ resource "aws_s3_bucket_policy" "allow_account_ro" {
   policy = <<POLICY
 {
   "Version": "2012-10-17",
-  "Id": "Allow account members to get objects",
+  "Id": "Allow everyone to get these objects",
   "Statement": [
     {
       "Effect": "Allow",
