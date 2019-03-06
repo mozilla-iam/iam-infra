@@ -9,8 +9,8 @@ locals {
   worker_groups = [
     {
       name                  = "k8s-worker-green"
-      ami_id                = "ami-0a2abab4107669c1b"
-      asg_desired_capacity  = "3"
+      ami_id                = "ami-081099ec932b99961"
+      asg_desired_capacity  = "6"
       asg_max_size          = "10"
       asg_min_size          = "3"
       autoscaling_enabled   = true
@@ -18,10 +18,11 @@ locals {
       instance_type         = "m4.large"
       root_volume_size      = "100"
       subnets               = "${join(",", data.terraform_remote_state.vpc.private_subnets)}"
+      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/ /tmp && sudo rpm -i /tmp/audisp-json-2.2.2-1.amazonlinux_x86_64.rpm && sudo mv /tmp/audit.rules /etc/audit/rules.d/ && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
     },
     {
       name                  = "k8s-worker-blue"
-      ami_id                = "ami-0a2abab4107669c1b"
+      ami_id                = "ami-081099ec932b99961"
       asg_desired_capacity  = "0"
       asg_max_size          = "0"
       asg_min_size          = "0"
@@ -30,6 +31,7 @@ locals {
       instance_type         = "m4.large"
       root_volume_size      = "100"
       subnets               = "${join(",", data.terraform_remote_state.vpc.private_subnets)}"
+      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/ /tmp && sudo rpm -i /tmp/audisp-json-2.2.2-1.amazonlinux_x86_64.rpm && sudo mv /tmp/audit.rules /etc/audit/rules.d/ && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
     },
   ]
 
