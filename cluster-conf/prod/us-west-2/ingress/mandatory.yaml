@@ -231,7 +231,7 @@ metadata:
   name: nginx-ingress-controller
   namespace: ingress-nginx 
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ingress-nginx
@@ -239,9 +239,6 @@ spec:
     metadata:
       labels:
         app: ingress-nginx
-      annotations:
-        prometheus.io/port: '10254'
-        prometheus.io/scrape: 'true'
     spec:
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
