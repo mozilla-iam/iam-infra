@@ -1,0 +1,26 @@
+kind: ConfigMap
+metadata:
+  name: fluentd-extra-conf
+  namespace: logging
+apiVersion: v1
+data:
+  audisp-json.conf: |+
+    <source>
+      @type tail
+      @id in_tail_audisp-json
+      path /var/log/audisp-json.log
+      pos_file /var/log/audisp-json.log.pos
+      tag audisp-json
+      read_from_head true
+      <parse>
+        @type none
+      </parse>
+      <filter audisp-json>
+        @type concat
+        key audisp-json
+        multiline_start_regexp /^\{/
+        multiline_end_regexp /^\{/
+        #time_format %Y-%m-%dT%H:%M:%S+%z
+      </filter>
+    </source>
+
