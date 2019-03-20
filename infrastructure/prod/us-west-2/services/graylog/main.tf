@@ -70,4 +70,39 @@ resource "aws_elasticsearch_domain" "graylog" {
   ]
 }
 CONFIG
+
+  log_publishing_options {
+    cloudwatch_log_group_arn = "${aws_cloudwatch_log_group.logs-to-cloudwatch.arn}"
+    log_type                 = "SEARCH_SLOW_LOGS"
+  }
+
 }
+
+resource "aws_cloudwatch_log_group" "logs-to-cloudwatch" {
+  name              = "/aws/elasticsearch/domains/graylog-${var.environment}"
+  retention_in_days = "1"
+}
+
+resource "aws_cloudwatch_log_resource_policy" "logs-to-cloudwatch" {
+  policy_name = "graylog-${var.environment}-to-cloudwatch"
+  policy_document = <<CONFIG
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "es.amazonaws.com"
+      },
+      "Action": [
+        "logs:PutLogEvents",
+        "logs:PutLogEventsBatch",
+        "logs:CreateLogStream"
+      ],
+      "Resource": "arn:aws:logs:*"
+    }
+  ]
+}
+CONFIG
+}
+
