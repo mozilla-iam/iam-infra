@@ -8,6 +8,7 @@ See the [README](/README.md) for related documents.
 
 - [Introduction](#toc-introduction)
 - [User management](#toc-user-management)
+  - [Allow CodeBuild to deploy](#toc-allow-codebuild)
   - [Add a new user](#toc-add-user)
     - [Configure IAM](#toc-add-user-in-iam)
     - [Configure ConfigMap](#toc-add-user-to-configmap)
@@ -24,6 +25,18 @@ Generally speaking, a new user should refer to the Kubernetes documentation for 
 # <a id="toc-user-management"></a>User Management
 
 EKS user management requires two separate changes. A user or role will need to be created in IAM. That ARN can be added to the `aws-auth` ConfigMap in Kuberenetes to authorize it to perform certain actions associated with a user and groups.
+
+## <a id="toc-allow-codebuild"></a>Allow CodeBuild to deploy
+In order to allow CodeBuild to run commands in a EKS Kubernetes cluster, you need to add the user which runs the CodeBuild job to the `aws-auth` ConfigMap. This process has to be enhanced, and probably future versions of EKS come with a better support for doing this kind of things. For the moment just edit the `aws-auth` configmap running `kubectl edit configmap -n kube-system aws-auth`.
+As an example, the next snippet gives the user rights to deploy into the cluster:
+```yaml
+mapRoles:
+----
+...
+- rolearn: arn:aws:iam::320464205386:role/template-codebuild
+  groups:
+    - system:masters
+```
 
 ## <a id="toc-add-user"></a>Add a new user
 
