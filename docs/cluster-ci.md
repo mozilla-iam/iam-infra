@@ -46,14 +46,14 @@ In this section your are going to be using Terraform code to define the AWS reso
 1. Clone this repository and create a new branch.
 2. Inside the repository change directory to the codebuild root: `cd infrastructure/global/codebuild`
 3. Copy the template directory using the same name that your project, and change directory to it: `cp -r template my-project && cd my-project`
-4. Set the path for your Terraform shared state file running (use your real project's name): `export PROJECT_NAME=my-project && sed -i -e "s/template/$PROJECT_NAME/g" provider.tf`. This can't be done using variables interpolation in Terraform because the state is loaded in a very early stage of the Terraform run, wher variables are unknown.
+4. Set the path for your Terraform shared state file running (use your real project's name): `export PROJECT_NAME=my-project && sed -i -e "s/template/$PROJECT_NAME/g" provider.tf`. This can't be done using variables interpolation in Terraform because the state is loaded in a very early stage of the Terraform run, when variables are unknown.
 5. Modify the variables.tf:
-  1. Change the field "default" in "project_name" with your project's name.
-  2. Add the address of your github repository to "github_repo".
-  3. Modify "deploy_environment" to choose if deploying to the production or staging/development cluster.
-  4. If you want to customize the image used for building your project, change the value of "build_image"
-  5. If your buildspec is not named buildspec-k8s.yml, you can reflect it in "buildspec"
-  6. If you want to deploy a Webhook for automatically build on push to a branch, write in "github_branch" a regular expression matching those branch names. You also have to uncomment the "aws_codebuild_webhook" in main.tf and give AWS access to your Github account.
+  * Change the field "default" in "project_name" with your project's name.
+  * Add the address of your github repository to "github_repo".
+  * Modify "deploy_environment" to choose if deploying to the production or staging/development cluster.
+  * If you want to customize the image used for building your project, change the value of "build_image"
+  * If your buildspec is not named buildspec-k8s.yml, you can reflect it in "buildspec"
+  * If you want to deploy a Webhook for automatically build on push to a branch, write in "github_branch" a regular expression matching those branch names. You also have to uncomment the "aws_codebuild_webhook" in main.tf and give AWS access to your Github account.
 6. Run `terraform init` in order to initialize your state. Do this only one time.
 7. Run `terraform plan` and check that only new resources are going to be created, no modify, no destroy.
 8. Run `terraform apply` to create the resources. This operation should take 2 to 3 minutes.
