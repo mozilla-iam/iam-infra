@@ -19,3 +19,4 @@ data "terraform_remote_state" "kubernetes" {
     region = "us-west-2"
   }
 }
+
