@@ -34,7 +34,7 @@ This process diverges from Amazon's [cluster creation documentation](https://doc
 
 ## <a id="toc-terraform"></a>Terraform
 
-The Terraform used to manage these cluster resources is found in [this repository](https://github.com/mozilla-iam/eks-deployment/infrastructure/infra-dev). This will create:
+The Terraform used to manage these cluster resources is found in [this repository](https://github.com/mozilla-iam/eks-deployment/infrastructure). This will create:
 
 The Terraform is roughly organized like this:
 
@@ -95,7 +95,7 @@ To begin, clone the source repository:
 
 ```sh
 $ git clone https://github.com/mozilla-iam/eks-deployment.git
-$ cd eks-deployment/infrastructure/infra-dev
+$ cd eks-deployment/infrastructure
 ```
 
 If the production cluster has not been deployed, you should change into the `prod/us-west-2/vpc` folder. The Terraform is flexible and you can add new regions or environments by copying the existing folders. If you do this, you must search through the Terraform to make sure you have not duplicated the environment name or things like the Terraform state file location. Just be cautious and try to avoid naming conflicts.
@@ -181,7 +181,7 @@ to worker node deployments with EKS and Terraform (Thank you, Wylie)
 These are the steps you should follow to upgrade the worker nodes:
 
 1. To begin, open
-[main.tf](https://github.com/mozilla-iam/eks-deployment/blob/development/infrastructure/infra-dev/prod/us-west-2/kubernetes/main.tf#L9)
+[main.tf](https://github.com/mozilla-iam/eks-deployment/blob/development/infrastructure/prod/us-west-2/kubernetes/main.tf#L9)
 and identify the unused worker group. You will see two in the list of worker
 groups. The unused one will have the ASG desired, min and max instances set to
 0
