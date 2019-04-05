@@ -20,12 +20,14 @@ data "terraform_remote_state" "kubernetes" {
   }
 }
 
-data "aws_kms_key" "ssm" {
-  key_id = "alias/aws/ssm"
+data "aws_security_group" "es-allow-https" {
+  id = "sg-08f1fb74db97a268e"
 }
 
-data "aws_ssm_parameter" "dinopark-db-password" {
-  name  = "/iam/dinopark/${var.environment}/${var.region}/DB_PASSWORD"
-  with_decryption = "true"
+data "aws_route53_zone" "sso_mozilla_com" {
+  name = "sso.mozilla.com."
 }
 
+data "aws_elb" "k8s-elb" {
+  name = "a00435690f99111e8989b0ace417809a"
+}

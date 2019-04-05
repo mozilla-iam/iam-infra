@@ -2,22 +2,9 @@
 # Elasticsearch
 #---
 
-resource "aws_security_group" "allow_https_from_kubernetes" {
-  name        = "allow_https_from_kubernetes_to_es"
-  description = "Allow HTTPS traffic from Kubernetes cluster"
-  vpc_id      = "${data.terraform_remote_state.vpc.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 443
-    protocol    = "tcp"
-    security_groups = ["${data.terraform_remote_state.kubernetes.worker_security_group_id}"]
-  }
-}
-
 resource "aws_elasticsearch_domain" "dinopark-es" {
   domain_name           = "dinopark-${var.environment}-${var.region}"
-  elasticsearch_version = "2.3"
+  elasticsearch_version = "6.4"
 
   ebs_options {
     ebs_enabled = true
@@ -27,7 +14,7 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
 
   cluster_config {
     instance_count           = 3
-    instance_type            = "t2.micro.elasticsearch"
+    instance_type            = "t2.small.elasticsearch"
     dedicated_master_enabled = false
     zone_awareness_enabled   = false
   }
@@ -38,11 +25,11 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
 
   vpc_options {
     subnet_ids = ["${data.terraform_remote_state.vpc.private_subnets[0]}"]
-    security_group_ids = ["${aws_security_group.allow_https_from_kubernetes.id}"]
+    security_group_ids = ["${data.aws_security_group.es-allow-https.id}"]
   }
 
   tags {
-    Domain  = "dinopark-shared-es"
+    Domain  = "dinopark-es"
     app     = "elasticsearch"
     env     = "${var.environment}"
     region  = "${var.region}"
@@ -63,7 +50,7 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
       "Action": [
         "es:*"
       ],
-      "Resource": "arn:aws:es:us-west-2:${data.aws_caller_identity.current.account_id}:domain/dinopark-shared-es-${var.environment}-${var.region}/*"
+      "Resource": "arn:aws:es:us-west-2:${data.aws_caller_identity.current.account_id}:domain/dinopark-es-${var.environment}-${var.region}/*"
     }
   ]
 }
