@@ -5,10 +5,12 @@
 # This script performs rolling deployments of Kubernetes worker nodes, doing a blue/green deployment
 # of their AutoscalingGroups. It's normally used to perform upgrades of EC2 instances OS.
 #
-# It detects which Autoscaling group is active and its desired capacity, after it scales the inactive
-# ASG to N+1 instances, starts draining kubernetes nodes one by one making sure applications are
-# able to start in the new nodes. After all the Pods have been moved, and the instances drained,
-# deleted from Kubernetes and the underlying EC2 instance is deleted after reducing the ASG to 0.
+# Strategy: For a given cluster, the script detects which Autoscaling group is active and its desired capacity, 
+# after it scales the inactive ASG to N+1 instances, starts draining kubernetes nodes one by one making 
+# sure applications are able to start in the new nodes. After all the Pods have been moved, 
+# the nodes get deleted from Kubernetes, the old active ASG is reduced to 0 and the old instances deleted.
+# Reducing ASG to 0 doesn't delete instance due to the "scale_in" proctection which is needed to avoid
+# certain situations where a race condition between Kubernetes and AWS autoscalers can appear.
 #
 # Note: $ASG_ACTIVE corresponds to the active ASG at the beginning of the run, and will keep that name
 # even if at the end of the script it will be Inactive. Same (but all the way around) for $ASG_INACTIVE
@@ -17,10 +19,35 @@
 #
 #######################################################################################################
 
-ENV="stage"
+while getopts ":c:" opt; do
+  case $opt in
+    c)
+      CLUSTER=$OPTARG
+      ;;
+    \?)
+      echo "Invalid option. Usage ./$0 -c <cluster-name>"
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument."
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -z $CLUSTER ]] ; then
+  echo -e "Usage: ./$0 -c <cluster-name>"
+  exit 1
+fi
 
 echo "In few moments a Blue/Green deployment for the worker nodes of the Kubernetes cluster"
-echo -e "$ENV is going to start. Interrupt now if you don't want to continue\n"
+echo -e "is going to start. Interrupt now if you don't want to continue\n"
+
+# Make sure k8s current-context matches the cluster you want to rolling-deploy
+if [[ ! $(kubectl config current-context) == "$CLUSTER" ]] ; then
+  echo "$CLUSTER is not matching your current k8s context name, check you are pointing to the current cluster and try again"
+  exit 1
+fi
 
 # Check all pods are running before starting
 if [[ $(kubectl get pods --all-namespaces | grep -v Running | wc -l) -ne 1 ]]; then
@@ -28,15 +55,8 @@ if [[ $(kubectl get pods --all-namespaces | grep -v Running | wc -l) -ne 1 ]]; t
   exit 1
 fi
 
-# Check that the current context contains $ENV in its name. This will safe you from
-# pointing to a different cluster
-if [[ ! $(kubectl config current-context) == *"$ENV"* ]] ; then
-  echo "$ENV not found in context name, check you are pointing to the current environment and try again"
-  exit 1
-fi
-
 # Query all the Autoscaling groups, grep for filtering by Environment
-ASGS=$(aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[].[AutoScalingGroupName]' --output text | grep $ENV | grep 'blue\|green')
+ASGS=$(aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[].[AutoScalingGroupName]' --output text | grep $CLUSTER)
 
 # Checking which one of the 2 ASGs is active:
 for ASG in $ASGS; do
