@@ -21,7 +21,7 @@ spec:
         k8s-app: graylog-oidc-proxy
     spec:
       containers:
-          - image:  ziegeer/auth0-oidc:latest
+      - image:  ziegeer/auth0-oidc:0.2
         name: graylog-oidc-proxy
         env:
         - name: discovery_url
@@ -44,21 +44,26 @@ spec:
             configMapKeyRef:
               name: graylog-oidc-proxy-config
               key: aws_region
-        - name: OIDCClientID
+        - name: host_name
+          valueFrom:
+            configMapKeyRef:
+              name: graylog-oidc-proxy-config
+              key: host_name
+        - name: oidc-client-id
           valueFrom:
             secretKeyRef:
               name: graylog-oidc-proxy-secret
-              key: OIDCClientID
-        - name: OIDCClientSecret
+              key: oidc-client-id
+        - name: oidc-client-secret
           valueFrom:
             secretKeyRef:
               name: graylog-oidc-proxy-secret
-              key: OIDCClientSecret
-        - name: OIDCCryptoPassphrase
+              key: oidc-client-secret
+        - name: oidc-crypto-passphrase
           valueFrom:
             secretKeyRef:
               name: graylog-oidc-proxy-secret
-              key: OIDCCryptoPassphrase
+              key: oidc-crypto-passphrase
         ports:
         - containerPort: 80
         - containerPort: 443

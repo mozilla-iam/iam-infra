@@ -8,4 +8,5 @@ data:
   discovery_url: https://auth.mozilla.auth0.com/.well-known/openid-configuration
   app_name: graylog
   aws_region: us-west-2
+  host_name: graylog.infra.iam.mozilla.com
 
