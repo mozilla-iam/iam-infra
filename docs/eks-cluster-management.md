@@ -152,13 +152,9 @@ You will be prompted to confirm that you want to remove all cluster resources. R
 
 # <a id="toc-upgrades"></a>Upgrades
 
-This is a work in progress. I have gone through the cluster and worker upgrade
-process one time and this provides some documentation for that along with a
-number of issues that should be addressed in the future.
-
 ## <a id="toc-cluster-upgrade"></a>EKS cluster
 
-The managed workers are simple to upgrade thanks for AWS. Documentation can be
+The managed masters are simple to upgrade thanks for AWS. Documentation can be
 found
 [here](https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html). At
 the bottom of the page there should be a link for "Worker Node Updates". That
@@ -178,37 +174,18 @@ from the Terraform team.
   approach](https://thinklumo.com/blue-green-node-deployment-kubernetes-eks-terraform/)
 to worker node deployments with EKS and Terraform (Thank you, Wylie)
 
+We have at all times 2 Autoscaling groups per cluster: blue and green. Only one of this 2 ASGs is active
+at a time, the other one has 0 running instances. The approach to upgrade the nodes is to modify the launch 
+configuration of the inactive ASG with the new AMI, scale this to N+1 instances, drain the old nodes forcing 
+pods to start in the new nodes and once all applications are running in the new nodes, scale down to 0 the old
+active ASG.
+
+We have wrote a script which takes care of scaling down the active ASG, scaling up the inactive ASG,
+draining the nodes and deleting the remaining EC2 instances.
+At this point you only have to deal with changing the AMI id in the Terraform code.
+
 These are the steps you should follow to upgrade the worker nodes:
-
-1. To begin, open
-[main.tf](https://github.com/mozilla-iam/eks-deployment/blob/development/infrastructure/prod/us-west-2/kubernetes/main.tf#L9)
-and identify the unused worker group. You will see two in the list of worker
-groups. The unused one will have the ASG desired, min and max instances set to
-0
-2. For the new worker group, make any necessary changes (AMI ID, root volume
-size, etc.) and set the ASG desired, min and max instances to match the active
-worker group
-3. Run `terraform apply`
-4. Use `kubectl get nodes` and wait for all new workers to join. The total
-number will depend on the ASG capacity as well as whether or not the cluster
-autoscaler has added new nodes. Once all new nodes are in a ready state, you can
-begin draining the old nodes
-5. Sort the nodes by the date created: `kubectl get no
---sort-by=.metadata.creationTimestamp`
-6. Drain one node and use `kubectl describe node <node name>` to make sure the
-pods have moved to another node successfully. Capture the name from the first
-column in the output from the previous command use drain the node with `kubectl
-drain node <name> --ignore-daemonsets=true --delete-local-data`
-7. Once this is done, you can drain all of the old nodes. After that, all the
-pods should be running on the new nodes
-
-This is where I ran into an issue. The documentation in the EKS Terraform module
-says that you should add the following to your worker group configuration if you
-are going to use the cluster autoscaler: `protect_from_scale_in = true`. This is
-consistent with what I have read in other places. This prevents the autoscaling
-group from terminating nodes.
-
-Terraform will return an error after it times out waiting to terminate the
-instances. I did this, ran the `terraform apply` again and then manually
-terminated those older instances in the AWS console.
+  1. Modify the Terraform code of the inactive ASG with the new AMI id. Edit this file for [staging](https://github.com/mozilla-iam/iam-infra/blob/master/infrastructure/stage/us-west-2/kubernetes/main.tf#L12)
+  2. Run the [workers-rolling-deployment.sh](https://github.com/mozilla-iam/iam-infra/scripts/scripts/workers-rolling-deployment.sh) passing as an argument the name of the cluster.
+  3. Once the script has finished, open again the Terraform file and switch the ASG `asg_desired_capacity`, `asg_max_size`, `asg_min_size` values from the old active ASG to the new active. We recommend reflecting the new AMI also in the second ASG.
 
