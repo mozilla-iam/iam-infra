@@ -21,7 +21,7 @@ spec:
         k8s-app: graylog-oidc-proxy
     spec:
       containers:
-      - image:  ziegeer/auth0-oidc:0.2
+      - image:  ziegeer/auth0-oidc:0.5
         name: graylog-oidc-proxy
         env:
         - name: discovery_url
