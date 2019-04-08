@@ -2,10 +2,6 @@
 # Elasticsearch
 #---
 
-resource "aws_iam_service_linked_role" "es" {
-  aws_service_name = "es.amazonaws.com"
-}
-
 resource "aws_security_group" "allow_https_from_kubernetes" {
   name        = "allow_https_from_kubernetes"
   description = "Allow HTTPS traffic from Kubernetes cluster"
@@ -20,7 +16,6 @@ resource "aws_security_group" "allow_https_from_kubernetes" {
 }
 
 resource "aws_elasticsearch_domain" "graylog" {
-  depends_on = ["aws_iam_service_linked_role.es"]
 
   domain_name           = "graylog-${var.environment}"
   elasticsearch_version = "5.6"
