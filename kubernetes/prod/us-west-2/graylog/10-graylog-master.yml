@@ -66,11 +66,11 @@ spec:
               configMapKeyRef:
                 name: graylog-master-config
                 key:   web_listen_uri
-          - name: GRAYLOG_REST_TRANSPORT_URI
+          - name: GRAYLOG_WEB_ENDPOINT_URI
             valueFrom:
               configMapKeyRef:
                 name: graylog-master-config
-                key: rest_transportation_uri
+                key:   web_endpoint_uri
           - name: GRAYLOG_SERVER_JAVA_OPTS
             valueFrom:
               configMapKeyRef:

@@ -9,6 +9,6 @@ data:
   elasticsearch_hosts: https://vpc-graylog-prod-uazovty6jvwvezxrgtlktw3swm.us-west-2.es.amazonaws.com
   rest_listen_uri: http://0.0.0.0:9000/api/
   web_listen_uri: http://0.0.0.0:9000/
-  rest_transportation_uri: http://graylog-master.logging.svc.cluster.local:9000/api/
+  web_endpoint_uri: https://graylog.infra.iam.mozilla.com/api/
   server_java_opts: -Xms1024m -Xmx1024m -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow
 
