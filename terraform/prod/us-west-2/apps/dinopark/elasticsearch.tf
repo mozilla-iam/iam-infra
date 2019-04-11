@@ -2,6 +2,16 @@
 # Elasticsearch
 #---
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:terraform/stage/us-west-2/services/graylog/main.tf
+#resource "aws_iam_service_linked_role" "es" {
+#  aws_service_name = "es.amazonaws.com"
+#}
+
+=======
+>>>>>>> master:terraform/prod/us-west-2/apps/dinopark/elasticsearch.tf
+>>>>>>> master
 resource "aws_security_group" "allow_https_from_kubernetes" {
   name        = "allow_https_from_kubernetes_to_es"
   description = "Allow HTTPS traffic from Kubernetes cluster"
@@ -15,9 +25,23 @@ resource "aws_security_group" "allow_https_from_kubernetes" {
   }
 }
 
+<<<<<<< HEAD
 resource "aws_elasticsearch_domain" "dinopark-es" {
   domain_name           = "dinopark-${var.environment}-${var.region}"
   elasticsearch_version = "2.3"
+=======
+<<<<<<< HEAD:terraform/stage/us-west-2/services/graylog/main.tf
+resource "aws_elasticsearch_domain" "graylog" {
+#  depends_on = ["aws_iam_service_linked_role.es"]
+
+  domain_name           = "graylog-${var.environment}"
+  elasticsearch_version = "5.6"
+=======
+resource "aws_elasticsearch_domain" "dinopark-es" {
+  domain_name           = "dinopark-${var.environment}-${var.region}"
+  elasticsearch_version = "2.3"
+>>>>>>> master:terraform/prod/us-west-2/apps/dinopark/elasticsearch.tf
+>>>>>>> master
 
   ebs_options {
     ebs_enabled = true
@@ -26,8 +50,18 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
   }
 
   cluster_config {
+<<<<<<< HEAD
     instance_count           = 3
     instance_type            = "t2.micro.elasticsearch"
+=======
+<<<<<<< HEAD:terraform/stage/us-west-2/services/graylog/main.tf
+    instance_count           = 1
+    instance_type            = "m3.medium.elasticsearch"
+=======
+    instance_count           = 3
+    instance_type            = "t2.micro.elasticsearch"
+>>>>>>> master:terraform/prod/us-west-2/apps/dinopark/elasticsearch.tf
+>>>>>>> master
     dedicated_master_enabled = false
     zone_awareness_enabled   = false
   }

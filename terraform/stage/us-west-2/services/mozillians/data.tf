@@ -17,6 +17,7 @@ data "terraform_remote_state" "kubernetes" {
     region = "us-west-2"
   }
 }
+<<<<<<< HEAD
 
 data "aws_route53_zone" "infra_iam" {
   name = "infra.iam.mozilla.com."
@@ -26,3 +27,5 @@ data "aws_elb" "k8s-elb" {
   name = "a00435690f99111e8989b0ace417809a"
 }
 
+=======
+>>>>>>> master
