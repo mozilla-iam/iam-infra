@@ -34,7 +34,7 @@ This process diverges from Amazon's [cluster creation documentation](https://doc
 
 ## <a id="toc-terraform"></a>Terraform
 
-The Terraform used to manage these cluster resources is found in [this repository](https://github.com/mozilla-iam/eks-deployment/infrastructure). This will create:
+The Terraform used to manage these cluster resources is found in [this repository](https://github.com/mozilla-iam/eks-deployment/terraform). This will create:
 
 The Terraform is roughly organized like this:
 
@@ -95,7 +95,7 @@ To begin, clone the source repository:
 
 ```sh
 $ git clone https://github.com/mozilla-iam/eks-deployment.git
-$ cd eks-deployment/infrastructure
+$ cd eks-deployment/terraform
 ```
 
 If the production cluster has not been deployed, you should change into the `prod/us-west-2/vpc` folder. The Terraform is flexible and you can add new regions or environments by copying the existing folders. If you do this, you must search through the Terraform to make sure you have not duplicated the environment name or things like the Terraform state file location. Just be cautious and try to avoid naming conflicts.
@@ -185,7 +185,7 @@ draining the nodes and deleting the remaining EC2 instances.
 At this point you only have to deal with changing the AMI id in the Terraform code.
 
 These are the steps you should follow to upgrade the worker nodes:
-  1. Modify the Terraform code of the inactive ASG with the new AMI id. Edit this file for [staging](https://github.com/mozilla-iam/iam-infra/blob/master/infrastructure/stage/us-west-2/kubernetes/main.tf#L12)
+  1. Modify the Terraform code of the inactive ASG with the new AMI id. Edit this file for [staging](https://github.com/mozilla-iam/iam-infra/blob/master/terraform/stage/us-west-2/kubernetes/main.tf#L12)
   2. Run the [workers-rolling-deployment.sh](https://github.com/mozilla-iam/iam-infra/scripts/scripts/workers-rolling-deployment.sh) passing as an argument the name of the cluster.
   3. Once the script has finished, open again the Terraform file and switch the ASG `asg_desired_capacity`, `asg_max_size`, `asg_min_size` values from the old active ASG to the new active. We recommend reflecting the new AMI also in the second ASG.
 

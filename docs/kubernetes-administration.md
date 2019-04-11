@@ -120,6 +120,6 @@ Before start doing it, is important that you read the [Changelog](https://github
 
 New versions can modify 2 very different things: the code of the prometheus-operator binary and/or the code of the CRDs.
 
-If you want to upgrade to a new version, which is not modifying the CRDs you are lucky, it's strightforward! Modify the version of the operator [here](https://github.com/mozilla-iam/eks-deployment/blob/master/cluster-conf/monitoring/10-prometheus-operator.yml#L103), apply the changes, and delete the prometheus-operator pod. Kubernetes will take care of starting it again using the new image.
+If you want to upgrade to a new version, which is not modifying the CRDs you are lucky, it's strightforward! Modify the version of the operator [here](https://github.com/mozilla-iam/eks-deployment/blob/master/kubernetes/monitoring/10-prometheus-operator.yml#L103), apply the changes, and delete the prometheus-operator pod. Kubernetes will take care of starting it again using the new image.
 
 If the upgrade modifies also the CRDs, you will have to replace them first: "kubectl replace -f 01-*". Once this is done, the prometheus-operator pod should start again hopefully without any errors. In case you face errors, better fixing them while the old version of Prometheus is running. Once you are done with it, you can delete the prometheus-master pod, and the operator will recreate it using the new image.
