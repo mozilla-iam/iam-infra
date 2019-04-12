@@ -225,13 +225,13 @@ subjects:
     namespace: ingress-nginx
 ---
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-ingress-controller
   namespace: ingress-nginx 
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ingress-nginx
@@ -243,7 +243,7 @@ spec:
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
         - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.18.0
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.24.0
           args:
             - /nginx-ingress-controller
             - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
