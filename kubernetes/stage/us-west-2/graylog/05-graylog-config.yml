@@ -7,8 +7,7 @@ data:
   mongodb_uri: mongodb://mongo-graylog-0.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-1.mongo-graylog.logging.svc.cluster.local:27017,mongo-graylog-2.mongo-graylog.logging.svc.cluster.local:27017/graylog?replicaSet=rs0
   is_master: 'true'
   elasticsearch_hosts: https://vpc-graylog-stage-7g2l3osdpkhniss2gjft2dmbam.us-west-2.es.amazonaws.com
-  rest_listen_uri: http://0.0.0.0:9000/api/
-  web_listen_uri: http://0.0.0.0:9000/
-  rest_transportation_uri: http://graylog-master.logging.svc.cluster.local:9000/api/
+  http_bind_address: 0.0.0.0:9000
+  http_publish_uri: http://graylog-master.logging.svc.cluster.local:9000/
   server_java_opts: -Xms1024m -Xmx1024m -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow
 
