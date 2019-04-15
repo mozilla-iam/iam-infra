@@ -29,7 +29,6 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: graylog-master
-          #image: graylog2/server:2.4.6-1
           image: graylog/graylog:3.0.1-1
           env:
           - name: GRAYLOG_PASSWORD_SECRET
@@ -67,11 +66,6 @@ spec:
               configMapKeyRef:
                 name: graylog-master-config
                 key: http_publish_uri
-         #- name: GRAYLOG_HTTP_EXTERNAL_URI
-         #   valueFrom:
-         #     configMapKeyRef:
-         #       name: graylog-master-config
-         #       key: http_external_uri
           - name: GRAYLOG_SERVER_JAVA_OPTS
             valueFrom:
               configMapKeyRef:
