@@ -29,7 +29,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: graylog-master
-          image: graylog2/server:2.4.6-1
+          image: graylog/graylog:3.0.1-1
           env:
           - name: GRAYLOG_PASSWORD_SECRET
             valueFrom:
@@ -56,21 +56,16 @@ spec:
               configMapKeyRef:
                 name: graylog-master-config
                 key:  elasticsearch_hosts
-          - name: GRAYLOG_REST_LISTEN_URI
+          - name: GRAYLOG_HTTP_BIND_ADDRESS
             valueFrom:
               configMapKeyRef:
                 name: graylog-master-config
-                key: rest_listen_uri 
-          - name: GRAYLOG_WEB_LISTEN_URI
+                key: http_bind_address
+          - name: GRAYLOG_HTTP_PUBLISH_URI
             valueFrom:
               configMapKeyRef:
                 name: graylog-master-config
-                key:   web_listen_uri
-          - name: GRAYLOG_REST_TRANSPORT_URI
-            valueFrom:
-              configMapKeyRef:
-                name: graylog-master-config
-                key: rest_transportation_uri
+                key: http_publish_uri
           - name: GRAYLOG_SERVER_JAVA_OPTS
             valueFrom:
               configMapKeyRef:
