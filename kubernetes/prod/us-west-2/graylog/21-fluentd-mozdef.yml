@@ -22,7 +22,7 @@ spec:
       serviceAccountName: fluentd
       containers:
       - name: fluentd
-        image: itsre/fluentd-k8s-mozdef:1.0
+        image: itsre/fluentd-k8s-mozdef:1.1
         imagePullPolicy: Always
         env:
         - name: FLUENT_UID
