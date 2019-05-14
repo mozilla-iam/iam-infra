@@ -1,11 +1,12 @@
-FROM fluent/fluentd:v1.3.3-debian-1.0
+#FROM fluent/fluentd:v1.3.3-debian-1.0
+FROM fluent/fluentd:v1.4.2-debian-2.0
 
 LABEL maintainer="Alberto del Barrio <adelbarrio@mozilla.com>"
 USER root
 WORKDIR /home/fluent
-ENV PATH /fluentd/vendor/bundle/ruby/2.3.0/bin:$PATH
-ENV GEM_PATH /fluentd/vendor/bundle/ruby/2.3.0
-ENV GEM_HOME /fluentd/vendor/bundle/ruby/2.3.0
+ENV PATH /fluentd/vendor/bundle/ruby/2.6.0/bin:$PATH
+ENV GEM_PATH /fluentd/vendor/bundle/ruby/2.6.0
+ENV GEM_HOME /fluentd/vendor/bundle/ruby/2.6.0
 # skip runtime bundler installation
 ENV FLUENTD_DISABLE_BUNDLER_INJECTION 1
 
