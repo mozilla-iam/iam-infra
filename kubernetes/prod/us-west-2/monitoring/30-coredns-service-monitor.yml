@@ -1,0 +1,36 @@
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: kube-system
+  name: coredns-prometheus-discovery
+  labels:
+    k8s-app: coredns-service
+spec:
+  selector:
+    k8s-app: kube-dns
+  type: ClusterIP
+  clusterIP: None    
+  ports:
+  - name: metrics
+    port: 9153
+    protocol: TCP
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  namespace: kube-system
+  name: coredns
+  labels:
+    k8s-app: coredns-service-monitor
+spec:
+  jobLabel: coredns
+  endpoints:
+  - port: metrics
+    interval: 30s
+  selector:
+    matchLabels:
+      k8s-app: coredns-service
+  namespaceSelector:
+    matchNames:
+    - kube-system
