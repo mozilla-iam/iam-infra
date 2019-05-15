@@ -1,4 +1,3 @@
-#FROM fluent/fluentd:v1.3.3-debian-1.0
 FROM fluent/fluentd:v1.4.2-debian-2.0
 
 LABEL maintainer="Alberto del Barrio <adelbarrio@mozilla.com>"
