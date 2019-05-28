@@ -29,5 +29,5 @@ data "aws_route53_zone" "sso_mozilla_com" {
 }
 
 data "aws_elb" "k8s-elb" {
-  name = "a00435690f99111e8989b0ace417809a"
+  name = "af3ef016b807c11e9976f06f807dee91"
 }
