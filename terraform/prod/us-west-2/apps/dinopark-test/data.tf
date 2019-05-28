@@ -29,5 +29,5 @@ data "aws_route53_zone" "sso_allizom_org" {
 }
 
 data "aws_elb" "k8s-elb" {
-  name = "a00435690f99111e8989b0ace417809a"
+  name = "a8cd8ab927d3211e9976f06f807dee91"
 }
