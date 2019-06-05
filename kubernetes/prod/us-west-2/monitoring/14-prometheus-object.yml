@@ -74,8 +74,8 @@ spec:
         storageClassName: prometheus-storage
         resources:
           requests:
-            storage: 40Gi
-  retention: 90d
+            storage: 250Gi
+  retention: 365d
 ---
 apiVersion: v1
 kind: Service
