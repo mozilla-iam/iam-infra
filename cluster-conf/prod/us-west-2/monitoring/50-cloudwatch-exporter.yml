@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: cloudwatch-metrics-exporter
+  name: cloudwatch-metrics-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      k8s-app: cloudwatch-metrics-exporter
+  template:
+    metadata:
+      labels:
+        k8s-app: cloudwatch-metrics-exporter
+      annotations:
+        iam.amazonaws.com/role: arn:aws:iam::320464205386:role/cloudwatch-exporter-prod
+    spec:
+      containers:
+      - image: prom/cloudwatch-exporter:cloudwatch_exporter-0.5.0
+        name: cloudwatch-metrics-exporter
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9106
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 9106
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        ports:
+        - containerPort: 9106
+          name: metrics
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /config
+          name: cloudwatch-exporter-conf
+          readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      restartPolicy: Always
+      volumes:
+      - configMap:
+          name: cloudwatch-exporter-conf
+        name: cloudwatch-exporter-conf
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudwatch-metrics-exporter
+  namespace: monitoring
+  labels:
+    k8s-app: cloudwatch-metrics-exporter
+spec:
+  ports:
+  - name: metrics
+    port: 9106
+    targetPort: metrics
+  selector:
+    k8s-app: cloudwatch-metrics-exporter
+  clusterIP: None
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: cloudwatch-metrics-exporter
+  name: cloudwatch-metrics-exporter
+  namespace: monitoring
+spec:
+  endpoints:
+  - interval: 60s
+    port: metrics
+  jobLabel: cloudwatch-metrics
+  selector:
+    matchLabels:
+      k8s-app: cloudwatch-metrics-exporter
