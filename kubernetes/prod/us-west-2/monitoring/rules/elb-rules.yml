@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: prometheus-general
+    role: alert-rules
+  name: elb-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: elb.rules
+    rules:
+    - alert: ELB_surge_queue_length
+      annotations:
+        message: 'ELB {{ $labels.load_balancer_name }} has a queue with more than 25 requests'
+      expr: |
+        avg(aws_elb_surge_queue_length_maximum{} offset 10m) by (load_balancer_name) > 25
+      for: 5m
+      labels:
+        severity: warning
+    - alert: ELB_surge_queue_length
+      annotations:
+        message: 'ELB {{ $labels.load_balancer_name }} has a queue with more than 250 requests'
+      expr: |
+        avg(aws_elb_surge_queue_length_maximum{} offset 10m) by (load_balancer_name) > 250
+      for: 5m
+      labels:
+        severity: critical

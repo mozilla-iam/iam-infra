@@ -11,6 +11,6 @@ data:
         aws_metric_name: SurgeQueueLength
         aws_dimensions: [LoadBalancerName]
         aws_dimension_select:
-          LoadBalancerName: [a00435690f99111e8989b0ace417809a]
+          LoadBalancerName: [a00435690f99111e8989b0ace417809a, af3ef016b807c11e9976f06f807dee91]
         aws_statistics: [Sum, Average, SampleCount, Maximum]
 
