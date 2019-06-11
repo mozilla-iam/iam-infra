@@ -129,17 +129,7 @@ In order to send Graylog alerts to Slack, in the UI `System / Outputs -> Outputs
 Usage
 ============
 
-Graylog is running inside the Kubernetes cluster and it doesn't have a public endpoint. In order to browse the UI you have to
-forward the port from the cluster to your local machine (this might change in the future). Also, sometimes is needed to have
-an entry in your `/etc/hosts` mapping localhost to the Graylog URL. You can do ti running
-```bash 
-sudo /bin/sh -c "echo '127.0.0.1 graylog-master.logging.svc.cluster.local' >> /etc/hosts"
-
-POD=$(kubectl get pods -n=logging | awk '/graylog-master/ { print $1}')
-kubectl port-forward -n=logging "$POD" 9000:9000`
-```
-Now, open Firefox and go to `localhost:9000` where you will be prompted by the logging form.
-Moving forward, Graylog will be behind Auth0, but for the moment if you want to have a user in there, please create a Github Issue in this repository.
+In order to browse the logs of your application you have to visit https://graylog.infra.iam.mozilla.com/ Graylog is protected behind an Auth0 proxy, so in order to be able to see your logs you need a valid Mozilla LDAP account with the right access groups set (ask InfoSec for more information about the right groups). After this you will need a valid user name and password, if you do not have an account and want to get access, file a bug under this repository requesting the access and which logs you would like to see.
  
 
 
