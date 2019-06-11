@@ -1,4 +1,4 @@
-# EKS cluster management
+# Deploying applications to the cluster
 
 This document provides an overview of our CI/CD pipeline and an example to help you setup your first deployment pipeline to your new EKS cluster.
 

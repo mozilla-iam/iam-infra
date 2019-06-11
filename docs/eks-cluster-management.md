@@ -20,7 +20,8 @@ See the [README](/README.md) for related documents.
   - [Cleanup](#toc-cleanup)
 - [Upgrades](#toc-upgrades)
   - [EKS cluster](#toc-cluster-upgrade)
-  - [Workers](#toc-worker-upgrade)
+  - [EKS Workers](#toc-worker-upgrade)
+  - [Prometheus Operator](#toc-prom-operator)
 
 # <a id="toc-introduction"></a>Introduction
 
@@ -151,6 +152,8 @@ $ terraform destroy
 You will be prompted to confirm that you want to remove all cluster resources. Repeat the same action for the VPC if that is no longer needed as well.
 
 # <a id="toc-upgrades"></a>Upgrades
+This section provides insights on how to upgrade different services running in the cluster.
+Before upgrading any component, you should read before its Changelog and make sure the upgrade will not break any functionality needed.
 
 ## <a id="toc-cluster-upgrade"></a>EKS cluster
 
@@ -189,3 +192,12 @@ These are the steps you should follow to upgrade the worker nodes:
   2. Run the [workers-rolling-deployment.sh](https://github.com/mozilla-iam/iam-infra/scripts/scripts/workers-rolling-deployment.sh) passing as an argument the name of the cluster.
   3. Once the script has finished, open again the Terraform file and switch the ASG `asg_desired_capacity`, `asg_max_size`, `asg_min_size` values from the old active ASG to the new active. We recommend reflecting the new AMI also in the second ASG.
 
+## <a id="toc-prom-operator"></a>Prometheus-Operator
+Prometheus Operator is taking care of choosing the right container image for Prometheus, so if you want to upgrade to a more recent version, first you have to check if it is supported by the operator, and upgrade this one.
+Before start doing it, is important that you read the [Changelog](https://github.com/coreos/prometheus-operator/blob/master/CHANGELOG.md) and verify that there are not incompatible changes, or if they are, that you took care of those.
+
+New versions can modify 2 very different things: the code of the prometheus-operator binary and/or the code of the CRDs.
+
+If you want to upgrade to a new version, which is not modifying the CRDs you are lucky, it's strightforward! Modify the version of the operator [here](https://github.com/mozilla-iam/eks-deployment/blob/master/kubernetes/monitoring/10-prometheus-operator.yml#L103), apply the changes, and delete the prometheus-operator pod. Kubernetes will take care of starting it again using the new image.
+
+If the upgrade modifies also the CRDs, you will have to replace them first: "kubectl replace -f 01-*". Once this is done, the prometheus-operator pod should start again hopefully without any errors. In case you face errors, better fixing them while the old version of Prometheus is running. Once you are done with it, you can delete the prometheus-master pod, and the operator will recreate it using the new image.
