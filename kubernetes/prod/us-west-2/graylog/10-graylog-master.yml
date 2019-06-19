@@ -29,7 +29,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: graylog-master
-          image: graylog/graylog:3.0.1-1
+          image: graylog/graylog:3.0.2
           env:
           - name: GRAYLOG_PASSWORD_SECRET
             valueFrom:
@@ -76,6 +76,11 @@ spec:
               configMapKeyRef:
                 name: graylog-master-config
                 key: server_java_opts
+          - name: GRAYLOG_TRUSTED_PROXIES
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key: trusted_proxies
           ports:
           - containerPort: 9000
             name: http

@@ -11,4 +11,4 @@ data:
   http_bind_address: 0.0.0.0:9000
   http_external_uri: https://graylog.infra.iam.mozilla.com/
   server_java_opts: -Xms1024m -Xmx1024m -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow
-
+  trusted_proxies: 10.0.0.0/16
