@@ -76,6 +76,11 @@ spec:
               configMapKeyRef:
                 name: graylog-master-config
                 key: server_java_opts
+          - name: GRAYLOG_TRUSTED_PROXIES
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-master-config
+                key: trusted_proxies
           ports:
           - containerPort: 9000
             name: http
