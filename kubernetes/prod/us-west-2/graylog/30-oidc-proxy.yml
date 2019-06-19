@@ -21,7 +21,7 @@ spec:
         k8s-app: graylog-oidc-proxy
     spec:
       containers:
-      - image:  itsre/graylog-oidc-proxy:1.8
+      - image:  itsre/graylog-oidc-proxy:1.9.5
         name: graylog-oidc-proxy
         env:
         - name: discovery_url
@@ -65,8 +65,7 @@ spec:
               name: graylog-oidc-proxy-secret
               key: oidc_crypto_passphrase
         ports:
-        - containerPort: 80
-        - containerPort: 443
+        - containerPort: 8000
         resources:
           requests:
             cpu: 25m
@@ -90,10 +89,7 @@ spec:
   selector:
     k8s-app: graylog-oidc-proxy
   ports:
-  - name: https
-    protocol: TCP
-    port: 443
   - name: http
     protocol: TCP
-    port: 80
+    port: 8000
   clusterIP: None

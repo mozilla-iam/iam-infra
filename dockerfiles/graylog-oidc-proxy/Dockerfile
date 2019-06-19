@@ -7,18 +7,22 @@ RUN wget https://github.com/zmartzone/mod_auth_openidc/releases/download/v2.3.11
 RUN wget https://github.com/zmartzone/mod_auth_openidc/releases/download/v2.3.11/libapache2-mod-auth-openidc_2.3.11-1.stretch+1_amd64.deb && \
 dpkg -i libapache2-mod-auth-openidc_2.3.11-1.stretch+1_amd64.deb
 
-# Don't serve the default web root
+# Don't serve the default web root or port
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 
 # Put our reverse proxy config in place
 COPY 010-reverseproxy.conf /etc/apache2/sites-enabled/
+COPY ports.conf /etc/apache2/ports.conf
 
 # Enable mod_auth_openidc
 RUN a2enmod auth_openidc
 RUN a2enmod proxy_http
 
-# Start apache in the foreground
-# This seems to struggle with passing env vars to apache
+# Start apache in the foreground not as root
+RUN chown -R www-data /var/log/apache2
+RUN mkdir /var/run/apache2
+RUN chown www-data /var/run/apache2
+USER www-data
 CMD apache2ctl -D FOREGROUND
 
-EXPOSE 80
+EXPOSE 8000
