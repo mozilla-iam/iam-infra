@@ -14,3 +14,8 @@ data:
           LoadBalancerName: [a00435690f99111e8989b0ace417809a, af3ef016b807c11e9976f06f807dee91]
         aws_statistics: [Sum, Average, SampleCount, Maximum]
 
+      - aws_namespace: AWS/ES
+        aws_metric_name: SearchRate
+        aws_dimensions: [DomainName, ClientId]
+        aws_statistics: [Average]
+
