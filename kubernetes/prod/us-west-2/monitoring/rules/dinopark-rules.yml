@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: prometheus-general
+    role: alert-rules
+  name: dinopark-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: dinopark.rules
+    rules:
+    - alert: PodRestarting
+      annotations:
+        message: 'Pod {{ $labels.pod }} on dinopark-prod namespace has been restarted'
+      expr: |
+        kube_pod_container_status_restarts_total{exported_namespace="dinopark-prod"}>0
+      for: 1m
+      labels:
+        severity: warning
+
