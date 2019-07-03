@@ -79,10 +79,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 64Mi
+              memory: 128Mi
             limits:
               cpu: 500m
-              memory: 128Mi
+              memory: 256Mi
         - name: mongo-sidecar
           # This one has to use :latest as upstream doesn't label
           # builds by version
