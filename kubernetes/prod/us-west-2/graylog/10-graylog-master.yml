@@ -11,6 +11,8 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        iam.amazonaws.com/role: arn:aws:iam::320464205386:role/graylog-role-prod-us-west-2
       labels:
         k8s-app: graylog-master
         graylog-role: master
