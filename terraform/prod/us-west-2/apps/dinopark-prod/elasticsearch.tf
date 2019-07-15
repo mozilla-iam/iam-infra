@@ -14,7 +14,7 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
 
   cluster_config {
     instance_count           = 3
-    instance_type            = "t2.small.elasticsearch"
+    instance_type            = "t2.medium.elasticsearch"
     dedicated_master_enabled = false
     zone_awareness_enabled   = false
   }
