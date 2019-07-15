@@ -17,6 +17,6 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: graylog-oidc-proxy
+          serviceName: graylog-master
           servicePort: 8000
         path: /
