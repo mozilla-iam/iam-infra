@@ -197,7 +197,7 @@ spec:
   endpoints:
   - interval: 30s
     path: /api/plugins/org.graylog.plugins.metrics.prometheus/metrics
-    port: http
+    port: http-app
     scheme: http
     basicAuth:
       username: 
