@@ -13,7 +13,7 @@ Infrastructure repo [iam-infra](https://github.com/mozilla-iam/iam-infra)
 
 SSO Dashboard repo [sso-dashboard](https://github.com/mozilla-iam/sso-dashboard)
 
-DinoPark is composed by several microservices, this are the most important:
+DinoPark is composed by several microservices, these are the most important:
 * [dino-park-fence](https://github.com/mozilla-iam/dino-park-fence) Main microservice
 * [dino-park-search](https://github.com/mozilla-iam/dino-park-search) Search functionality
 * [dino-park-tree](https://github.com/mozilla-iam/dino-park-tree) Draws the org chart
