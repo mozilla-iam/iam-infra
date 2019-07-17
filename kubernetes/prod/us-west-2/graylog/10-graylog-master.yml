@@ -113,6 +113,61 @@ spec:
             timeoutSeconds: 60
             successThreshold: 1
             failureThreshold: 2
+        - name: graylog-oidc-proxy-sidecar
+          image:  itsre/graylog-oidc-proxy:1.9.6
+          env:
+          - name: discovery_url
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-oidc-proxy-config
+                key: discovery_url
+          - name: backend
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-oidc-proxy-config
+                key:  backend
+          - name: app_name
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-oidc-proxy-config
+                key: app_name
+          - name: aws_region
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-oidc-proxy-config
+                key: aws_region
+          - name: host_name
+            valueFrom:
+              configMapKeyRef:
+                name: graylog-oidc-proxy-config
+                key: host_name
+          - name: oidc_client_id
+            valueFrom:
+              secretKeyRef:
+                name: graylog-oidc-proxy-secret
+                key: oidc_client_id
+          - name: oidc_client_secret
+            valueFrom:
+              secretKeyRef:
+                name: graylog-oidc-proxy-secret
+                key: oidc_client_secret
+          - name: oidc_crypto_passphrase
+            valueFrom:
+              secretKeyRef:
+                name: graylog-oidc-proxy-secret
+                key: oidc_crypto_passphrase
+          ports:
+          - containerPort: 8000
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+      securityContext:
+        runAsNonRoot: false
+      restartPolicy: Always
   volumeClaimTemplates:
   - metadata:
       name: graylog-persistent-storage
@@ -144,7 +199,7 @@ spec:
   endpoints:
   - interval: 30s
     path: /api/plugins/org.graylog.plugins.metrics.prometheus/metrics
-    port: http
+    port: http-app
     scheme: http
     basicAuth:
       username: 
@@ -170,8 +225,11 @@ spec:
   selector:
     k8s-app: graylog-master
   ports:
-  - name: http
+  - name: http-app
     protocol: TCP
     port: 9000
+  - name: http-proxy
+    protocol: TCP
+    port: 8000
   clusterIP: None
 
