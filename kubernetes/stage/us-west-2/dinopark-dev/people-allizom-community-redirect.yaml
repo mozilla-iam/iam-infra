@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: dinopark-dev
+  name: people.allizom.community
+  annotations:
+    kubernetes.io/ingress.class: "nginx-dinopark-dev"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+        return 301 https://people.mozilla.org ;
+spec:
+  tls:
+  - hosts:
+    - people.allizom.community
+    secretName: people-allizom-community
+  rules:
+  - host: people.allizom.community
+
