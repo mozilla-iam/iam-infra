@@ -114,4 +114,3 @@ resource "aws_iam_role" "fluentd_mozdef_role" {
 }
 EOF
 }
-

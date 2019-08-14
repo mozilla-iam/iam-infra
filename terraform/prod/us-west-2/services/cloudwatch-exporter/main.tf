@@ -48,4 +48,3 @@ resource "aws_iam_role_policy" "cloudwatch_exporter_role_policy" {
 }
 EOF
 }
-
