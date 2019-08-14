@@ -94,7 +94,6 @@ data "aws_iam_policy_document" "allow_access_to_kinesis" {
   }
 }
 
-
 ### Subscription filters (one per Cloudwatch loggroup):
 
 resource "aws_cloudwatch_log_subscription_filter" "ldap_publisher_prod" {
@@ -150,4 +149,3 @@ resource "aws_cloudwatch_log_subscription_filter" "webhook_notifications_prod" {
   filter_pattern  = ""
   distribution    = "ByLogStream"
 }
-

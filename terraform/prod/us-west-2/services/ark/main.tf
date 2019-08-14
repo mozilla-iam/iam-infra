@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "ark-bucket" {
   bucket = "ark-${var.environment}-${var.region}"
   acl    = "private"
   region = "${var.region}"
-  
+
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -112,4 +112,3 @@ resource "aws_kms_alias" "ark_kms_key_alias" {
   name          = "alias/ark-${var.environment}-${var.region}"
   target_key_id = "${aws_kms_key.ark_kms_key.key_id}"
 }
-

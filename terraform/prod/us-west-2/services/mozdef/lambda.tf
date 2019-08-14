@@ -3,9 +3,9 @@
 # logs to, and publish those into MozDef SNS topic
 # At the moment the logs published are Elasticsearch queries.
 #
- resource "aws_iam_role" "publish_to_sns" {
+resource "aws_iam_role" "publish_to_sns" {
   name = "lambda-${var.environment}-publish-to-mozdef-topic"
- 
+
   assume_role_policy = <<EOF
 {
    "Version": "2012-10-17",
@@ -53,7 +53,7 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 resource "aws_lambda_function" "cloudwatch2sns" {
   function_name    = "cloudwatchES2sns-${var.environment}"
   role             = "${aws_iam_role.publish_to_sns.arn}"
-  description      = "Reads Elasticsearch logs from Cloudwatch and sends them to SNS MozDef topic" 
+  description      = "Reads Elasticsearch logs from Cloudwatch and sends them to SNS MozDef topic"
   filename         = "lambda-function-cloudwatch2sns.zip"
   handler          = "lambda-function-cloudwatch2sns.handler"
   source_code_hash = "${base64sha256(file("lambda-function-cloudwatch2sns.zip"))}"
@@ -61,8 +61,9 @@ resource "aws_lambda_function" "cloudwatch2sns" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "graylog-prod" {
-  name            = "cloudwatch2sns-graylog-prod-subscription"
-  log_group_name  = "${data.aws_cloudwatch_log_group.graylog-prod.name}"
+  name           = "cloudwatch2sns-graylog-prod-subscription"
+  log_group_name = "${data.aws_cloudwatch_log_group.graylog-prod.name}"
+
   # Empty patter matches all logs
   filter_pattern  = ""
   destination_arn = "${aws_lambda_function.cloudwatch2sns.arn}"
@@ -77,8 +78,8 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
 # See also the following AWS managed policy: AWSLambdaBasicExecutionRole
 resource "aws_iam_policy" "lambda_logging" {
-  name = "lambda_logging"
-  path = "/"
+  name        = "lambda_logging"
+  path        = "/"
   description = "IAM policy for logging from a lambda"
 
   policy = <<EOF
@@ -99,7 +100,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role = "${aws_iam_role.publish_to_sns.name}"
+  role       = "${aws_iam_role.publish_to_sns.name}"
   policy_arn = "${aws_iam_policy.lambda_logging.arn}"
 }
-

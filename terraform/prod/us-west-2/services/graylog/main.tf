@@ -8,15 +8,14 @@ resource "aws_security_group" "allow_https_from_kubernetes" {
   vpc_id      = "${data.terraform_remote_state.vpc.vpc_id}"
 
   ingress {
-    from_port   = 0
-    to_port     = 443
-    protocol    = "tcp"
+    from_port       = 0
+    to_port         = 443
+    protocol        = "tcp"
     security_groups = ["${data.terraform_remote_state.kubernetes.worker_security_group_id}"]
   }
 }
 
 resource "aws_elasticsearch_domain" "graylog" {
-
   domain_name           = "graylog-${var.environment}"
   elasticsearch_version = "5.6"
 
@@ -38,12 +37,12 @@ resource "aws_elasticsearch_domain" "graylog" {
   }
 
   vpc_options {
-    subnet_ids = ["${data.terraform_remote_state.vpc.private_subnets[0]}"]
+    subnet_ids         = ["${data.terraform_remote_state.vpc.private_subnets[0]}"]
     security_group_ids = ["${aws_security_group.allow_https_from_kubernetes.id}"]
   }
 
   tags {
-    Service  = "graylog-${var.environment}"
+    Service = "graylog-${var.environment}"
   }
 
   access_policies = <<CONFIG
@@ -65,6 +64,4 @@ resource "aws_elasticsearch_domain" "graylog" {
   ]
 }
 CONFIG
-
 }
-
