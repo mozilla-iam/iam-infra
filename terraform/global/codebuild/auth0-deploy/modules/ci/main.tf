@@ -38,6 +38,11 @@ resource "aws_codebuild_project" "build" {
         "UNUSED",
       )
     }
+
+    environment_variable {
+      name = "ENV"
+      value = var.environment
+    }
   }
 
   source {
