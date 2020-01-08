@@ -21,12 +21,12 @@ module "auth0-deploy-ci-stage" {
 module "auth0-deploy-ci-prod" {
   source = "./modules/ci"
 
-  project_name   = "auth0-deploy"
-  environment    = "prod"
-  github_repo    = "https://github.com/mozilla-iam/auth0-deploy"
-  github_branch  = "^production$"
-	# For the time being, we don't want to autodeploy on merge
-	enable_webhook = "false"
+  project_name  = "auth0-deploy"
+  environment   = "prod"
+  github_repo   = "https://github.com/mozilla-iam/auth0-deploy"
+  github_branch = "^production$"
+  # For the time being, we don't want to autodeploy on merge
+  enable_webhook = "false"
   enable_ecr     = "false"
   build_image    = "aws/codebuild/python:3.6.5"
 }
