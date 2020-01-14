@@ -12,7 +12,7 @@ spec:
     rules:
     - alert: PodRestarting
       annotations:
-        message: 'Pod {{ $labels.pod }} on dinopark-prod namespace has been restarted'
+        message: 'Pod {{ $labels.exported_pod }} on dinopark-prod namespace has been restarted'
       expr: |
         kube_pod_container_status_restarts_total{exported_namespace="dinopark-prod"}>0
       for: 1m
