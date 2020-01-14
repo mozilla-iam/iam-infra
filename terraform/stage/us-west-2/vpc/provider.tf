@@ -3,8 +3,7 @@
 #---
 
 provider "aws" {
-  region  = "us-west-2"
-  version = "~> 1.54"
+  region = "us-west-2"
 }
 
 terraform {
@@ -16,3 +15,4 @@ terraform {
     region = "us-west-2"
   }
 }
+
