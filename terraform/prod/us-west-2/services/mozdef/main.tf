@@ -5,7 +5,7 @@ resource "aws_sns_topic" "logs2mozdef" {
 # This topic policy allows InfoSec account to manage the topic
 # and consume its messages via SQS.
 resource "aws_sns_topic_policy" "allowInfosecAccount" {
-  arn = "${aws_sns_topic.logs2mozdef.arn}"
+  arn = aws_sns_topic.logs2mozdef.arn
 
   policy = <<EOF
 {
@@ -56,13 +56,14 @@ resource "aws_sns_topic_policy" "allowInfosecAccount" {
     ]
 }
 EOF
+
 }
 
 # This IAM role allows FluentD (assuming the role) to publish
 # to the SNS topic.
 resource "aws_iam_role_policy" "fluentd_mozdef_role_policy" {
   name = "fluentd-mozdef-policy-${var.environment}-${var.region}"
-  role = "${aws_iam_role.fluentd_mozdef_role.id}"
+  role = aws_iam_role.fluentd_mozdef_role.id
 
   policy = <<EOF
 {
@@ -87,6 +88,7 @@ resource "aws_iam_role_policy" "fluentd_mozdef_role_policy" {
     ]
 }
 EOF
+
 }
 
 resource "aws_iam_role" "fluentd_mozdef_role" {
@@ -113,4 +115,6 @@ resource "aws_iam_role" "fluentd_mozdef_role" {
    ]
 }
 EOF
+
 }
+

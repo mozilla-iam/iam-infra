@@ -26,11 +26,12 @@ resource "aws_iam_role" "cloudwatch_exporter_role" {
    ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "cloudwatch_exporter_role_policy" {
   name = "cloudwatch-exporter-policy-${var.environment}"
-  role = "${aws_iam_role.cloudwatch_exporter_role.id}"
+  role = aws_iam_role.cloudwatch_exporter_role.id
 
   policy = <<EOF
 {
@@ -47,4 +48,6 @@ resource "aws_iam_role_policy" "cloudwatch_exporter_role_policy" {
     ]
 }
 EOF
+
 }
+

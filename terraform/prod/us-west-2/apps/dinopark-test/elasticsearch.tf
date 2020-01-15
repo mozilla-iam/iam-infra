@@ -24,16 +24,16 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
   }
 
   vpc_options {
-    subnet_ids = ["${data.terraform_remote_state.vpc.private_subnets[0]}"]
-    #security_group_ids = ["${aws_security_group.allow_https_from_kubernetes.id}"]
-    security_group_ids = ["${data.aws_security_group.es-allow-https.id}"]
+    subnet_ids = [data.terraform_remote_state.vpc.outputs.private_subnets[0]]
+
+    security_group_ids = [data.aws_security_group.es-allow-https.id]
   }
 
-  tags {
+  tags = {
     Domain  = "dinopark-es"
     app     = "elasticsearch"
-    env     = "${var.environment}"
-    region  = "${var.region}"
+    env     = var.environment
+    region  = var.region
     project = "dinopark"
   }
 
@@ -56,5 +56,6 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
   ]
 }
 CONFIG
+
 }
 
