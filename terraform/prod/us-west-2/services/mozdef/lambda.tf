@@ -20,11 +20,12 @@ resource "aws_iam_role" "publish_to_sns" {
     ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "publish_to_sns" {
   name = "lambda-${var.environment}-publish-to-mozdef-topic"
-  role = "${aws_iam_role.publish_to_sns.id}"
+  role = aws_iam_role.publish_to_sns.id
 
   policy = <<EOF
 {
@@ -39,35 +40,36 @@ resource "aws_iam_role_policy" "publish_to_sns" {
         "Resource" : "${aws_sns_topic.logs2mozdef.arn}"    }]
 }
 EOF
+
 }
 
 # Grants access from Cloudwatch to write to Lambda
 resource "aws_lambda_permission" "allow_cloudwatch" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.cloudwatch2sns.function_name}"
+  function_name = aws_lambda_function.cloudwatch2sns.function_name
   principal     = "logs.us-west-2.amazonaws.com"
-  source_arn    = "${data.aws_cloudwatch_log_group.graylog-prod.arn}"
+  source_arn    = data.aws_cloudwatch_log_group.graylog-prod.arn
 }
 
 resource "aws_lambda_function" "cloudwatch2sns" {
   function_name    = "cloudwatchES2sns-${var.environment}"
-  role             = "${aws_iam_role.publish_to_sns.arn}"
+  role             = aws_iam_role.publish_to_sns.arn
   description      = "Reads Elasticsearch logs from Cloudwatch and sends them to SNS MozDef topic"
   filename         = "lambda-function-cloudwatch2sns.zip"
   handler          = "lambda-function-cloudwatch2sns.handler"
-  source_code_hash = "${base64sha256(file("lambda-function-cloudwatch2sns.zip"))}"
+  source_code_hash = filebase64sha256("lambda-function-cloudwatch2sns.zip")
   runtime          = "nodejs8.10"
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "graylog-prod" {
   name           = "cloudwatch2sns-graylog-prod-subscription"
-  log_group_name = "${data.aws_cloudwatch_log_group.graylog-prod.name}"
+  log_group_name = data.aws_cloudwatch_log_group.graylog-prod.name
 
   # Empty patter matches all logs
   filter_pattern  = ""
-  destination_arn = "${aws_lambda_function.cloudwatch2sns.arn}"
-  depends_on      = ["aws_lambda_permission.allow_cloudwatch"]
+  destination_arn = aws_lambda_function.cloudwatch2sns.arn
+  depends_on      = [aws_lambda_permission.allow_cloudwatch]
 }
 
 # Lambda function logging:
@@ -97,9 +99,11 @@ resource "aws_iam_policy" "lambda_logging" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role       = "${aws_iam_role.publish_to_sns.name}"
-  policy_arn = "${aws_iam_policy.lambda_logging.arn}"
+  role       = aws_iam_role.publish_to_sns.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
 }
+
