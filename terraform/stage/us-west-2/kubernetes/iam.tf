@@ -24,11 +24,12 @@ resource "aws_iam_role" "cluster_autoscaler" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "cluster_autoscaler" {
   name = "cluster-autoscaler-${var.environment}-${var.region}"
-  role = "${aws_iam_role.cluster_autoscaler.name}"
+  role = aws_iam_role.cluster_autoscaler.name
 
   policy = <<EOF
 {
@@ -49,4 +50,6 @@ resource "aws_iam_role_policy" "cluster_autoscaler" {
     ]
 }
 EOF
+
 }
+

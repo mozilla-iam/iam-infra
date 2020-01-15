@@ -2,10 +2,11 @@
 # Elasticsearch
 #---
 
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
 
 data "aws_security_group" "default" {
-  vpc_id = "${data.terraform_remote_state.vpc.vpc_id}"
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
   name   = "default"
 }
 
@@ -31,11 +32,11 @@ resource "aws_elasticsearch_domain" "es" {
   }
 
   vpc_options {
-    subnet_ids = ["${data.terraform_remote_state.vpc.private_subnets[0]}"]
-    security_group_ids = ["${data.aws_security_group.default.id}"]
+    subnet_ids         = [data.terraform_remote_state.vpc.outputs.private_subnets[0]]
+    security_group_ids = [data.aws_security_group.default.id]
   }
 
-  tags {
+  tags = {
     Domain  = "dinopark-mozillians-es-stage"
     app     = "elasticsearch"
     env     = "dinopark-staging"
@@ -57,4 +58,6 @@ resource "aws_elasticsearch_domain" "es" {
   ]
 }
 CONFIG
+
 }
+

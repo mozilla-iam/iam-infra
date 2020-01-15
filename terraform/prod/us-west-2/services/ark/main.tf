@@ -2,12 +2,12 @@
 resource "aws_s3_bucket" "ark-bucket" {
   bucket = "ark-${var.environment}-${var.region}"
   acl    = "private"
-  region = "${var.region}"
+  region = var.region
 
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = "${aws_kms_key.ark_kms_key.key_id}"
+        kms_master_key_id = aws_kms_key.ark_kms_key.key_id
         sse_algorithm     = "aws:kms"
       }
     }
@@ -38,11 +38,12 @@ resource "aws_iam_role" "ark_role" {
    ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "ark_role_policy" {
   name = "ark-role-policy-${var.environment}-${var.region}"
-  role = "${aws_iam_role.ark_role.id}"
+  role = aws_iam_role.ark_role.id
 
   policy = <<EOF
 {
@@ -101,6 +102,7 @@ resource "aws_iam_role_policy" "ark_role_policy" {
      ]
 }
 EOF
+
 }
 
 resource "aws_kms_key" "ark_kms_key" {
@@ -110,5 +112,6 @@ resource "aws_kms_key" "ark_kms_key" {
 # This alias provides a name to the key. It will be displayed in the AWS console
 resource "aws_kms_alias" "ark_kms_key_alias" {
   name          = "alias/ark-${var.environment}-${var.region}"
-  target_key_id = "${aws_kms_key.ark_kms_key.key_id}"
+  target_key_id = aws_kms_key.ark_kms_key.key_id
 }
+

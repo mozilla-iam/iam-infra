@@ -21,4 +21,3 @@ resource "aws_route53_record" "picture_api" {
     evaluate_target_health = false
   }
 }
-

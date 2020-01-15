@@ -1,4 +1,6 @@
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
+
 data "aws_kms_key" "ssm" {
   key_id = "alias/aws/ssm"
 }
@@ -8,16 +10,16 @@ data "aws_kms_key" "ssm" {
 #---
 
 resource "aws_codebuild_webhook" "webhook" {
-  count         = "${var.enable_webhook ? 1 : 0}"
-  project_name  = "${aws_codebuild_project.build.name}"
-  branch_filter = "${var.github_branch}"
+  count         = var.enable_webhook ? 1 : 0
+  project_name  = aws_codebuild_project.build.name
+  branch_filter = var.github_branch
 }
 
 resource "aws_codebuild_project" "build" {
   name          = "${var.project_name}-${var.environment}"
   description   = "CI pipeline for ${var.project_name}-${var.environment}"
   build_timeout = "5"
-  service_role  = "${aws_iam_role.codebuild.arn}"
+  service_role  = aws_iam_role.codebuild.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -25,24 +27,32 @@ resource "aws_codebuild_project" "build" {
 
   environment {
     compute_type    = "BUILD_GENERAL1_SMALL"
-    image           = "${var.build_image}"
+    image           = var.build_image
     type            = "LINUX_CONTAINER"
     privileged_mode = "true"
 
     environment_variable {
-      "name"  = "DOCKER_REPO"
-      "value" = "${coalesce(join("",aws_ecr_repository.registry.*.repository_url),"UNUSED")}"
+      name = "DOCKER_REPO"
+      value = coalesce(
+        join("", aws_ecr_repository.registry.*.repository_url),
+        "UNUSED",
+      )
+    }
+
+    environment_variable {
+      name = "ENV"
+      value = var.environment
     }
   }
 
   source {
     type     = "GITHUB"
-    location = "${var.github_repo}"
+    location = var.github_repo
   }
 
-  tags {
-    "App"         = "${var.project_name}"
-    "Environment" = "${var.environment}"
+  tags = {
+    "App"         = var.project_name
+    "Environment" = var.environment
   }
 }
 
@@ -67,10 +77,11 @@ resource "aws_iam_role" "codebuild" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "codebuild" {
-  role = "${aws_iam_role.codebuild.name}"
+  role = aws_iam_role.codebuild.name
 
   policy = <<POLICY
 {
@@ -118,6 +129,7 @@ resource "aws_iam_role_policy" "codebuild" {
   ]
 }
 POLICY
+
 }
 
 #---
@@ -125,13 +137,13 @@ POLICY
 #---
 
 resource "aws_ecr_repository" "registry" {
-  count = "${var.enable_ecr ? 1 : 0}"
+  count = var.enable_ecr ? 1 : 0
   name  = "${var.project_name}/${var.environment}"
 }
 
 resource "aws_ecr_repository_policy" "registrypolicy" {
-  count      = "${var.enable_ecr ? 1 : 0}"
-  repository = "${aws_ecr_repository.registry.name}"
+  count      = var.enable_ecr ? 1 : 0
+  repository = aws_ecr_repository.registry[0].name
 
   policy = <<EOF
 {
@@ -162,4 +174,6 @@ resource "aws_ecr_repository_policy" "registrypolicy" {
     ]
 }
 EOF
+
 }
+
