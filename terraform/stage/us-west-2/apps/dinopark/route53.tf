@@ -12,7 +12,7 @@ resource "aws_route53_record" "dinopark" {
 
 resource "aws_route53_record" "picture_api" {
   zone_id = data.aws_route53_zone.sso_allizom_org.zone_id
-  name    = "pictures.api.dev.sso.allizom.org"
+  name    = "picture.api.dev.sso.allizom.org"
   type    = "A"
 
   alias {
