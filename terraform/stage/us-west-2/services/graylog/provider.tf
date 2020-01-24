@@ -7,10 +7,10 @@ provider "aws" {
 }
 
 terraform {
-
   backend "s3" {
     bucket = "eks-terraform-shared-state"
     key    = "stage/us-west-2/services/graylog/terraform.tfstate"
     region = "us-west-2"
   }
 }
+

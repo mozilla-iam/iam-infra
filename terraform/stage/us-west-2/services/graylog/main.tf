@@ -9,13 +9,13 @@
 resource "aws_security_group" "allow_https_from_kubernetes" {
   name        = "allow_https_from_kubernetes"
   description = "Allow HTTPS traffic from Kubernetes cluster"
-  vpc_id      = "${data.terraform_remote_state.vpc.vpc_id}"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   ingress {
-    from_port       = 0
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = ["${data.terraform_remote_state.kubernetes.worker_security_group_id}"]
+    from_port = 0
+    to_port   = 443
+    protocol  = "tcp"
+    security_groups = [data.terraform_remote_state.kubernetes.outputs.worker_security_group_id]
   }
 }
 
@@ -43,11 +43,11 @@ resource "aws_elasticsearch_domain" "graylog" {
   }
 
   vpc_options {
-    subnet_ids         = ["${data.terraform_remote_state.vpc.private_subnets[0]}"]
-    security_group_ids = ["${aws_security_group.allow_https_from_kubernetes.id}"]
+    subnet_ids         = [data.terraform_remote_state.vpc.outputs.private_subnets[0]]
+    security_group_ids = [aws_security_group.allow_https_from_kubernetes.id]
   }
 
-  tags {
+  tags = {
     Service = "graylog-${var.environment}"
   }
 
@@ -70,4 +70,6 @@ resource "aws_elasticsearch_domain" "graylog" {
   ]
 }
 CONFIG
+
 }
+
