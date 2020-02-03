@@ -50,7 +50,7 @@ if [[ ! $(kubectl config current-context) == "$CLUSTER" ]] ; then
 fi
 
 # Check all pods are running before starting
-if [[ $(kubectl get pods --all-namespaces | grep -v Running | wc -l) -ne 1 ]]; then
+if [[ $(kubectl get pods --all-namespaces | grep -v Running | grep -v Completed | wc -l) -ne 1 ]]; then
   echo "There are Pods which are not in 'Running' state, fix those before continuing"
   exit 1
 fi
@@ -92,7 +92,7 @@ aws autoscaling update-auto-scaling-group --auto-scaling-group-name $ASG_INACTIV
 
 while [[ $(kubectl get nodes -o name | wc -l) -ne $(( NUM_INSTANCES + 1 + NUM_KUBE_NODES)) ]] ; do
   echo "Waiting for all the instances to join the cluster..."
-  sleep 10
+  sleep 15
 done
 
 while [[ $(kubectl get nodes | grep 'NotReady') ]] ; do
@@ -107,7 +107,7 @@ for NODE in $(echo $ASG_ACTIVE_NODES); do
   kubectl drain --ignore-daemonsets=true --delete-local-data=true $NODE
 
   sleep 3
-  while [[ $(kubectl get pods --all-namespaces | grep -v Running | wc -l) -ne 1 ]]; do
+  while [[ $(kubectl get pods --all-namespaces | grep -v Running | grep -v Completed | wc -l) -ne 1 ]]; do
     echo -e "Waiting on all the pods to be in 'Running' state"
     sleep 5
   done
