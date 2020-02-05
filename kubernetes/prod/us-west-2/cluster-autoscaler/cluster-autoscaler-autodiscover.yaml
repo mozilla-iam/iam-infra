@@ -42,11 +42,21 @@ rules:
   resources: ["poddisruptionbudgets"]
   verbs: ["watch","list"]
 - apiGroups: ["apps"]
-  resources: ["statefulsets"]
+  resources: ["statefulsets", "replicasets", "daemonsets"]
   verbs: ["watch","list","get"]
 - apiGroups: ["storage.k8s.io"]
-  resources: ["storageclasses"]
+  resources: ["storageclasses", "csinodes"]
   verbs: ["watch","list","get"]
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "patch"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["create"]
+- apiGroups: ["coordination.k8s.io"]
+  resourceNames: ["cluster-autoscaler"]
+  resources: ["leases"]
+  verbs: ["get", "update"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -117,13 +127,13 @@ spec:
   template:
     metadata:
       annotations:
-        iam.amazonaws.com/role: arn:aws:iam::320464205386:role/terraform-kubernetes-production-01-ClusterAutoscaler
+        iam.amazonaws.com/role: arn:aws:iam::320464205386:role/cluster-autoscaler-prod-us-west-2
       labels:
         app: cluster-autoscaler
     spec:
       serviceAccountName: cluster-autoscaler
       containers:
-        - image: k8s.gcr.io/cluster-autoscaler:v1.2.2
+        - image: gcr.io/google-containers/cluster-autoscaler:v1.14.7
           name: cluster-autoscaler
           resources:
             limits:
@@ -139,7 +149,7 @@ spec:
             - --cloud-provider=aws
             - --skip-nodes-with-local-storage=false
             - --expander=least-waste
-            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/kubernetes-production-01
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/kubernetes-prod-us-west-2
             - --skip-nodes-with-system-pods=false
           env:
             - name: AWS_REGION
