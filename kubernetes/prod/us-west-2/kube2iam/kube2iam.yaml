@@ -45,7 +45,7 @@ spec:
       serviceAccountName: kube2iam
       hostNetwork: true
       containers:
-        - image: jtblin/kube2iam:0.10.4
+        - image: jtblin/kube2iam:0.10.8
           imagePullPolicy: Always
           name: kube2iam
           args:
