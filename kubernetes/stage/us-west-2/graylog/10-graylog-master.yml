@@ -29,7 +29,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: graylog-master
-          image: graylog/graylog:3.0.1-1
+          image: graylog/graylog:3.2.1
           env:
           - name: GRAYLOG_PASSWORD_SECRET
             valueFrom:
