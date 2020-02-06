@@ -63,7 +63,7 @@ spec:
       serviceAccountName: mongo-graylog
       containers:
         - name: mongo
-          image: mongo:4.0.6
+          image: mongo:4.0.16
           command:
             - mongod
             - "--replSet"
@@ -79,10 +79,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
             limits:
               cpu: 500m
-              memory: 256Mi
+              memory: 1024Mi
         - name: mongo-sidecar
           # This one has to use :latest as upstream doesn't label
           # builds by version
