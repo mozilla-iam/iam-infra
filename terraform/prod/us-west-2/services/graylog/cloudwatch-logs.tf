@@ -150,3 +150,12 @@ resource "aws_cloudwatch_log_subscription_filter" "webhook_notifications_prod" {
   distribution    = "ByLogStream"
 }
 
+resource "aws_cloudwatch_log_subscription_filter" "auth0_publisher_prod" {
+  name            = "auth0-publisher-prod"
+  role_arn        = aws_iam_role.cloudwatch2kinesis.arn
+  log_group_name  = "/aws/lambda/auth0-publisher-production-handler"
+  destination_arn = aws_kinesis_stream.cloudwatch2graylog.arn
+  filter_pattern  = ""
+  distribution    = "ByLogStream"
+}
+
