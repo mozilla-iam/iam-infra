@@ -11,8 +11,8 @@ locals {
       name                  = "k8s-worker-blue"
       ami_id                = "ami-0c13bb9cbfd007e56"
       asg_desired_capacity  = "0"
-      asg_max_size          = "0"
-      asg_min_size          = "0"
+      asg_max_size          = "10"
+      asg_min_size          = "3"
       autoscaling_enabled   = true
       protect_from_scale_in = true
       instance_type         = "m5.large"
@@ -23,9 +23,9 @@ locals {
     {
       name                  = "k8s-worker-green"
       ami_id                = "ami-0c13bb9cbfd007e56"
-      asg_desired_capacity  = "3"
-      asg_max_size          = "10"
-      asg_min_size          = "3"
+      asg_desired_capacity  = "0"
+      asg_max_size          = "0"
+      asg_min_size          = "0"
       autoscaling_enabled   = true
       protect_from_scale_in = true
       instance_type         = "m5.large"

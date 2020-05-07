@@ -53,3 +53,47 @@ EOF
 
 }
 
+
+# Role for dino-park-dev
+resource "aws_iam_role" "dino_park_dev" {
+	name = "dino-park-dev-${var.region}"
+
+	assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "AWS": "${module.eks.worker_iam_role_arn}"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_iam_role_policy" "dino-park-dev" {
+  name = "dino-park-dev-${var.region}"
+  role = aws_iam_role.dino_park_dev.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ses:SendRawEmail",
+        "ses:SendEmail"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+
+}
