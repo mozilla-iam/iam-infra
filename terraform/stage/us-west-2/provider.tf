@@ -9,8 +9,8 @@ provider "aws" {
 terraform {
 
   backend "s3" {
-    bucket = "eks-terraform-shared-state"
-    key    = "stage/us-west-2/services/ssm-agent/terraform.tfstate"
+		bucket = "it-sre-state-32046420538"
+    key    = "state/terraform.tfstate"
     region = "us-west-2"
   }
 }
