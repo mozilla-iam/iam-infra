@@ -1,3 +1,72 @@
+#---
+# Elasticsearch
+#---
+
+resource "aws_security_group" "allow_https_from_kubernetes" {
+  name        = "allow_https_from_kubernetes"
+  description = "Allow HTTPS traffic from Kubernetes cluster"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 0
+    to_port   = 443
+    protocol  = "tcp"
+    security_groups = [module.eks.worker_security_group_id]
+  }
+}
+
+resource "aws_elasticsearch_domain" "graylog" {
+  domain_name           = "graylog-${var.environment}"
+  elasticsearch_version = "5.6"
+
+  ebs_options {
+    ebs_enabled = true
+    volume_type = "gp2"
+    volume_size = 100
+  }
+
+  cluster_config {
+    instance_count           = 3
+    instance_type            = "m3.medium.elasticsearch"
+    dedicated_master_enabled = false
+    zone_awareness_enabled   = false
+  }
+
+  snapshot_options {
+    automated_snapshot_start_hour = 20
+  }
+
+  vpc_options {
+    subnet_ids         = [module.vpc.private_subnets[0]]
+    security_group_ids = [aws_security_group.allow_https_from_kubernetes.id]
+  }
+
+  tags = {
+    Service = "graylog-${var.environment}"
+  }
+
+  access_policies = <<CONFIG
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "*"
+        ]
+      },
+      "Action": [
+        "es:*"
+      ],
+      "Resource": "arn:aws:es:us-west-2:${data.aws_caller_identity.current.account_id}:domain/graylog-${var.environment}/*"
+    }
+  ]
+}
+CONFIG
+
+}
+
 resource "aws_kinesis_stream" "cloudwatch2graylog" {
   name        = "Cloudwatch2Graylog"
   shard_count = 1
@@ -157,5 +226,17 @@ resource "aws_cloudwatch_log_subscription_filter" "auth0_publisher_prod" {
   destination_arn = aws_kinesis_stream.cloudwatch2graylog.arn
   filter_pattern  = ""
   distribution    = "ByLogStream"
+}
+
+resource "aws_route53_record" "graylog" {
+  zone_id = data.aws_route53_zone.infra_iam.zone_id
+  name    = "graylog.infra.iam.mozilla.com"
+  type    = "A"
+
+  alias {
+    name                   = "dualstack.${data.aws_elb.k8s-elb.dns_name}"
+    zone_id                = data.aws_elb.k8s-elb.zone_id
+    evaluate_target_health = false
+  }
 }
 

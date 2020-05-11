@@ -8,8 +8,8 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "eks-terraform-shared-state"
-    key    = "prod/us-west-2/apps/dinopark-prod/terraform.tfstate"
+    bucket = "it-sre-state-32046420538"
+    key    = "prod/us-west-2/terraform.tfstate"
     region = "us-west-2"
   }
 }
