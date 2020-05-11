@@ -1,4 +1,0 @@
-variable "environment" {
-  default = "prod"
-}
-

@@ -18,7 +18,7 @@ resource "aws_db_instance" "cis-prod" {
 
 resource "aws_db_subnet_group" "cis-prod-db" {
   name = "cis-prod-db-subnet"
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
+  subnet_ids = module.vpc.private_subnets
 }
 
 resource "aws_db_instance" "cis-stage" {
@@ -41,7 +41,7 @@ resource "aws_db_instance" "cis-stage" {
 
 resource "aws_db_subnet_group" "cis-stage-db" {
   name = "cis-stage-db-subnet"
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
+  subnet_ids = module.vpc.private_subnets
 }
 
 resource "aws_db_instance" "cis-dev" {
@@ -64,19 +64,19 @@ resource "aws_db_instance" "cis-dev" {
 
 resource "aws_db_subnet_group" "cis-dev-db" {
   name = "cis-dev-db-subnet"
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
+  subnet_ids = module.vpc.private_subnets
 }
 
 resource "aws_security_group" "allow-psql" {
   name        = "allow_psql_from_k8s_workers"
   description = "Allow traffic to PSQL from Kubernetes prod workers"
-  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port = 5432
     to_port   = 5432
     protocol  = "tcp"
-    security_groups = [data.terraform_remote_state.k8s.outputs.worker_security_group_id]
+    security_groups = [module.eks.worker_security_group_id]
   }
 
   egress {

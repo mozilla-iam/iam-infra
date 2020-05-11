@@ -2,7 +2,7 @@
 # Elasticsearch
 #---
 
-resource "aws_elasticsearch_domain" "dinopark-es" {
+resource "aws_elasticsearch_domain" "dinopark-es-prod" {
   domain_name           = "dinopark-${var.environment}-${var.region}"
   elasticsearch_version = "6.4"
 
@@ -24,7 +24,7 @@ resource "aws_elasticsearch_domain" "dinopark-es" {
   }
 
   vpc_options {
-    subnet_ids         = [data.terraform_remote_state.vpc.outputs.private_subnets[0]]
+    subnet_ids         = [module.vpc.private_subnets[0]]
     security_group_ids = [data.aws_security_group.es-allow-https.id]
   }
 
@@ -58,3 +58,26 @@ CONFIG
 
 }
 
+resource "aws_route53_record" "dinopark_prod" {
+  zone_id = data.aws_route53_zone.sso_mozilla_com.zone_id
+  name    = "dinopark.k8s.sso.mozilla.com"
+  type    = "A"
+
+  alias {
+    name                   = "dualstack.${data.aws_elb.dinopark-prod-elb.dns_name}"
+    zone_id                = data.aws_elb.dinopark-prod-elb.zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "picture_api_prod" {
+  zone_id = data.aws_route53_zone.sso_mozilla_com.zone_id
+  name    = "picture.api.sso.mozilla.com"
+  type    = "A"
+
+  alias {
+    name                   = "dualstack.${data.aws_elb.dinopark-prod-elb.dns_name}"
+    zone_id                = data.aws_elb.dinopark-prod-elb.zone_id
+    evaluate_target_health = false
+  }
+}
