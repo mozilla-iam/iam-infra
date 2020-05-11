@@ -9,3 +9,5 @@ data "aws_elb" "k8s-elb" {
   name = "aed7f2f217bc811e9bfc4029580efe58"
 }
 
+data "aws_availability_zones" "available" {
+}
