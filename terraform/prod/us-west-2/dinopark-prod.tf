@@ -15,7 +15,8 @@ resource "aws_elasticsearch_domain" "dinopark-es-prod" {
   cluster_config {
     instance_count           = 3
     instance_type            = "m5.large.elasticsearch"
-    dedicated_master_enabled = false
+    dedicated_master_enabled = true
+    dedicated_master_type    = "m5.large.elasticsearch"
     zone_awareness_enabled   = false
   }
 
@@ -26,6 +27,18 @@ resource "aws_elasticsearch_domain" "dinopark-es-prod" {
   vpc_options {
     subnet_ids         = [module.vpc.private_subnets[0]]
     security_group_ids = [data.aws_security_group.es-allow-https.id]
+  }
+
+  log_publishing_options {
+    cloudwatch_log_group_arn = "arn:aws:logs:us-west-2:320464205386:log-group:/aws/aes/domains/dinopark-prod-us-west-2/es-dinopark-prod-logs"
+    enabled                  = true
+    log_type                 = "ES_APPLICATION_LOGS"
+  }
+
+  log_publishing_options {
+    cloudwatch_log_group_arn = "arn:aws:logs:us-west-2:320464205386:log-group:/aws/aes/domains/dinopark-prod-us-west-2/es-dinopark-prod-logs"
+    enabled                  = true
+    log_type                 = "SEARCH_SLOW_LOGS"
   }
 
   tags = {
