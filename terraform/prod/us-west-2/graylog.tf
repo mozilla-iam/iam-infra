@@ -41,6 +41,11 @@ resource "aws_elasticsearch_domain" "graylog" {
     security_group_ids = [aws_security_group.allow_https_from_kubernetes.id]
   }
 
+  # TODO: Remove this when the issue is fixed on AWS Provider: https://github.com/terraform-providers/terraform-provider-aws/issues/5752
+  lifecycle {
+    ignore_changes = [log_publishing_options]
+  }
+
   tags = {
     Service = "graylog-${var.environment}"
   }
