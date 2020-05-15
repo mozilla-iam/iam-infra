@@ -16,6 +16,7 @@ resource "aws_elasticsearch_domain" "dinopark-es-prod" {
     instance_count           = 3
     instance_type            = "m5.large.elasticsearch"
     dedicated_master_enabled = true
+    dedicated_master_count   = 3
     dedicated_master_type    = "m5.large.elasticsearch"
     zone_awareness_enabled   = false
   }
