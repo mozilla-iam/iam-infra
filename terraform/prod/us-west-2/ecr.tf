@@ -5,3 +5,11 @@ resource "aws_ecr_repository" "mozdef" {
     scan_on_push = true
   }
 }
+
+resource "aws_ecr_repository" "graylog-oidc-proxy" {
+  name = "graylog-oidc-proxy"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
