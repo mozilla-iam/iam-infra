@@ -13,3 +13,11 @@ resource "aws_ecr_repository" "graylog-oidc-proxy" {
     scan_on_push = true
   }
 }
+
+resource "aws_ecr_repository" "dinopark-metrics" {
+  name = "dinopark-metrics"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
