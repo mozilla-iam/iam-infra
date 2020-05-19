@@ -114,7 +114,7 @@ spec:
             successThreshold: 1
             failureThreshold: 2
         - name: graylog-oidc-proxy-sidecar
-          image:  itsre/graylog-oidc-proxy:1.9.6
+          image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/graylog-oidc-proxy:1.9.6
           env:
           - name: discovery_url
             valueFrom:
