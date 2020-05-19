@@ -1,0 +1,52 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dinopark-metrics
+  namespace: monitoring
+spec:
+  schedule: "@hourly"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: dinopark-metrics
+            image: 320464205386.dkr.ecr.us-west-2.amazonaws.com/dinopark-metrics:0.01
+            command: [ "/app/dinopark-metrics.py" ]
+            env:
+              - name: DINOP_METRICS_ES_URL
+                valueFrom:
+                  secretKeyRef:
+                    name: dinopark-metrics
+                    key: es_url
+              - name: DINOP_METRICS_ES_INDEX
+                valueFrom:
+                  secretKeyRef:
+                    name: dinopark-metrics
+                    key: es_index
+              - name: DINOP_METRICS_INFLUX_HOST
+                valueFrom:
+                  secretKeyRef:
+                    name: influx-iam
+                    key: host
+              - name: DINOP_METRICS_INFLUX_DB
+                valueFrom:
+                  secretKeyRef:
+                    name: influx-iam
+                    key: db
+              - name: DINOP_METRICS_INFLUX_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: influx-iam
+                    key: user
+              - name: DINOP_METRICS_INFLUX_PW
+                valueFrom:
+                  secretKeyRef:
+                    name: influx-iam
+                    key: pw
+              - name: DINOP_METRICS_INFLUX_PORT
+                valueFrom:
+                  secretKeyRef:
+                    name: influx-iam
+                    key: port
+          restartPolicy: OnFailure
