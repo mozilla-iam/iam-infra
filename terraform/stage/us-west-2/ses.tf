@@ -32,15 +32,6 @@ resource "aws_route53_record" "dkim" {
   records = ["${element(aws_ses_domain_dkim.main.dkim_tokens, count.index)}.dkim.amazonses.com"]
 }
 
-# SPF validaton record
-#resource "aws_route53_record" "spf_mail_from" {
-#  zone_id = data.aws_route53_zone.sso_allizom_org.zone_id
-#  name    = aws_ses_domain_mail_from.main.mail_from_domain
-#  type    = "TXT"
-#  ttl     = "600"
-#  records = ["v=spf1 include:amazonses.com -all"]
-#}
-
 resource "aws_route53_record" "spf_domain" {
   zone_id = data.aws_route53_zone.sso_allizom_org.zone_id
   name    = aws_ses_domain_identity.main.domain

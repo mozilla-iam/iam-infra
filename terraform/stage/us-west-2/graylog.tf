@@ -12,9 +12,9 @@ resource "aws_security_group" "allow_https_from_kubernetes" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    from_port = 0
-    to_port   = 443
-    protocol  = "tcp"
+    from_port       = 0
+    to_port         = 443
+    protocol        = "tcp"
     security_groups = [module.eks.worker_security_group_id]
   }
 }
