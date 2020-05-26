@@ -16,6 +16,10 @@ data "aws_route53_zone" "sso_allizom_org" {
   name = "sso.allizom.org."
 }
 
+data "aws_route53_zone" "people_mozilla_org" {
+  name = "people.mozilla.org."
+}
+
 data "aws_elb" "k8s-elb" {
   name = "a00435690f99111e8989b0ace417809a"
 }
