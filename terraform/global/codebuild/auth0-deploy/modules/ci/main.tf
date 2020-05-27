@@ -10,9 +10,20 @@ data "aws_kms_key" "ssm" {
 #---
 
 resource "aws_codebuild_webhook" "webhook" {
-  count         = var.enable_webhook ? 1 : 0
-  project_name  = aws_codebuild_project.build.name
-  branch_filter = var.github_branch
+  count        = var.enable_webhook ? 1 : 0
+  project_name = aws_codebuild_project.build.name
+
+  filter_group {
+    filter {
+      type    = "EVENT"
+      pattern = var.github_event_type
+    }
+
+    filter {
+      type    = "HEAD_REF"
+      pattern = var.github_head_ref
+    }
+  }
 }
 
 resource "aws_codebuild_project" "build" {
@@ -40,7 +51,7 @@ resource "aws_codebuild_project" "build" {
     }
 
     environment_variable {
-      name = "ENV"
+      name  = "ENV"
       value = var.environment
     }
   }
