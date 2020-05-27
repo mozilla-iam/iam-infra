@@ -1,4 +1,9 @@
-variable "github_branch" {
+variable "github_head_ref" {
+  description = "Git head reference used to determine which branches gets tbuilt"
+}
+
+variable "github_event_type" {
+  description = "Event type which will trigger a deploy"
 }
 
 variable "github_repo" {
