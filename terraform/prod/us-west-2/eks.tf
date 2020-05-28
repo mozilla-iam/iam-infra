@@ -55,6 +55,30 @@ module "eks" {
 }
 
 
+# Managed nodes
+resource "aws_eks_node_group" "nodes" {
+  cluster_name    = local.cluster_name
+  node_group_name = "${local.cluster_name}_worker"
+  node_role_arn   = module.eks.worker_iam_role_arn
+  subnet_ids      = module.vpc.private_subnets
+  instance_types  = ["m5.large"]
+  disk_size       = 150
+
+  scaling_config {
+    desired_size = 0
+    max_size     = 0
+    min_size     = 0
+  }
+
+  labels = {
+    node            = "managed"
+    node_group_name = "${local.cluster_name}_worker"
+  }
+  tags = {
+    Name = "iam-prod-eks-node"
+  }
+}
+
 ### Autoscaling policies
 resource "aws_iam_role_policy_attachment" "workers_autoscaling" {
   policy_arn = aws_iam_policy.worker_autoscaling.arn
