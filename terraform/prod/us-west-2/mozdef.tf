@@ -173,7 +173,7 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 }
 
 resource "aws_cloudwatch_log_group" "graylog-prod" {
-	  name = "/aws/elasticsearch/domains/graylog-${var.environment}"
+  name = "/aws/elasticsearch/domains/graylog-${var.environment}"
 }
 
 resource "aws_lambda_function" "cloudwatch2sns" {

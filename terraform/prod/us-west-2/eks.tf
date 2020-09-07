@@ -41,17 +41,18 @@ locals {
 }
 
 module "eks" {
-  source = "terraform-aws-modules/eks/aws"
-	version = "12.0.0"
+  source  = "terraform-aws-modules/eks/aws"
+  version = "12.1.0"
 
-  cluster_name          = local.cluster_name
-  cluster_version       = "1.15"
-  subnets               = module.vpc.private_subnets
-  vpc_id                = module.vpc.vpc_id
-  worker_groups         = local.worker_groups
-  tags                  = local.tags
-  write_kubeconfig      = "false"
-  manage_aws_auth       = "false"
+  cluster_name                                       = local.cluster_name
+  cluster_version                                    = "1.15"
+  subnets                                            = module.vpc.private_subnets
+  vpc_id                                             = module.vpc.vpc_id
+  worker_groups                                      = local.worker_groups
+  tags                                               = local.tags
+  write_kubeconfig                                   = "false"
+  manage_aws_auth                                    = "false"
+  worker_create_cluster_primary_security_group_rules = true
 }
 
 

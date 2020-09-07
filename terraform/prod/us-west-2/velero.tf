@@ -2,7 +2,6 @@
 resource "aws_s3_bucket" "ark-bucket" {
   bucket = "ark-${var.environment}-${var.region}"
   acl    = "private"
-  region = var.region
 
   server_side_encryption_configuration {
     rule {
