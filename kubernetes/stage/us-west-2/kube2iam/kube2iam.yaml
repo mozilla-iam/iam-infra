@@ -29,7 +29,7 @@ items:
       apiGroup: rbac.authorization.k8s.io
 kind: List
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube2iam
@@ -37,6 +37,9 @@ metadata:
     app: kube2iam
   namespace: kube-system
 spec:
+  selector:
+    matchLabels:
+      name: kube2iam
   template:
     metadata:
       labels:
@@ -45,7 +48,7 @@ spec:
       serviceAccountName: kube2iam
       hostNetwork: true
       containers:
-        - image: jtblin/kube2iam:0.10.8
+        - image: jtblin/kube2iam:0.10.11
           imagePullPolicy: IfNotPresent
           name: kube2iam
           args:
