@@ -12,7 +12,7 @@ locals {
       ami_id                = "ami-065418523a44331e5"
       asg_desired_capacity  = "5"
       asg_max_size          = "10"
-      asg_min_size          = "3"
+      asg_min_size          = "5"
       autoscaling_enabled   = true
       protect_from_scale_in = true
       instance_type         = "m5.large"
@@ -22,7 +22,7 @@ locals {
     },
     {
       name                  = "k8s-worker-blue"
-      ami_id                = "ami-065418523a44331e5"
+      ami_id                = "ami-08509bccec3a27874"
       asg_desired_capacity  = "0"
       asg_max_size          = "0"
       asg_min_size          = "0"
@@ -45,7 +45,7 @@ module "eks" {
   version = "12.1.0"
 
   cluster_name                                       = local.cluster_name
-  cluster_version                                    = "1.15"
+  cluster_version                                    = "1.16"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
   worker_groups                                      = local.worker_groups
@@ -53,31 +53,6 @@ module "eks" {
   write_kubeconfig                                   = "false"
   manage_aws_auth                                    = "false"
   worker_create_cluster_primary_security_group_rules = true
-}
-
-
-# Managed nodes
-resource "aws_eks_node_group" "nodes" {
-  cluster_name    = local.cluster_name
-  node_group_name = "${local.cluster_name}_worker"
-  node_role_arn   = module.eks.worker_iam_role_arn
-  subnet_ids      = module.vpc.private_subnets
-  instance_types  = ["m5.large"]
-  disk_size       = 150
-
-  scaling_config {
-    desired_size = 0
-    max_size     = 0
-    min_size     = 0
-  }
-
-  labels = {
-    node            = "managed"
-    node_group_name = "${local.cluster_name}_worker"
-  }
-  tags = {
-    Name = "iam-prod-eks-node"
-  }
 }
 
 ### Autoscaling policies

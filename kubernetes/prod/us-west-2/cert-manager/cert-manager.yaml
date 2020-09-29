@@ -1447,7 +1447,7 @@ spec:
 
 ---
 # Source: cert-manager/charts/cainjector/templates/deployment.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cert-manager-cainjector
@@ -1489,7 +1489,7 @@ spec:
 
 ---
 # Source: cert-manager/charts/webhook/templates/deployment.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cert-manager-webhook
@@ -1540,7 +1540,7 @@ spec:
 
 ---
 # Source: cert-manager/templates/deployment.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cert-manager
