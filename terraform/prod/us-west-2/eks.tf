@@ -9,10 +9,10 @@ locals {
   worker_groups = [
     {
       name                  = "k8s-worker-green"
-      ami_id                = "ami-08509bccec3a27874"
-      asg_desired_capacity  = "0"
-      asg_max_size          = "0"
-      asg_min_size          = "0"
+      ami_id                = "ami-09bcaad64bb08605e"
+      asg_desired_capacity  = "6"
+      asg_max_size          = "10"
+      asg_min_size          = "5"
       autoscaling_enabled   = true
       protect_from_scale_in = true
       instance_type         = "m5.large"
@@ -22,10 +22,10 @@ locals {
     },
     {
       name                  = "k8s-worker-blue"
-      ami_id                = "ami-08509bccec3a27874"
-      asg_desired_capacity  = "6"
-      asg_max_size          = "10"
-      asg_min_size          = "5"
+      ami_id                = "ami-09bcaad64bb08605e"
+      asg_desired_capacity  = "0"
+      asg_max_size          = "0"
+      asg_min_size          = "0"
       autoscaling_enabled   = true
       protect_from_scale_in = true
       instance_type         = "m5.large"
@@ -45,7 +45,7 @@ module "eks" {
   version = "12.1.0"
 
   cluster_name                                       = local.cluster_name
-  cluster_version                                    = "1.16"
+  cluster_version                                    = "1.17"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
   worker_groups                                      = local.worker_groups
