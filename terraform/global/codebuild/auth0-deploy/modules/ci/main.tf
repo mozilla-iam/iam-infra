@@ -59,7 +59,13 @@ resource "aws_codebuild_project" "build" {
   source {
     type     = "GITHUB"
     location = var.github_repo
+
+    git_submodules_config {
+      fetch_submodules = var.fetch_submodules
+    }
   }
+
+  source_version = var.source_version
 
   tags = {
     "App"         = var.project_name

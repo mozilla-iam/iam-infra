@@ -27,3 +27,12 @@ variable "build_image" {
   default = "aws/codebuild/docker:17.09.0"
 }
 
+variable "source_version" {
+  description = "Git reference to fetch code from."
+  default     = ""
+}
+
+variable "fetch_submodules" {
+  description = "Fetch submodules included in the repository"
+  default     = "false"
+}

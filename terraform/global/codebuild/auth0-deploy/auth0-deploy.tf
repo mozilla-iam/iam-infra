@@ -24,12 +24,13 @@ module "auth0-deploy-ci-prod" {
 
   project_name      = "auth0-deploy"
   environment       = "prod"
-  github_repo       = "https://github.com/mozilla-iam/auth0-deploy"
+  github_repo       = "https://github.com/mozilla-iam/auth0-deploy.git"
   github_head_ref   = "refs/heads/production"
   github_event_type = "PUSH"
   # For the time being, we don't want to autodeploy on merge
   enable_webhook = "false"
   enable_ecr     = "false"
   build_image    = "aws/codebuild/python:3.6.5"
+  source_version = "production"
 }
 
