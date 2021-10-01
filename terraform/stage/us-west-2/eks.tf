@@ -13,15 +13,15 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "12.0.0"
+  version = "17.20.0"
 
-  cluster_name       = local.cluster_name
-  cluster_version    = "1.17"
-  subnets            = module.vpc.private_subnets
-  vpc_id             = module.vpc.vpc_id
-  tags               = local.tags
-  write_kubeconfig   = "false"
-  manage_aws_auth = "false"
+  cluster_name     = local.cluster_name
+  cluster_version  = "1.18"
+  subnets          = module.vpc.private_subnets
+  vpc_id           = module.vpc.vpc_id
+  tags             = local.tags
+  write_kubeconfig = "false"
+  manage_aws_auth  = "false"
 }
 
 # Managed nodes
