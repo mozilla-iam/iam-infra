@@ -22,7 +22,7 @@ locals {
     },
     {
       name                  = "k8s-worker-blue"
-      ami_id                = "ami-09bcaad64bb08605e"
+      ami_id                = "ami-0329499d31310cf49"
       asg_desired_capacity  = "0"
       asg_max_size          = "0"
       asg_min_size          = "0"
@@ -45,7 +45,7 @@ module "eks" {
   version = "12.1.0"
 
   cluster_name                                       = local.cluster_name
-  cluster_version                                    = "1.17"
+  cluster_version                                    = "1.18"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
   worker_groups                                      = local.worker_groups
