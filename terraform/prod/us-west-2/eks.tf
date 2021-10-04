@@ -9,7 +9,7 @@ locals {
   worker_groups = [
     {
       name                  = "k8s-worker-green"
-      ami_id                = "ami-09bcaad64bb08605e"
+      ami_id                = "ami-0adca766413605f27"
       asg_desired_capacity  = "6"
       asg_max_size          = "10"
       asg_min_size          = "5"
@@ -45,7 +45,7 @@ module "eks" {
   version = "12.1.0"
 
   cluster_name                                       = local.cluster_name
-  cluster_version                                    = "1.18"
+  cluster_version                                    = "1.19"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
   worker_groups                                      = local.worker_groups
