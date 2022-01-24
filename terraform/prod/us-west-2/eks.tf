@@ -18,7 +18,7 @@ locals {
       instance_type         = "m5.large"
       root_volume_size      = "150"
       subnets               = module.vpc.private_subnets
-      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/ /tmp && sudo rpm -i /tmp/audisp-json-2.2.5-1.x86_64-amazon.rpm && sudo mv /tmp/audisp-json.conf /etc/audisp/audisp-json.conf && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
+      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/v2 /tmp && sudo mv /tmp/audit.rules /etc/audit/rules.d/audit.rules && sudo mv /tmp/auditd.conf /etc/audit/auditd.conf && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
     },
     {
       name                  = "k8s-worker-blue"
@@ -31,7 +31,7 @@ locals {
       instance_type         = "m5.large"
       root_volume_size      = "150"
       subnets               = module.vpc.private_subnets
-      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/ /tmp && sudo rpm -i /tmp/audisp-json-2.2.5-1.x86_64-amazon.rpm && sudo mv /tmp/audisp-json.conf /etc/audisp/audisp-json.conf && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
+      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/v2 /tmp && sudo mv /tmp/audit.rules /etc/audit/rules.d/audit.rules && sudo mv /tmp/auditd.conf /etc/audit/auditd.conf && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
     },
   ]
 
