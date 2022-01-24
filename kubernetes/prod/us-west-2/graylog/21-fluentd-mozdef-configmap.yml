@@ -11,5 +11,8 @@ data:
       path /var/log/audit/audit.log
       pos_file /var/log/audit-log.pos
       tag auditd
+      <parse>
+        @type none
+      </parse>
     </source>
 
