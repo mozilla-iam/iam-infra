@@ -163,43 +163,8 @@ EOF
 
 }
 
-# Grants access from Cloudwatch to write to Lambda
-resource "aws_lambda_permission" "allow_cloudwatch" {
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch2sns.function_name
-  principal     = "logs.us-west-2.amazonaws.com"
-  source_arn    = aws_cloudwatch_log_group.graylog-prod.arn
-}
-
 resource "aws_cloudwatch_log_group" "graylog-prod" {
   name = "/aws/elasticsearch/domains/graylog-${var.environment}"
-}
-
-resource "aws_lambda_function" "cloudwatch2sns" {
-  function_name    = "cloudwatchES2sns-${var.environment}"
-  role             = aws_iam_role.publish_to_sns.arn
-  description      = "Reads Elasticsearch logs from Cloudwatch and sends them to SNS MozDef topic"
-  filename         = "lambda-function-cloudwatch2sns.zip"
-  handler          = "lambda-function-cloudwatch2sns.handler"
-  source_code_hash = filebase64sha256("lambda-function-cloudwatch2sns.zip")
-  runtime          = "nodejs10.x"
-}
-
-resource "aws_cloudwatch_log_subscription_filter" "graylog-prod" {
-  name           = "cloudwatch2sns-graylog-prod-subscription"
-  log_group_name = "/aws/elasticsearch/domains/graylog-${var.environment}"
-
-  # Empty patter matches all logs
-  filter_pattern  = ""
-  destination_arn = aws_lambda_function.cloudwatch2sns.arn
-  depends_on      = [aws_lambda_permission.allow_cloudwatch]
-}
-
-# Lambda function logging:
-resource "aws_cloudwatch_log_group" "lambda_logs" {
-  name              = "/aws/lambda/${aws_lambda_function.cloudwatch2sns.function_name}"
-  retention_in_days = 1
 }
 
 # See also the following AWS managed policy: AWSLambdaBasicExecutionRole
