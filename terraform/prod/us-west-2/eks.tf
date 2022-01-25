@@ -9,10 +9,10 @@ locals {
   worker_groups = [
     {
       name                  = "k8s-worker-green"
-      ami_id                = "ami-0adca766413605f27"
-      asg_desired_capacity  = "6"
-      asg_max_size          = "10"
-      asg_min_size          = "5"
+      ami_id                = "ami-0e9d7772961b84bc8"
+      asg_desired_capacity  = "0"
+      asg_max_size          = "0"
+      asg_min_size          = "0"
       autoscaling_enabled   = true
       protect_from_scale_in = true
       instance_type         = "m5.large"
@@ -22,10 +22,10 @@ locals {
     },
     {
       name                  = "k8s-worker-blue"
-      ami_id                = "ami-0329499d31310cf49"
-      asg_desired_capacity  = "0"
-      asg_max_size          = "0"
-      asg_min_size          = "0"
+      ami_id                = "ami-0e9d7772961b84bc8"
+      asg_desired_capacity  = "6"
+      asg_max_size          = "10"
+      asg_min_size          = "5"
       autoscaling_enabled   = true
       protect_from_scale_in = true
       instance_type         = "m5.large"
