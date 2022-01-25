@@ -4,15 +4,15 @@ metadata:
   namespace: logging
 apiVersion: v1
 data:
-  audisp-json.conf: |+
+  audit.conf: |+
     <source>
       @type tail
       @id audit_log
-      path /var/log/audit-json.log
-      pos_file /var/log/audit-json.log.pos
-      tag audisp-json
+      path /var/log/audit/audit.log
+      pos_file /var/log/audit-log.pos
+      tag auditd
       <parse>
-        @type json
+        @type none
       </parse>
     </source>
 
