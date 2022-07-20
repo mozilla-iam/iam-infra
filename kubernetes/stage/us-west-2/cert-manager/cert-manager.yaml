@@ -1,4 +1,4 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
@@ -197,7 +197,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
@@ -376,7 +376,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
@@ -655,7 +655,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
@@ -934,7 +934,7 @@ status:
   conditions: []
   storedVersions: []
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
@@ -1236,7 +1236,7 @@ metadata:
 
 ---
 # Source: cert-manager/charts/cainjector/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cert-manager-cainjector
@@ -1262,7 +1262,7 @@ rules:
     resources: ["apiservices"]
     verbs: ["*"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cert-manager-cainjector
@@ -1281,7 +1281,7 @@ subjects:
     kind: ServiceAccount
 ---
 # Source: cert-manager/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cert-manager
@@ -1301,7 +1301,7 @@ rules:
     resources: ["ingresses", "ingresses/finalizers"]
     verbs: ["*"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cert-manager
@@ -1358,7 +1358,7 @@ rules:
 ---
 # apiserver gets the auth-delegator role to delegate auth decisions to
 # the core apiserver
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cert-manager-webhook:auth-delegator
@@ -1382,7 +1382,7 @@ subjects:
 # apiserver gets the ability to read authentication. This allows it to
 # read the specific configmap that has the requestheader-* entries to
 # api agg
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: cert-manager-webhook:webhook-authentication-reader
@@ -1590,10 +1590,10 @@ spec:
 
 ---
 # Source: cert-manager/charts/webhook/templates/apiservice.yaml
-apiVersion: apiregistration.k8s.io/v1beta1
+apiVersion: apiregistration.k8s.io/v1
 kind: APIService
 metadata:
-  name: v1beta1.admission.certmanager.k8s.io
+  name: v1.admission.certmanager.k8s.io
   labels:
     app: webhook
     chart: webhook-v0.8.1
@@ -1608,7 +1608,7 @@ spec:
   service:
     name: cert-manager-webhook
     namespace: "cert-manager"
-  version: v1beta1
+  version: v1
 
 ---
 # Source: cert-manager/charts/webhook/templates/pki.yaml
@@ -1691,7 +1691,7 @@ spec:
 
 ---
 # Source: cert-manager/charts/webhook/templates/validating-webhook.yaml
-apiVersion: admissionregistration.k8s.io/v1beta1
+apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: cert-manager-webhook
@@ -1729,7 +1729,7 @@ webhooks:
       service:
         name: kubernetes
         namespace: default
-        path: /apis/admission.certmanager.k8s.io/v1beta1/certificates
+        path: /apis/admission.certmanager.k8s.io/v1/certificates
   - name: issuers.admission.certmanager.k8s.io
     namespaceSelector:
       matchExpressions:
@@ -1756,7 +1756,7 @@ webhooks:
       service:
         name: kubernetes
         namespace: default
-        path: /apis/admission.certmanager.k8s.io/v1beta1/issuers
+        path: /apis/admission.certmanager.k8s.io/v1/issuers
   - name: clusterissuers.admission.certmanager.k8s.io
     namespaceSelector:
       matchExpressions:
@@ -1783,5 +1783,5 @@ webhooks:
       service:
         name: kubernetes
         namespace: default
-        path: /apis/admission.certmanager.k8s.io/v1beta1/clusterissuers
+        path: /apis/admission.certmanager.k8s.io/v1/clusterissuers
 
