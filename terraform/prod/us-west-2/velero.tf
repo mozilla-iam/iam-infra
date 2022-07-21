@@ -1,14 +1,19 @@
 # Ark recommends to use one bucket per cluster
 resource "aws_s3_bucket" "ark-bucket" {
   bucket = "ark-${var.environment}-${var.region}"
-  acl    = "private"
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        kms_master_key_id = aws_kms_key.ark_kms_key.key_id
-        sse_algorithm     = "aws:kms"
-      }
+resource "aws_s3_bucket_acl" "ark-bucket" {
+  bucket = aws_s3_bucket.ark-bucket.id
+  acl = "private"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "ark-bucket" {
+  bucket = aws_s3_bucket.ark-bucket.id
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.ark_kms_key.key_id
+      sse_algorithm     = "aws:kms"
     }
   }
 }
