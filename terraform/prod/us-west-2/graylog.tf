@@ -19,6 +19,10 @@ resource "aws_elasticsearch_domain" "graylog" {
   domain_name           = "graylog-${var.environment}"
   elasticsearch_version = "5.6"
 
+  advanced_options = {
+    "rest.action.multi.allow_explicit_index" = "true"
+  }
+
   ebs_options {
     ebs_enabled = true
     volume_type = "gp2"
