@@ -16,6 +16,7 @@ rules:
   - ""
   - extensions
   - apps
+  - networking.k8s.io
   resources:
   - '*'
   verbs:
