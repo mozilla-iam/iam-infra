@@ -1,0 +1,53 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    annotations:
+    name: letsencrypt-production
+    namespace: dinopark-prod
+  spec:
+    acme:
+      preferredChain: ""
+      privateKeySecretRef:
+        name: letsencrypt-production
+      server: https://acme-v02.api.letsencrypt.org/directory
+      solvers:
+      - http01:
+          ingress:
+            class: nginx-dinopark-prod
+
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    annotations:
+    name: letsencrypt-production
+    namespace: dinopark-test
+  spec:
+    acme:
+      preferredChain: ""
+      privateKeySecretRef:
+        name: letsencrypt-production
+      server: https://acme-v02.api.letsencrypt.org/directory
+      solvers:
+      - http01:
+          ingress:
+            class: nginx-dinopark-test
+
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    annotations:
+    name: letsencrypt-production
+    namespace: monitoring
+  spec:
+    acme:
+      preferredChain: ""
+      privateKeySecretRef:
+        name: letsencrypt-production
+      server: https://acme-v02.api.letsencrypt.org/directory
+      solvers:
+      - http01:
+          ingress:
+            class: nginx-monitoring
+kind: List
