@@ -15,13 +15,14 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "17.20.0"
 
-  cluster_name     = local.cluster_name
-  cluster_version  = "1.20"
-  subnets          = module.vpc.private_subnets
-  vpc_id           = module.vpc.vpc_id
-  tags             = local.tags
-  write_kubeconfig = "false"
-  manage_aws_auth  = "false"
+  cluster_name              = local.cluster_name
+  cluster_version           = "1.21"
+  subnets                   = module.vpc.private_subnets
+  vpc_id                    = module.vpc.vpc_id
+  tags                      = local.tags
+  write_kubeconfig          = "false"
+  manage_aws_auth           = "false"
+  cluster_enabled_log_types = ["audit"]
 }
 
 # Managed nodes
@@ -32,6 +33,7 @@ resource "aws_eks_node_group" "nodes" {
   subnet_ids      = module.vpc.private_subnets
   instance_types  = ["m5.large"]
   disk_size       = 150
+  version         = module.eks.cluster_version
 
   scaling_config {
     desired_size = 3
