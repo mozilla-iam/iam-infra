@@ -112,6 +112,7 @@ rules:
       - pods
       - secrets
     verbs:
+      - get
       - list
       - watch
   - apiGroups:
@@ -144,6 +145,13 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingressclasses
+    verbs:
+      - get
+      - list
   - apiGroups:
       - ""
     resources:

@@ -3,7 +3,7 @@ kind: Role
 metadata:
   annotations:
   name: nginx-ingress-role
-  namespace: dinopark-prod
+  namespace: sso-dashboard-prod
 rules:
 - apiGroups:
   - ""
@@ -20,20 +20,17 @@ rules:
   - watch
 - apiGroups:
   - ""
-  resourceNames:
-  - ingress-controller-leader-nginx-dinopark-prod
   resources:
   - configmaps
   verbs:
-  - get
-  - update
+  - create
 - apiGroups:
   - ""
   resources:
-  - configmaps
   - events
   verbs:
   - create
+  - patch
 - apiGroups:
   - extensions
   resources:
@@ -49,6 +46,7 @@ rules:
   - get
   - list
   - watch
+  - update
 - apiGroups:
   - coordination.k8s.io
   resources:
@@ -67,3 +65,9 @@ rules:
   - list
   - watch
   - get
+- apiGroups:
+    - networking.k8s.io
+  resources:
+    - ingresses/status
+  verbs:
+    - update
