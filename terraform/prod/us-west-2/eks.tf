@@ -6,35 +6,6 @@
 locals {
   cluster_name = "kubernetes-${var.environment}-${var.region}"
 
-  worker_groups = [
-    {
-      name                  = "k8s-worker-green"
-      ami_id                = "ami-0aa4096ec49a62235"
-      asg_desired_capacity  = "0"
-      asg_max_size          = "0"
-      asg_min_size          = "0"
-      autoscaling_enabled   = true
-      protect_from_scale_in = true
-      instance_type         = "m5.large"
-      root_volume_size      = "150"
-      subnets               = module.vpc.private_subnets
-      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/v2 /tmp && sudo mv /tmp/audit.rules /etc/audit/rules.d/audit.rules && sudo mv /tmp/auditd.conf /etc/audit/auditd.conf && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
-    },
-    {
-      name                  = "k8s-worker-blue"
-      ami_id                = "ami-0ac2f1bf9769d65f3"
-      asg_desired_capacity  = "6"
-      asg_max_size          = "10"
-      asg_min_size          = "5"
-      autoscaling_enabled   = true
-      protect_from_scale_in = true
-      instance_type         = "m5.large"
-      root_volume_size      = "150"
-      subnets               = module.vpc.private_subnets
-      additional_userdata   = "aws s3 cp --recursive s3://audisp-json/v2 /tmp && sudo mv /tmp/audit.rules /etc/audit/rules.d/audit.rules && sudo mv /tmp/auditd.conf /etc/audit/auditd.conf && sudo service auditd restart && sudo yum install -y amazon-ssm-agent && sudo systemctl start amazon-ssm-agent"
-    },
-  ]
-
   tags = {
     "Environment" = var.environment
   }
@@ -48,13 +19,38 @@ module "eks" {
   cluster_version                                    = "1.21"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
-  worker_groups                                      = local.worker_groups
   tags                                               = local.tags
   write_kubeconfig                                   = "false"
   manage_aws_auth                                    = "false"
   worker_create_cluster_primary_security_group_rules = true
   cluster_enabled_log_types = ["audit"]
 }
+
+# Managed nodes
+resource "aws_eks_node_group" "nodes" {
+  cluster_name    = local.cluster_name
+  node_group_name = local.cluster_name
+  node_role_arn   = module.eks.worker_iam_role_arn
+  subnet_ids      = module.vpc.private_subnets
+  instance_types  = ["m5.large"]
+  disk_size       = 20
+  version         = module.eks.cluster_version
+
+  scaling_config {
+    desired_size = 5
+    max_size     = 10
+    min_size     = 5
+  }
+
+  labels = {
+    node            = "managed"
+    node_group_name = "${local.cluster_name}_worker"
+  }
+  tags = {
+    Name = "iam-prod-eks-node"
+  }
+}
+
 
 ### Autoscaling policies
 resource "aws_iam_role_policy_attachment" "workers_autoscaling" {
