@@ -39,6 +39,9 @@ spec:
         - --configmap=$(POD_NAMESPACE)/nginx-configuration
         - --publish-service=$(POD_NAMESPACE)/ingress-nginx
         - --annotations-prefix=nginx.ingress.kubernetes.io
+        - --validating-webhook=:8443
+        - --validating-webhook-certificate=/usr/local/certificates/cert
+        - --validating-webhook-key=/usr/local/certificates/key
         env:
         - name: POD_NAME
           valueFrom:
@@ -50,7 +53,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.24.1
+        image: bitnami/nginx-ingress-controller:1.6.4
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -87,7 +90,7 @@ spec:
             drop:
             - ALL
           procMount: Default
-          runAsUser: 33
+          runAsUser: 101
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
@@ -97,22 +100,3 @@ spec:
       serviceAccount: nginx-ingress-serviceaccount
       serviceAccountName: nginx-ingress-serviceaccount
       terminationGracePeriodSeconds: 30
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2019-05-23T08:12:47Z"
-    lastUpdateTime: "2019-05-23T08:13:04Z"
-    message: ReplicaSet "nginx-ingress-controller-7c58f699fb" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  - lastTransitionTime: "2023-05-03T10:26:45Z"
-    lastUpdateTime: "2023-05-03T10:26:45Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
