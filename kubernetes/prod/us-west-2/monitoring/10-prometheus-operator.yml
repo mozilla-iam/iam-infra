@@ -27,11 +27,17 @@ rules:
   - monitoring.coreos.com
   resources:
   - alertmanagers
+  - alertmanagerconfigs
   - prometheuses
   - prometheuses/finalizers
   - alertmanagers/finalizers
   - servicemonitors
   - prometheusrules
+  - podmonitors
+  - probes
+  - thanosrulers
+  - alertmanagers/status
+  - prometheuses/status
   verbs:
   - '*'
 - apiGroups:
@@ -99,10 +105,8 @@ spec:
       containers:
       - args:
         - --kubelet-service=kube-system/kubelet
-        - --logtostderr=true
-        - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
-        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.27.0
-        image: quay.io/coreos/prometheus-operator:v0.27.0
+        - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.63.0
+        image: quay.io/prometheus-operator/prometheus-operator:v0.63.0
         name: prometheus-operator
         ports:
         - containerPort: 8080
