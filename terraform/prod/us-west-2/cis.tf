@@ -4,7 +4,7 @@ resource "aws_db_instance" "cis-prod" {
   max_allocated_storage       = 20
   storage_type                = "gp2"
   engine                      = "postgres"
-  engine_version              = "11.13"
+  engine_version              = "11.16"
   instance_class              = "db.t2.micro"
   username                    = "cis"
   password                    = "oneTimePassword"
@@ -27,7 +27,7 @@ resource "aws_db_instance" "cis-stage" {
   max_allocated_storage       = 20
   storage_type                = "gp2"
   engine                      = "postgres"
-  engine_version              = "11.13"
+  engine_version              = "11.16"
   instance_class              = "db.t2.micro"
   username                    = "cis"
   password                    = "oneTimePassword"
@@ -50,7 +50,7 @@ resource "aws_db_instance" "cis-dev" {
   max_allocated_storage       = 20
   storage_type                = "gp2"
   engine                      = "postgres"
-  engine_version              = "11.13"
+  engine_version              = "11.16"
   instance_class              = "db.t2.micro"
   username                    = "cis"
   password                    = "oneTimePassword"
@@ -90,4 +90,3 @@ resource "aws_security_group" "allow-psql" {
     Name = "allow_psql_from_k8s_prod_workers"
   }
 }
-
