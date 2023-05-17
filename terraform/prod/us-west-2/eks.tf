@@ -23,7 +23,7 @@ module "eks" {
   write_kubeconfig                                   = "false"
   manage_aws_auth                                    = "false"
   worker_create_cluster_primary_security_group_rules = true
-  cluster_enabled_log_types = ["audit"]
+  cluster_enabled_log_types                          = ["audit"]
 }
 
 # Managed nodes
@@ -103,5 +103,25 @@ data "aws_iam_policy_document" "worker_autoscaling" {
       variable = "autoscaling:ResourceTag/k8s.io/cluster-autoscaler/enabled"
       values   = ["true"]
     }
+  }
+}
+
+# cert-manager
+resource "kubernetes_namespace" "cert-manager" {
+  metadata {
+    name = "cert-manager"
+  }
+}
+
+resource "helm_release" "cert-manager" {
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = "v1.11.2"
+  namespace  = kubernetes_namespace.cert-manager.id
+
+  set {
+    name  = "installCRDs"
+    value = "true"
   }
 }
