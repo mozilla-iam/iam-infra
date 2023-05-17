@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "ark-bucket" {
 
 resource "aws_s3_bucket_acl" "ark-bucket" {
   bucket = aws_s3_bucket.ark-bucket.id
-  acl = "private"
+  acl    = "private"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "ark-bucket" {

@@ -26,7 +26,7 @@ resource "aws_elasticsearch_domain" "dinopark-es-prod" {
   }
 
   vpc_options {
-    subnet_ids         = [module.vpc.private_subnets[0]]
+    subnet_ids = [module.vpc.private_subnets[0]]
     security_group_ids = [
       data.aws_security_group.es-allow-https.id,
       module.eks.worker_security_group_id

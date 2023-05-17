@@ -13,7 +13,7 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "13.2.0"
+  version = "17.20.0"
 
   cluster_name                                       = local.cluster_name
   cluster_version                                    = "1.22"
@@ -23,7 +23,8 @@ module "eks" {
   write_kubeconfig                                   = "false"
   manage_aws_auth                                    = "false"
   worker_create_cluster_primary_security_group_rules = true
-  cluster_enabled_log_types = ["audit"]
+  cluster_enabled_log_types                          = ["audit"]
+  enable_irsa                                        = true
 }
 
 # Managed nodes
@@ -102,6 +103,32 @@ data "aws_iam_policy_document" "worker_autoscaling" {
       test     = "StringEquals"
       variable = "autoscaling:ResourceTag/k8s.io/cluster-autoscaler/enabled"
       values   = ["true"]
+    }
+  }
+}
+
+resource "helm_release" "aws-ebs-csi-driver" {
+  name       = "aws-ebs-csi-driver"
+  repository = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
+  chart      = "aws-ebs-csi-driver"
+  version    = "2.19.0"
+  namespace  = "kube-system"
+
+  set {
+    name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.ebs_csi_irsa_role.iam_role_arn
+  }
+}
+
+module "ebs_csi_irsa_role" {
+  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  role_name             = "ebs-csi-driver"
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
     }
   }
 }
