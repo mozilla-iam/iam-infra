@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRoleBinding","metadata":{"annotations":{},"name":"nginx-ingress-clusterrole-nisa-binding"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"nginx-ingress-clusterrole"},"subjects":[{"kind":"ServiceAccount","name":"nginx-ingress-serviceaccount","namespace":"ingress-nginx"}]}
+  creationTimestamp: "2019-02-13T10:35:36Z"
+  name: nginx-ingress-clusterrole-nisa-binding
+  resourceVersion: "848515"
+  uid: 1980473f-2f7b-11e9-9652-02175cae888c
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nginx-ingress-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
