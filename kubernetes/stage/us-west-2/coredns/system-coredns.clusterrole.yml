@@ -1,0 +1,38 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRole","metadata":{"annotations":{},"labels":{"eks.amazonaws.com/component":"coredns","k8s-app":"kube-dns","kubernetes.io/bootstrapping":"rbac-defaults"},"name":"system:coredns"},"rules":[{"apiGroups":[""],"resources":["endpoints","services","pods","namespaces"],"verbs":["list","watch"]},{"apiGroups":[""],"resources":["nodes"],"verbs":["get"]}]}
+  creationTimestamp: "2019-04-11T14:39:44Z"
+  labels:
+    eks.amazonaws.com/component: coredns
+    k8s-app: kube-dns
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:coredns
+  resourceVersion: "414625749"
+  uid: a5e6bfc1-5c67-11e9-968c-0ae0e1692862
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - services
+  - pods
+  - namespaces
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
