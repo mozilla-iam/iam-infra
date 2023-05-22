@@ -132,3 +132,16 @@ module "ebs_csi_irsa_role" {
     }
   }
 }
+
+resource "helm_release" "cert-manager" {
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = "v1.11.2"
+  namespace  = "cert-manager"
+
+  set {
+    name  = "installCRDs"
+    value = "true"
+  }
+}
