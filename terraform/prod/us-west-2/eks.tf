@@ -16,7 +16,7 @@ module "eks" {
   version = "17.20.0"
 
   cluster_name                                       = local.cluster_name
-  cluster_version                                    = "1.22"
+  cluster_version                                    = "1.23"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
   tags                                               = local.tags
@@ -122,7 +122,7 @@ resource "helm_release" "aws-ebs-csi-driver" {
 
 module "ebs_csi_irsa_role" {
   source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name             = "ebs-csi-driver"
+  role_name             = "ebs-csi-driver-prod"
   attach_ebs_csi_policy = true
 
   oidc_providers = {
