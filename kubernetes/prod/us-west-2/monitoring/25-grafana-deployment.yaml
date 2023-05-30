@@ -11,7 +11,7 @@ spec:
     requests:
       storage: 2Gi
 ---
-apiVersion: storage.k8s.io/v1beta1
+apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: grafana-storage
@@ -85,11 +85,11 @@ spec:
           name: http
         resources:
           limits:
-            cpu: 200m
-            memory: 200Mi
+            cpu: 3
+            memory: 4G
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 1
+            memory: 1G
         volumeMounts:
         - mountPath: /var/lib/grafana
           name: grafana-persistent-storage
