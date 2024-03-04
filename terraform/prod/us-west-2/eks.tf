@@ -16,7 +16,7 @@ module "eks" {
   version = "17.20.0"
 
   cluster_name                                       = local.cluster_name
-  cluster_version                                    = "1.25"
+  cluster_version                                    = "1.29"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
   tags                                               = local.tags
@@ -39,7 +39,7 @@ resource "aws_eks_node_group" "nodes" {
 
   scaling_config {
     desired_size = 5
-    max_size     = 10
+    max_size     = 15
     min_size     = 5
   }
 
@@ -137,7 +137,7 @@ resource "helm_release" "cert-manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.11.2"
+  version    = "v1.14.3"
   namespace  = "cert-manager"
 
   set {
