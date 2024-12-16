@@ -6,17 +6,17 @@ resource "google_clouddeploy_delivery_pipeline" "sso-dashboard" {
   serial_pipeline {
     stages {
       profiles  = ["dev"]
-      target_id = "dev"
+      target_id = google_clouddeploy_target.dev.target_id
     }
 
     stages {
       profiles  = ["staging"]
-      target_id = "staging"
+      target_id = google_clouddeploy_target.staging.target_id
     }
 
     stages {
       profiles  = ["prod"]
-      target_id = "prod"
+      target_id = google_clouddeploy_target.prod.target_id
     }
   }
 }
