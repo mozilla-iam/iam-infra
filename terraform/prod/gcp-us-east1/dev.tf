@@ -1,8 +1,3 @@
-data "google_cloud_run_v2_service" "dev" {
-  name     = "sso-dashboard-dev"
-  location = "us-east1"
-}
-
 data "google_cloud_run_v2_service" "sso_dashboard_dev" {
   name     = "sso-dashboard-dev"
   location = "us-east1"
