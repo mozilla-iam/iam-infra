@@ -8,7 +8,7 @@ resource "google_compute_region_network_endpoint_group" "sso_dashboard_prod" {
   network_endpoint_type = "SERVERLESS"
   region                = "us-east1"
   cloud_run {
-    service = "sso-dashboard-prod"
+    service = data.google_cloud_run_v2_service.sso_dashboard_prod.name
   }
 }
 
