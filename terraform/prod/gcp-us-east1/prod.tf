@@ -19,6 +19,7 @@ resource "google_compute_backend_service" "sso_dashboard_prod" {
   load_balancing_scheme           = "EXTERNAL_MANAGED"
   locality_lb_policy              = "ROUND_ROBIN"
   connection_draining_timeout_sec = 0
+  security_policy                 = google_compute_security_policy.default.id
   backend {
     balancing_mode  = "UTILIZATION"
     capacity_scaler = 1
