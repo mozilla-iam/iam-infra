@@ -90,7 +90,7 @@ GEM
     systemd-journal (1.3.3)
       ffi (~> 1.9)
     thread_safe (0.3.6)
-    tzinfo (1.2.5)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     tzinfo-data (1.2019.1)
       tzinfo (>= 1.0.0)
