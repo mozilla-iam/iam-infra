@@ -16,7 +16,7 @@ module "eks" {
   version = "17.20.0"
 
   cluster_name                                       = local.cluster_name
-  cluster_version                                    = "1.29"
+  cluster_version                                    = "1.32"
   subnets                                            = module.vpc.private_subnets
   vpc_id                                             = module.vpc.vpc_id
   tags                                               = local.tags
@@ -137,7 +137,7 @@ resource "helm_release" "cert-manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.14.3"
+  version    = "v1.17.2"
   namespace  = "cert-manager"
 
   set {
