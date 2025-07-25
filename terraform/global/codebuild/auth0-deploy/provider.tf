@@ -7,10 +7,17 @@ provider "aws" {
 }
 
 terraform {
+  required_version = ">= 1.12.2"
   backend "s3" {
     bucket = "eks-terraform-shared-state"
     key    = "global/codebuild/auth0-deploy/terraform.tfstate"
     region = "us-west-2"
+  }
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 6.0"
+    }
   }
 }
 
