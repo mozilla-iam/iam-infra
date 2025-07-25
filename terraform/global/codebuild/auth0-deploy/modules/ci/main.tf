@@ -68,8 +68,8 @@ resource "aws_codebuild_project" "build" {
   source_version = var.source_version
 
   tags = {
-    "App"         = var.project_name
-    "Environment" = var.environment
+    App         = var.project_name
+    Environment = var.environment
   }
 }
 
