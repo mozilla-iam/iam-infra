@@ -11,45 +11,45 @@ data "aws_kms_key" "ssm" {
 #---
 
 resource "aws_codebuild_webhook" "webhook" {
-  project_name  = "${aws_codebuild_project.build.name}"
+  project_name  = aws_codebuild_project.build.name
   branch_filter = "^master$"
 }
 
 resource "aws_codebuild_project" "build" {
-  name          = "${var.service_name}"
+  name          = var.service_name
   description   = "CI pipeline for ${var.service_name}"
-  build_timeout = "10"
-  service_role  = "${aws_iam_role.codebuild.arn}"
+  build_timeout = "60"
+  service_role  = aws_iam_role.codebuild.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
   }
 
   environment {
-    compute_type    = "BUILD_GENERAL1_SMALL"
-    image           = "aws/codebuild/docker:17.09.0"
+    compute_type    = "BUILD_GENERAL1_LARGE"
+    image           = "aws/codebuild/standard:4.0"
     type            = "LINUX_CONTAINER"
     privileged_mode = "true"
 
     environment_variable {
-      "name"  = "DOCKER_REPO"
-      "value" = "${aws_ecr_repository.registry.repository_url}"
+      name  = "DOCKER_REPO"
+      value = aws_ecr_repository.registry.repository_url
     }
 
     environment_variable {
-      "name"  = "PROJECT_NAME"
-      "value" = "${var.service_name}"
+      name  = "PROJECT_NAME"
+      value = var.service_name
     }
 
     environment_variable {
-      "name"  = "CLUSTER_NAME"
-      "value" = "kubernetes-production-01"
+      name  = "CLUSTER_NAME"
+      value = "kubernetes-production-01"
     }
 
     environment_variable {
-      "name"  = "DEPLOY_TOKEN"
-      "value" = "/iam/kubernetes/DEPLOY_TOKEN"
-      "type"  = "PARAMETER_STORE"
+      name  = "DEPLOY_TOKEN"
+      value = "/iam/kubernetes/DEPLOY_TOKEN"
+      type  = "PARAMETER_STORE"
     }
   }
 
@@ -58,8 +58,8 @@ resource "aws_codebuild_project" "build" {
     location  = "https://github.com/mozilla-iam/dino-park-search.git"
   }
 
-  tags {
-    "App" = "${var.service_name}"
+  tags = {
+    App = var.service_name
   }
 }
 
@@ -87,7 +87,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "codebuild" {
-  role = "${aws_iam_role.codebuild.name}"
+  role = aws_iam_role.codebuild.name
 
   policy = <<POLICY
 {
@@ -150,11 +150,11 @@ POLICY
 #---
 
 resource "aws_ecr_repository" "registry" {
-  name = "${var.service_name}"
+  name = var.service_name
 }
 
 resource "aws_ecr_repository_policy" "registrypolicy" {
-  repository = "${aws_ecr_repository.registry.name}"
+  repository = aws_ecr_repository.registry.name
 
   policy = <<EOF
 {
