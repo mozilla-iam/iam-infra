@@ -12,5 +12,5 @@ variable "project_name" {
 }
 
 variable "build_image" {
-  default = "aws/codebuild/docker:17.09.0"
+  default = "aws/codebuild/standard:2.0-1.12.0"
 }
