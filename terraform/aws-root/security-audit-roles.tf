@@ -150,6 +150,9 @@ resource "aws_cloudformation_stack_set" "security_audit_descendants" {
   auto_deployment {
     enabled = true
   }
+  operation_preferences {
+    max_concurrent_percentage = 33
+  }
 }
 
 resource "aws_cloudformation_stack_instances" "security_audit_descendants" {
