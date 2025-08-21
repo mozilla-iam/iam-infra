@@ -1,7 +1,12 @@
 data "aws_caller_identity" "current" {}
 data "aws_organizations_organization" "default" {}
 
+data "aws_organizations_organizational_unit_descendant_accounts" "accounts" {
+  parent_id = data.aws_organizations_organization.default.roots[0].id
+}
+
 locals {
+  child_account_list = [for ca in data.aws_organizations_organizational_unit_descendant_accounts.accounts.accounts: ca.id]
   security_audit_role_name = "MozillaSecurityAudit"
   security_audit_role_cloudformation_root = {
     Resources = {
@@ -13,7 +18,7 @@ locals {
           AssumeRolePolicyDocument = data.aws_iam_policy_document.security_audit_assume_role_root.json
           Policies = [
             {
-              PolicyName     = "MozillaSecurityAudit"
+              PolicyName     = local.security_audit_role_name
               PolicyDocument = data.aws_iam_policy_document.security_audit_root.json
             }
           ]
@@ -35,7 +40,7 @@ locals {
           AssumeRolePolicyDocument = data.aws_iam_policy_document.security_audit_assume_role_descendants.json
           Policies = [
             {
-              PolicyName     = "MozillaSecurityAudit"
+              PolicyName     = local.security_audit_role_name
               PolicyDocument = data.aws_iam_policy_document.security_audit_descendants.json
             }
           ]
@@ -64,15 +69,7 @@ data "aws_iam_policy_document" "security_audit_assume_role_root" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-    condition {
-      test     = "ArnEquals"
-      variable = "aws:PrincipalArn"
-      values = setunion(
-        data.aws_iam_roles.admin_sso_roles.arns,
-        data.aws_iam_roles.security_sso_roles.arns,
-      )
+      identifiers = setunion(data.aws_iam_roles.admin_sso_roles.arns, data.aws_iam_roles.security_sso_roles.arns)
     }
   }
 }
@@ -82,46 +79,54 @@ data "aws_iam_policy_document" "security_audit_assume_role_descendants" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-    condition {
-      test     = "ArnEquals"
-      variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.security_audit_role_name}"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.security_audit_role_name}"]
     }
   }
 }
 
 data "aws_iam_policy_document" "security_audit_descendants" {
+  # Statement 1: These actions require Resources="*"
   statement {
-    sid = "AllowGeneralReadOnly"
     actions = [
       "dynamodb:ListTables",
       "ec2:DescribeInstances",
       "ec2:DescribeRegions",
-      "ec2:DescribeRepositories",
-      "ecr:ListImages",
-      "ecr:ListImages",
-      "ecs:DescribeTasks",
       "ecs:ListClusters",
-      "ecs:ListContainerInstances",
-      "ecs:ListTasks",
       "eks:ListClusters",
-      "eks:ListFargateProfiles",
       "lambda:ListFunctions",
-      "lambda:ListVersionsByFunction",
       "lightsail:GetInstances",
       "lightsail:GetRegions",
       "rds:DescribeDBClusters",
       "rds:DescribeDBInstances",
       "redshift:DescribeClusters",
       "s3:ListAllMyBuckets",
-      "s3:ListBuckets",
       "sagemaker:ListDomains",
       "sagemaker:ListEndpoints",
       "sts:GetCallerIdentity",
     ]
     resources = ["*"]
+  }
+
+  # Statement 2: Resource-scoped where supported
+  statement {
+    sid     = "AllowGeneralReadOnlyResourceScoped"
+    actions = [
+      "ecr:DescribeRepositories",
+      "ecr:ListImages",
+      "ecs:DescribeTasks",
+      "ecs:ListContainerInstances",
+      "ecs:ListTasks",
+      "eks:ListFargateProfiles",
+      "lambda:ListVersionsByFunction",
+    ]
+    resources = [
+      "arn:aws:ecr:*:*:repository/*",          # ECR repos
+      "arn:aws:ecs:*:*:cluster/*",             # ECS cluster (needed for ListContainerInstances)
+      "arn:aws:ecs:*:*:container-instance/*",  # ECS container-instance (needed for ListTasks)
+      "arn:aws:ecs:*:*:task/*",                # ECS tasks (DescribeTasks)
+      "arn:aws:eks:*:*:cluster/*",             # EKS cluster (ListFargateProfiles)
+      "arn:aws:lambda:*:*:function:*",         # Lambda function (ListVersionsByFunction)
+    ]
   }
 }
 
@@ -130,7 +135,7 @@ data "aws_iam_policy_document" "security_audit_root" {
   statement {
     sid       = "AllowAssumeMozillaSecurityAudit"
     actions   = ["sts:AssumeRole"]
-    resources = ["arn:aws:iam::*:role/${local.security_audit_role_name}"]
+    resources = formatlist("arn:aws:iam::%s:role/%s", local.child_account_list, local.security_audit_role_name)
   }
   statement {
     sid = "AllowOrganizationRead"
@@ -138,6 +143,7 @@ data "aws_iam_policy_document" "security_audit_root" {
       "organizations:DescribeOrganization",
       "organizations:ListAccounts",
     ]
+    # Both actions require Resources="*"
     resources = ["*"]
   }
 }
@@ -152,6 +158,12 @@ resource "aws_cloudformation_stack_set" "security_audit_descendants" {
   }
   operation_preferences {
     max_concurrent_percentage = 33
+  }
+
+  # AWS returns an AdministrationRoleARN even in SERVICE_MANAGED.
+  # Ignore it so plans stop showing an in-place update.
+  lifecycle {
+    ignore_changes = [administration_role_arn]
   }
 }
 
