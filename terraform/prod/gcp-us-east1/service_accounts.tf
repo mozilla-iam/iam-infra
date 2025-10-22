@@ -1,5 +1,7 @@
 # Service accounts for deployments.
 
+# It's this account that GitHub uses. See the policies in GCP for the full
+# picture.
 resource "google_service_account" "sso_dashboard" {
   account_id                   = "sso-dashboard"
   display_name                 = "sso-dashboard"
