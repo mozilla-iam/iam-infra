@@ -31,7 +31,7 @@ resource "google_clouddeploy_target" "dev" {
   execution_configs {
     usages            = ["RENDER", "DEPLOY"]
     execution_timeout = "3600s"
-    service_account = "sso-dashboard-prod@iam-auth0.iam.gserviceaccount.com"
+    service_account = google_service_account.sso_dashboard.email
   }
   require_approval = false
 }
@@ -46,7 +46,7 @@ resource "google_clouddeploy_target" "staging" {
   execution_configs {
     usages            = ["RENDER", "DEPLOY"]
     execution_timeout = "3600s"
-    service_account = "sso-dashboard-staging@iam-auth0.iam.gserviceaccount.com"
+    service_account = google_service_account.sso_dashboard_staging.email
   }
   require_approval = false
 }
@@ -61,7 +61,7 @@ resource "google_clouddeploy_target" "prod" {
   execution_configs {
     usages            = ["RENDER", "DEPLOY"]
     execution_timeout = "3600s"
-    service_account = "sso-dashboard-prod@iam-auth0.iam.gserviceaccount.com"
+    service_account = google_service_account.sso_dashboard_prod.email
   }
   require_approval = false
 }
