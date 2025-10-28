@@ -37,3 +37,40 @@ resource "google_compute_backend_service" "sso_dashboard_dev" {
     }
   }
 }
+
+resource "google_compute_managed_ssl_certificate" "sso_dashboard_dev" {
+  name        = "sso-dashboard-dev"
+  description = "SSO Dashboard Dev"
+  type        = "MANAGED"
+  managed {
+    domains = ["sso.allizom.org"]
+  }
+}
+
+resource "google_compute_global_address" "sso_dashboard_dev" {
+  name         = "sso-dashboard-dev"
+  address_type = "EXTERNAL"
+  ip_version   = "IPV4"
+}
+
+resource "google_compute_url_map" "sso_dashboard_dev" {
+  name            = "sso-dashboard-dev"
+  default_service = google_compute_backend_service.sso_dashboard_dev.self_link
+}
+
+resource "google_compute_target_https_proxy" "sso_dashboard_dev" {
+  name = "sso-dashboard-dev-target-proxy"
+  ssl_certificates = [
+    google_compute_managed_ssl_certificate.sso_dashboard_dev.self_link
+  ]
+  url_map = google_compute_url_map.sso_dashboard_dev.self_link
+}
+
+resource "google_compute_global_forwarding_rule" "sso_dashboard_dev" {
+  name                  = "sso-dashboard-dev"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  network_tier          = "PREMIUM"
+  port_range            = "443-443"
+  target                = google_compute_target_https_proxy.sso_dashboard_dev.self_link
+  ip_address            = google_compute_global_address.sso_dashboard_dev.address
+}
