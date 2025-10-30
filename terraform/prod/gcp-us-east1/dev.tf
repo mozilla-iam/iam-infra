@@ -1,3 +1,10 @@
+# Right now, we only have the SSO Dashboard imported. There's a couple of other
+# things which are dev but aren't included in this file, such as the: Auth0
+# logging webhook (CloudDeploy) and User Unblocking App (AppEngine).
+#
+# At some point, once we start importing/managing more things in Terraform,
+# we'll want to split this file up.
+
 data "google_cloud_run_v2_service" "sso_dashboard_dev" {
   name     = "sso-dashboard-dev"
   location = "us-east1"
@@ -43,7 +50,20 @@ resource "google_compute_managed_ssl_certificate" "sso_dashboard_dev" {
   description = "SSO Dashboard Dev"
   type        = "MANAGED"
   managed {
-    domains = ["sso.allizom.org"]
+    domains = [
+      "sso.allizom.org",
+    ]
+  }
+}
+
+resource "google_compute_managed_ssl_certificate" "waf_sso_dashboard_dev" {
+  name        = "waf-sso-dashboard-dev"
+  description = "SSO Dashboard Dev (WAF)"
+  type        = "MANAGED"
+  managed {
+    domains = [
+      "waf-sso-dashboard-dev.gcp-iam-auth0.sso.mozilla.com",
+    ]
   }
 }
 
@@ -61,7 +81,8 @@ resource "google_compute_url_map" "sso_dashboard_dev" {
 resource "google_compute_target_https_proxy" "sso_dashboard_dev" {
   name = "sso-dashboard-dev-target-proxy"
   ssl_certificates = [
-    google_compute_managed_ssl_certificate.sso_dashboard_dev.self_link
+    google_compute_managed_ssl_certificate.sso_dashboard_dev.self_link,
+    google_compute_managed_ssl_certificate.waf_sso_dashboard_dev.self_link,
   ]
   url_map = google_compute_url_map.sso_dashboard_dev.self_link
 }
