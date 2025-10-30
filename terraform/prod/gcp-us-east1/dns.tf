@@ -26,6 +26,14 @@ resource "google_dns_record_set" "waf_sso_dashboard_staging" {
   rrdatas      = [google_compute_global_address.sso_dashboard_staging.address]
 }
 
+resource "google_dns_record_set" "waf_sso_dashboard_prod" {
+  name         = "waf-sso-dashboard-prod.gcp-iam-auth0.sso.mozilla.com."
+  managed_zone = google_dns_managed_zone.gcp_iam_auth0.name
+  type         = "A"
+  ttl          = 300
+  rrdatas      = [google_compute_global_address.waf_sso_dashboard_prod.address]
+}
+
 # We'll need the following outputs to be copied over to our AWS Hosted Zone.
 
 output "gcp_iam_auth0_dns_zone_ns_records" {
