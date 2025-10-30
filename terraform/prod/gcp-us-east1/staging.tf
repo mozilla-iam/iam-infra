@@ -1,3 +1,11 @@
+# Until IAM-1653 is complete, staging shares some infrastructure with
+# production. This includes the global forwarding rule and the certificate.
+#
+# As a part of some cleanup (while doing IAM-1653), @bheesham, split this out.
+# This was done because updating the rules, etc, requires tainting resources
+# for Terraform to apply things in the correct order, which would mean
+# potential downtime in production.
+
 data "google_cloud_run_v2_service" "sso_dashboard_staging" {
   name     = "sso-dashboard-staging"
   location = "us-east1"
@@ -29,4 +37,43 @@ resource "google_compute_backend_service" "sso_dashboard_staging" {
     enable      = true
     sample_rate = 1
   }
+}
+
+resource "google_compute_managed_ssl_certificate" "waf_sso_dashboard_staging" {
+  name        = "waf-sso-dashboard-staging"
+  description = "SSO Dashboard Staging (WAF)"
+  type        = "MANAGED"
+  managed {
+    domains = [
+      "waf-sso-dashboard-stage.gcp-iam-auth0.sso.mozilla.com",
+    ]
+  }
+}
+
+resource "google_compute_global_address" "sso_dashboard_staging" {
+  name         = "sso-dashboard-staging"
+  address_type = "EXTERNAL"
+  ip_version   = "IPV4"
+}
+
+resource "google_compute_url_map" "sso_dashboard_staging" {
+  name            = "sso-dashboard-staging"
+  default_service = google_compute_backend_service.sso_dashboard_staging.self_link
+}
+
+resource "google_compute_target_https_proxy" "waf_sso_dashboard_staging" {
+  name = "sso-dashboard-stage-target-proxy"
+  ssl_certificates = [
+    google_compute_managed_ssl_certificate.waf_sso_dashboard_staging.self_link
+  ]
+  url_map = google_compute_url_map.sso_dashboard_staging.self_link
+}
+
+resource "google_compute_global_forwarding_rule" "sso_dashboard_staging" {
+  name                  = "sso-dashboard-staging"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  network_tier          = "PREMIUM"
+  port_range            = "443-443"
+  target                = google_compute_target_https_proxy.waf_sso_dashboard_staging.self_link
+  ip_address            = google_compute_global_address.sso_dashboard_staging.address
 }
