@@ -1,8 +1,9 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    certmanager.k8s.io/cluster-issuer: letsencrypt-production
+    cert-manager.io/issuer: letsencrypt-production
+    cert-manager.io/revision-history-limit: "1"
     kubernetes.io/ingress.class: nginx-monitoring
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   name: grafana
@@ -13,20 +14,20 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: grafana
-          servicePort: 3000
+          service:
+            name: grafana
+            port:
+              number: 3000
         path: /
-      # We are disabling serving the /metrics endpoint from the external Loadbalancer
-      # because it's not authenticated, so we leak Grafana metrics.
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: non-existent
-          servicePort: 3000
+          service:
+            name: non-existent
+            port:
+              number: 3000
         path: /metrics
+        pathType: ImplementationSpecific
   tls:
   - hosts:
     - grafana.infra.iam.mozilla.com
     secretName: grafana-cert-secret
-status:
-  loadBalancer:
-    ingress:
-    - hostname: a00435690f99111e8989b0ace417809a-10479801.us-west-2.elb.amazonaws.com
