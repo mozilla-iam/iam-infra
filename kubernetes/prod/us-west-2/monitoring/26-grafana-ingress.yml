@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    certmanager.k8s.io/cluster-issuer: letsencrypt-production
+    cert-manager.io/issuer: letsencrypt-production
     kubernetes.io/ingress.class: nginx-monitoring
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   name: grafana
