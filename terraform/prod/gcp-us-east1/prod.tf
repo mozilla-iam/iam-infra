@@ -39,15 +39,6 @@ resource "google_compute_backend_service" "sso_dashboard_prod" {
   }
 }
 
-resource "google_compute_managed_ssl_certificate" "sso_dashboard_prod" {
-  name        = "sso-dashboard-prod"
-  description = "SSL Certificates for both Stage and Prod"
-  type        = "MANAGED"
-  managed {
-    domains = ["sso.mozilla.com", "staging.sso.mozilla.com"]
-  }
-}
-
 resource "google_compute_managed_ssl_certificate" "waf_sso_dashboard_prod" {
   name        = "waf-sso-dashboard-prod"
   description = "SSO Dashboard Prod (WAF)"
@@ -59,42 +50,15 @@ resource "google_compute_managed_ssl_certificate" "waf_sso_dashboard_prod" {
   }
 }
 
-resource "google_compute_global_address" "sso_dashboard_prod" {
-  name         = "sso-dashboard"
-  address_type = "EXTERNAL"
-  ip_version   = "IPV4"
-}
-
 resource "google_compute_global_address" "waf_sso_dashboard_prod" {
   name         = "waf-sso-dashboard-prod"
   address_type = "EXTERNAL"
   ip_version   = "IPV4"
 }
 
-resource "google_compute_url_map" "sso_dashboard_prod" {
-  name            = "sso-dashboard"
-  default_service = google_compute_backend_service.sso_dashboard_prod.self_link
-  host_rule {
-    hosts        = ["staging.sso.mozilla.com"]
-    path_matcher = "path-matcher-1"
-  }
-  path_matcher {
-    default_service = google_compute_backend_service.sso_dashboard_staging.self_link
-    name            = "path-matcher-1"
-  }
-}
-
 resource "google_compute_url_map" "waf_sso_dashboard_prod" {
   name            = "waf-sso-dashboard-prod"
   default_service = google_compute_backend_service.sso_dashboard_prod.self_link
-}
-
-resource "google_compute_target_https_proxy" "sso_dashboard_prod" {
-  name = "sso-dashboard-target-proxy"
-  ssl_certificates = [
-    google_compute_managed_ssl_certificate.sso_dashboard_prod.self_link
-  ]
-  url_map = google_compute_url_map.sso_dashboard_prod.self_link
 }
 
 resource "google_compute_target_https_proxy" "waf_sso_dashboard_prod" {
@@ -103,15 +67,6 @@ resource "google_compute_target_https_proxy" "waf_sso_dashboard_prod" {
     google_compute_managed_ssl_certificate.waf_sso_dashboard_prod.self_link
   ]
   url_map = google_compute_url_map.waf_sso_dashboard_prod.self_link
-}
-
-resource "google_compute_global_forwarding_rule" "sso_dashboard_prod" {
-  name                  = "sso-dashboard"
-  load_balancing_scheme = "EXTERNAL_MANAGED"
-  network_tier          = "PREMIUM"
-  port_range            = "443-443"
-  target                = google_compute_target_https_proxy.sso_dashboard_prod.self_link
-  ip_address            = google_compute_global_address.sso_dashboard_prod.address
 }
 
 resource "google_compute_global_forwarding_rule" "waf_sso_dashboard_prod" {
