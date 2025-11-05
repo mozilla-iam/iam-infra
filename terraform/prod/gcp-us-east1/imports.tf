@@ -44,11 +44,6 @@ import {
 }
 
 import {
-  id = "projects/iam-auth0/global/sslCertificates/sso-dashboard-dev"
-  to = google_compute_managed_ssl_certificate.sso_dashboard_dev
-}
-
-import {
   id = "projects/iam-auth0/global/forwardingRules/sso-dashboard-dev"
   to = google_compute_global_forwarding_rule.sso_dashboard_dev
 }
