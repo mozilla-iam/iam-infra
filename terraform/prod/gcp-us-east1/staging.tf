@@ -1,10 +1,4 @@
-# Until IAM-1653 is complete, staging shares some infrastructure with
-# production. This includes the global forwarding rule and the certificate.
-#
-# As a part of some cleanup (while doing IAM-1653), @bheesham, split this out.
-# This was done because updating the rules, etc, requires tainting resources
-# for Terraform to apply things in the correct order, which would mean
-# potential downtime in production.
+# There may still be more resources we need to import (HTTP->HTTPS redirect).
 
 data "google_cloud_run_v2_service" "sso_dashboard_staging" {
   name     = "sso-dashboard-staging"

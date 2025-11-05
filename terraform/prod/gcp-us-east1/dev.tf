@@ -2,6 +2,8 @@
 # things which are dev but aren't included in this file, such as the: Auth0
 # logging webhook (CloudDeploy) and User Unblocking App (AppEngine).
 #
+# There's also the HTTP->HTTPS redirects.
+#
 # At some point, once we start importing/managing more things in Terraform,
 # we'll want to split this file up.
 
