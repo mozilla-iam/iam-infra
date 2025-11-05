@@ -45,17 +45,6 @@ resource "google_compute_backend_service" "sso_dashboard_dev" {
   }
 }
 
-resource "google_compute_managed_ssl_certificate" "sso_dashboard_dev" {
-  name        = "sso-dashboard-dev"
-  description = "SSO Dashboard Dev"
-  type        = "MANAGED"
-  managed {
-    domains = [
-      "sso.allizom.org",
-    ]
-  }
-}
-
 resource "google_compute_managed_ssl_certificate" "waf_sso_dashboard_dev" {
   name        = "waf-sso-dashboard-dev"
   description = "SSO Dashboard Dev (WAF)"
@@ -81,7 +70,6 @@ resource "google_compute_url_map" "sso_dashboard_dev" {
 resource "google_compute_target_https_proxy" "sso_dashboard_dev" {
   name = "sso-dashboard-dev-target-proxy"
   ssl_certificates = [
-    google_compute_managed_ssl_certificate.sso_dashboard_dev.self_link,
     google_compute_managed_ssl_certificate.waf_sso_dashboard_dev.self_link,
   ]
   url_map = google_compute_url_map.sso_dashboard_dev.self_link
