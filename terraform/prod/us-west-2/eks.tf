@@ -114,14 +114,16 @@ resource "helm_release" "aws-ebs-csi-driver" {
   version    = "2.19.0"
   namespace  = "kube-system"
 
-  set {
+  set = [{
     name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.ebs_csi_irsa_role.iam_role_arn
-  }
+  }]
 }
 
 module "ebs_csi_irsa_role" {
-  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.52.2"
+
   role_name             = "ebs-csi-driver-prod"
   attach_ebs_csi_policy = true
 
@@ -140,8 +142,8 @@ resource "helm_release" "cert-manager" {
   version    = "v1.17.2"
   namespace  = "cert-manager"
 
-  set {
+  set = [{
     name  = "installCRDs"
     value = "true"
-  }
+  }]
 }
