@@ -10,6 +10,14 @@ The Terraform code and Kubernetes manifests are organized by folders representin
 The Terraform code, as stated above is divided in folder representing environments and location. Also the resources needed for both environments staging and production will go to the global folder, like for example a policy allowing other AWS account to fetch metrics.
 Inside of each environment and location the code is organized in independent modules. This means that each of the components are maintaining its own state file rather than sharing one for all the resources. This design has mostly 2 implications that can be considered an advantage or a disadvantage. The first one is that you can issue `terraform delete` only affecting the resource that you want, think for example if we stop using Graylog, issuing a `terraform destroy` on the Graylog folder will delete the ES cluster and DNS name but leave the rest of the infrastructure as it is. The second implication is that in order to share the state we use `remote_state` pointing to the state file used by the resource for example most of the services need to know the VPC id and are adding it as a remote state.
 
+#### Exporting credentials
+
+Because we use an older version of the provider, you'll need to export your
+session's credentials using:
+
+```
+eval "$(aws configure export-credentials --profile iam-admin --format env)"
+```
 
 ### Kubernetes code
 The Kubernetes manifests present on this repository are organized in a similar fashion to the Terraform ones. Inside the Kubernetes folder we can find 2 more folder each one corresponding to one of the clusters: one for production and one for staging.

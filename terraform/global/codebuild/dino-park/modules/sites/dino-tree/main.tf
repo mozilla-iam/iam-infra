@@ -10,11 +10,6 @@ data "aws_kms_key" "ssm" {
 # CodeBuild and webhook
 #---
 
-resource "aws_codebuild_webhook" "webhook" {
-  project_name  = "${aws_codebuild_project.build.name}"
-  branch_filter = "^master$"
-}
-
 resource "aws_codebuild_project" "build" {
   name          = "${var.service_name}"
   description   = "CI pipeline for ${var.service_name}"
@@ -32,24 +27,24 @@ resource "aws_codebuild_project" "build" {
     privileged_mode = "true"
 
     environment_variable {
-      "name"  = "DOCKER_REPO"
-      "value" = "${aws_ecr_repository.registry.repository_url}"
+      name  = "DOCKER_REPO"
+      value = "${aws_ecr_repository.registry.repository_url}"
     }
 
     environment_variable {
-      "name"  = "PROJECT_NAME"
-      "value" = "${var.service_name}"
+      name  = "PROJECT_NAME"
+      value = "${var.service_name}"
     }
 
     environment_variable {
-      "name"  = "CLUSTER_NAME"
-      "value" = "kubernetes-production-01"
+      name  = "CLUSTER_NAME"
+      value = "kubernetes-production-01"
     }
 
     environment_variable {
-      "name"  = "DEPLOY_TOKEN"
-      "value" = "/iam/kubernetes/DEPLOY_TOKEN"
-      "type"  = "PARAMETER_STORE"
+      name  = "DEPLOY_TOKEN"
+      value = "/iam/kubernetes/DEPLOY_TOKEN"
+      type  = "PARAMETER_STORE"
     }
   }
 
@@ -58,8 +53,8 @@ resource "aws_codebuild_project" "build" {
     location  = "https://github.com/mozilla-iam/dino-tree.git"
   }
 
-  tags {
-    "App" = "${var.service_name}"
+  tags = {
+    App = "${var.service_name}"
   }
 }
 
