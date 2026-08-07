@@ -8,11 +8,6 @@ module "dino-tree-ci" {
   service_name = "dino-tree"
 }
 
-module "dino-park-search-ci" {
-  source       = "./modules/sites/dino-park-search"
-  service_name = "dino-park-search"
-}
-
 module "dino-park-mozillians-ci" {
   source       = "./modules/sites/dino-park-mozillians"
   service_name = "dino-park-mozillians"
