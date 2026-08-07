@@ -10,11 +10,6 @@ data "aws_kms_key" "ssm" {
 # CodeBuild and webhook
 #---
 
-resource "aws_codebuild_webhook" "webhook" {
-  project_name  = "${aws_codebuild_project.build.name}"
-  branch_filter = "^master$"
-}
-
 resource "aws_codebuild_project" "build" {
   name          = "${var.service_name}"
   description   = "CI pipeline for ${var.service_name}"

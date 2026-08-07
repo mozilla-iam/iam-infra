@@ -10,15 +10,10 @@ data "aws_kms_key" "ssm" {
 # CodeBuild and webhook
 #---
 
-resource "aws_codebuild_webhook" "webhook" {
-  project_name  = "${aws_codebuild_project.build.name}"
-  branch_filter = "^master$"
-}
-
 resource "aws_codebuild_project" "build" {
   name          = "${var.service_name}"
   description   = "CI pipeline for ${var.service_name}"
-  build_timeout = "10"
+  build_timeout = "60"
   service_role  = "${aws_iam_role.codebuild.arn}"
 
   artifacts {
@@ -26,40 +21,25 @@ resource "aws_codebuild_project" "build" {
   }
 
   environment {
-    compute_type    = "BUILD_GENERAL1_SMALL"
-    image           = "aws/codebuild/docker:17.09.0"
+    compute_type    = "BUILD_GENERAL1_LARGE"
+    image           = "aws/codebuild/standard:4.0"
     type            = "LINUX_CONTAINER"
     privileged_mode = "true"
 
     environment_variable {
-      "name"  = "DOCKER_REPO"
-      "value" = "${aws_ecr_repository.registry.repository_url}"
-    }
-
-    environment_variable {
-      "name"  = "PROJECT_NAME"
-      "value" = "${var.service_name}"
-    }
-
-    environment_variable {
-      "name"  = "CLUSTER_NAME"
-      "value" = "kubernetes-production-01"
-    }
-
-    environment_variable {
-      "name"  = "DEPLOY_TOKEN"
-      "value" = "/iam/kubernetes/DEPLOY_TOKEN"
-      "type"  = "PARAMETER_STORE"
+      name  = "DOCKER_REPO"
+      value = "${aws_ecr_repository.registry.repository_url}"
     }
   }
 
   source {
     type      = "GITHUB"
     location  = "https://github.com/mozilla-iam/dino-park-front-end.git"
+    buildspec = "buildspec.yml"
   }
 
-  tags {
-    "App" = "${var.service_name}"
+  tags = {
+    App = "${var.service_name}"
   }
 }
 

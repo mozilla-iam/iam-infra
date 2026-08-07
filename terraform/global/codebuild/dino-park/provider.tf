@@ -3,9 +3,7 @@
 #---
 
 provider "aws" {
-  region  = "us-west-2"
-  // https://discuss.hashicorp.com/t/hcsec-2021-12-codecov-security-event-and-hashicorp-gpg-key-exposure/23512
-  version = "v2.70.0"
+  region = "us-west-2"
 }
 
 terraform {
